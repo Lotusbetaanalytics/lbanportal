@@ -43,6 +43,10 @@ app.use(cors());
 
 app.use("/api/v1/staff/login", authRoute);
 
+app.get("/", (req, res) => {
+  return res.status(200).json({ msg: "This is the api for the lban portal" });
+});
+
 const PORT = process.env.PORT || 3000;
 
 const server = app.listen(

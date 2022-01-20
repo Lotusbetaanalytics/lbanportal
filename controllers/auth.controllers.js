@@ -9,6 +9,7 @@ const dotenv = require("dotenv").config();
 
 const postUserDetails = async (req, res) => {
   const { accessToken } = req.body;
+
   if (!accessToken) {
     return res
       .status(400)
@@ -23,20 +24,20 @@ const postUserDetails = async (req, res) => {
   };
 
   try {
-    const { data } = await axios(config);
+    const { data } = await axios(config); //get user data from active directory
 
-    let checkEmail = data.mail.split("@");
+    let checkEmail = data.mail.split("@"); //split the email address
     if (
       checkEmail[1] !== "lotusbetaanalytics.com" ||
-      !checkEmail.includes("lotusbetaanalytics.com")
+      !checkEmail.includes("lotusbetaanalytics.com") //check if the email address has lotusbetaanalytics.com domain
     ) {
       return res.status(400).json({ success: false, msg: "Invalid email" });
     }
     const { mail, displayName } = data;
 
-    const checkStaff = await Staff.findOne({ email: mail });
+    const checkStaff = await Staff.findOne({ email: mail }); //check if there is a staff with the email in the db
     if (checkStaff) {
-      const token = generateToken({ staff: checkStaff });
+      const token = generateToken({ staff: checkStaff }); //generate token
       return res.status(400).cookie("token", token).json({
         success: false,
         token,
@@ -45,7 +46,7 @@ const postUserDetails = async (req, res) => {
     }
 
     const newStaff = new Staff({ email: mail, fullname: displayName });
-    await newStaff.save();
+    await newStaff.save(); //add new user to the db
     const token = generateToken({ staff: newStaff });
     return res.status(200).cookie("token", token).json({
       success: true,
@@ -125,11 +126,11 @@ const uploadDp = async (req, res) => {
   }
 
   await Staff.findByIdAndUpdate(user._id, {
-    photo: uploadedImage.eager[0].secure_url,
+    photo: uploadedImage.eager[0].secure_url.toString("base64"),
   });
   res.status(200).json({
     success: true,
-    photo: uploadedImage.eager[0].secure_url,
+    photo: uploadedImage.eager[0].secure_url.toString("base64"),
   });
 };
 

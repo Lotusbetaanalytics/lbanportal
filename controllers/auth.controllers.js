@@ -36,8 +36,10 @@ const postUserDetails = async (req, res) => {
 
     const checkStaff = await Staff.findOne({ email: mail });
     if (checkStaff) {
-      return res.status(400).json({
+      const token = generateToken({ staff: checkStaff });
+      return res.status(400).cookie("token", token).json({
         success: false,
+        token,
         msg: "Staff already exists. Register with a different account.",
       });
     }

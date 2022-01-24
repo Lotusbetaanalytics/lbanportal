@@ -157,6 +157,13 @@ const uploadDp = async (req, res) => {
 //Get all user details
 const getAllStaff = async (req, res) => {
   try {
+    const { user } = req;
+    if (user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        msg: "You are not authorized to view all staff",
+      });
+    }
     const allStaff = await Staff.find();
     res.status(200).json({
       success: true,
@@ -173,13 +180,23 @@ const getAllStaff = async (req, res) => {
 const deleteStaff = async (req, res) => {
   try {
     const { user } = req;
+
     if (user.role !== "admin") {
       return res.status(403).json({
         success: false,
         msg: "You are not authorized to delete a staff member",
       });
     }
-    await Staff.findByIdAndDelete(user._id);
+
+    const foundStaff = await Staff.findByIdAndDelete(user._id);
+
+    if (!foundStaff) {
+      return res.status(404).json({
+        success: false,
+        msg: "Staff member not found",
+      });
+    }
+
     return res.status(200).json({
       success: true,
       msg: "Staff deleted",

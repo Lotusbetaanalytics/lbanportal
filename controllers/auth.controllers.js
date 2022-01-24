@@ -3,11 +3,11 @@ const cloudinary = require("cloudinary").v2;
 const cloudinarySetup = require("../config/cloudinarysetup");
 const fs = require("fs");
 const axios = require("axios");
-const { sign } = require("jsonwebtoken");
 const generateToken = require("../helpers/generateToken");
 const dotenv = require("dotenv").config();
 const { strToBase64 } = require("../utils/generic");
 
+//Register new users and send a token
 const postUserDetails = async (req, res) => {
   const { accessToken } = req.body;
 
@@ -63,79 +63,139 @@ const postUserDetails = async (req, res) => {
   }
 };
 
+//Upadate a user's details
 const updateUser = async (req, res) => {
-  const { user, body } = req;
-  if (!body) {
-    return res
-      .status(400)
-      .json({ success: false, msg: "No data was provided!" });
-  }
-  const staff = await Staff.findByIdAndUpdate(user._id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  res.status(200).json({
-    success: true,
-    data: staff,
-  });
-};
-
-const uploadDp = async (req, res) => {
-  const { file, user } = req;
-
-  const imageSizeLimit = 5 * 1024 * 1024; // 5Mb
-
-  if (!file || file.size <= 0) {
-    return res.status(400).json({
-      success: false,
-      msg: "Avatar field is required",
+  try {
+    const { user, body } = req;
+    if (!body) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "No data was provided!" });
+    }
+    const staff = await Staff.findByIdAndUpdate(user._id, req.body, {
+      new: true,
+      runValidators: true,
     });
-  }
 
-  if (file.size >= imageSizeLimit) {
-    return res.status(400).json({
-      success: false,
-      msg: `Uploaded image size limit is ${imageSizeLimit / 1024 / 1024}Mb`,
+    res.status(200).json({
+      success: true,
+      data: staff,
     });
-  }
-
-  //check if the file is an image
-  if (!file.mimetype.startsWith("image")) {
-    fs.unlinkSync(file.path); //delete the file from memory if it's not an image
-
-    return res.status(400).json({
-      success: false,
-      msg: "Uploaded file is not an image",
-    });
-  }
-
-  // upload file to cloud storage
-  await cloudinarySetup();
-  const uploadedImage = await cloudinary.uploader.upload(file.path, {
-    eager: [
-      { height: 100, width: 100, crop: "fill" },
-      { height: 150, width: 150, crop: "fill" },
-    ],
-  });
-
-  if (!uploadedImage) {
+  } catch (err) {
     return res.status(500).json({
       success: false,
-      msg: "Something went wrong",
+      msg: err.message,
     });
   }
-
-  //convert the image to base64
-  const base64Image = strToBase64(uploadedImage.eager[0].url);
-
-  await Staff.findByIdAndUpdate(user._id, {
-    photo: base64Image,
-  });
-  res.status(200).json({
-    success: true,
-    photo: base64Image,
-  });
 };
 
-module.exports = { postUserDetails, updateUser, uploadDp };
+// upload profile picture
+const uploadDp = async (req, res) => {
+  try {
+    const { file, user } = req;
+
+    const imageSizeLimit = 5 * 1024 * 1024; // 5Mb
+
+    if (!file || file.size <= 0) {
+      return res.status(400).json({
+        success: false,
+        msg: "Avatar field is required",
+      });
+    }
+
+    if (file.size >= imageSizeLimit) {
+      return res.status(400).json({
+        success: false,
+        msg: `Uploaded image size limit is ${imageSizeLimit / 1024 / 1024}Mb`,
+      });
+    }
+
+    //check if the file is an image
+    if (!file.mimetype.startsWith("image")) {
+      fs.unlinkSync(file.path); //delete the file from memory if it's not an image
+
+      return res.status(400).json({
+        success: false,
+        msg: "Uploaded file is not an image",
+      });
+    }
+
+    // upload file to cloud storage
+    await cloudinarySetup();
+    const uploadedImage = await cloudinary.uploader.upload(file.path, {
+      eager: [
+        { height: 100, width: 100, crop: "fill" },
+        { height: 150, width: 150, crop: "fill" },
+      ],
+    });
+
+    if (!uploadedImage) {
+      return res.status(500).json({
+        success: false,
+        msg: "Something went wrong",
+      });
+    }
+
+    //convert the image to base64
+    const base64Image = strToBase64(uploadedImage.eager[0].url);
+
+    await Staff.findByIdAndUpdate(user._id, {
+      photo: base64Image,
+    });
+    res.status(200).json({
+      success: true,
+      photo: base64Image,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
+//Get all user details
+const getAllStaff = async (req, res) => {
+  try {
+    const allStaff = await Staff.find();
+    res.status(200).json({
+      success: true,
+      data: allStaff,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
+const deleteStaff = async (req, res) => {
+  try {
+    const { user } = req;
+    if (user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        msg: "You are not authorized to delete a staff member",
+      });
+    }
+    await Staff.findByIdAndDelete(user._id);
+    return res.status(200).json({
+      success: true,
+      msg: "Staff deleted",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
+module.exports = {
+  postUserDetails,
+  updateUser,
+  uploadDp,
+  getAllStaff,
+  deleteStaff,
+};

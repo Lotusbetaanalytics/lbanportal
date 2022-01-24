@@ -41,7 +41,7 @@ const limiter = rateLimit({
 app.use(limiter);
 app.use(cors());
 
-app.use("/api/v1/staff/login", authRoute);
+app.use("/api/v1/staff/auth", authRoute);
 
 app.get("/", (req, res) => {
   return res.status(200).json({ msg: "This is the api for the lban portal" });

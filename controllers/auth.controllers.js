@@ -6,6 +6,7 @@ const axios = require("axios");
 const { sign } = require("jsonwebtoken");
 const generateToken = require("../helpers/generateToken");
 const dotenv = require("dotenv").config();
+const { strToBase64 } = require("../utils/generic");
 
 const postUserDetails = async (req, res) => {
   const { accessToken } = req.body;
@@ -125,12 +126,15 @@ const uploadDp = async (req, res) => {
     });
   }
 
+  //convert the image to base64
+  const base64Image = strToBase64(uploadedImage.eager[0].url);
+
   await Staff.findByIdAndUpdate(user._id, {
-    photo: uploadedImage.eager[0].secure_url.toString("base64"),
+    photo: base64Image,
   });
   res.status(200).json({
     success: true,
-    photo: uploadedImage.eager[0].secure_url.toString("base64"),
+    photo: base64Image,
   });
 };
 

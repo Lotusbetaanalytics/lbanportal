@@ -9,6 +9,7 @@ const rateLimit = require("express-rate-limit");
 const express = require("express");
 const connectDB = require("./config/db");
 const authRoute = require("./routes/auth.routes");
+const appraisalRoute = require("./routes/appraisal.routes")
 
 // configure express
 const app = express();
@@ -42,6 +43,7 @@ app.use(limiter);
 app.use(cors());
 
 app.use("/api/v1/staff/auth", authRoute);
+app.use("/api/v1/appraisal", appraisalRoute);
 
 app.get("/", (req, res) => {
   return res.status(200).json({ msg: "This is the api for the lban portal" });

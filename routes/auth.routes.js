@@ -13,9 +13,9 @@ router.post("/", postUserDetails); //register a new user
 
 router.put("/", verifyToken, updateUser); //update a user
 
-router.delete("/:id", verifyToken, deleteStaff); //delete a user
+router.delete("/", verifyToken, deleteStaff); //delete a user
 
-router.post("/userdp", verifyToken, upload.single("profilePic"), uploadDp); //upload profile picture
+router.patch("/userdp", verifyToken, upload.single("profilePic"), uploadDp); //upload profile picture
 
 router.get("/allstaff", verifyToken, getAllStaff); //get all staff"
 

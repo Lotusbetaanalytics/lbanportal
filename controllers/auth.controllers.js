@@ -72,10 +72,17 @@ const updateUser = async (req, res) => {
         .status(400)
         .json({ success: false, msg: "No data was provided!" });
     }
-    const staff = await Staff.findByIdAndUpdate(user._id, req.body, {
+    const staff = await Staff.findByIdAndUpdate(user._id, body, {
       new: true,
       runValidators: true,
     });
+
+    if (!staff) {
+      return res.status(400).json({
+        success: false,
+        msg: "Staff not found",
+      });
+    }
 
     res.status(200).json({
       success: true,
@@ -93,6 +100,15 @@ const updateUser = async (req, res) => {
 const uploadDp = async (req, res) => {
   try {
     const { file, user } = req;
+
+    const findUser = await Staff.findById(user._id);
+
+    if (!findUser) {
+      return res.status(404).json({
+        success: false,
+        msg: "Staff member not found",
+      });
+    }
 
     const imageSizeLimit = 5 * 1024 * 1024; // 5Mb
 
@@ -139,10 +155,17 @@ const uploadDp = async (req, res) => {
     //convert the image to base64
     const base64Image = strToBase64(uploadedImage.eager[0].url);
 
-    await Staff.findByIdAndUpdate(user._id, {
-      photo: base64Image,
-    });
-    res.status(200).json({
+    await Staff.findByIdAndUpdate(
+      user._id,
+      {
+        photo: base64Image,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    return res.status(200).json({
       success: true,
       photo: base64Image,
     });
@@ -164,8 +187,16 @@ const getAllStaff = async (req, res) => {
         msg: "You are not authorized to view all staff",
       });
     }
-    const allStaff = await Staff.find().lean();
-    res.status(200).json({
+    const allStaff = await Staff.find().lean().populate("role");
+
+    if (!allStaff) {
+      return res.status(400).json({
+        success: false,
+        msg: "No staff found",
+      });
+    }
+
+    return res.status(200).json({
       success: true,
       data: allStaff,
     });
@@ -181,20 +212,19 @@ const deleteStaff = async (req, res) => {
   try {
     const { user } = req;
 
+    if (user.role !== "Admin") {
+      return res.status(403).json({
+        success: false,
+        msg: "You are not authorized to delete a staff member",
+      });
+    }
+
     const foundStaff = await Staff.findByIdAndDelete(user._id);
 
     if (!foundStaff) {
       return res.status(404).json({
         success: false,
         msg: "Staff member not found",
-      });
-    }
-    console.log(user.role);
-
-    if (user.role !== "Admin") {
-      return res.status(403).json({
-        success: false,
-        msg: "You are not authorized to delete a staff member",
       });
     }
 

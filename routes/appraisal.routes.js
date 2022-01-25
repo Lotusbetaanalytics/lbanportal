@@ -5,9 +5,9 @@ const {
   getCurrentAppraisal,
   getAllAppraisal,
   updateAppraisal,
-  deleteAppraisal
+  deleteAppraisal,
 } = require("../controllers/appraisal.controllers");
-const verifyToken = require("../middlewares/auth.middleware");
+const { verifyToken } = require("../middlewares/auth.middleware");
 
 router.post("/", createAppraisal); // create an appraisal
 

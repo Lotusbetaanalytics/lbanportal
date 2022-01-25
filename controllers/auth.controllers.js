@@ -181,19 +181,20 @@ const deleteStaff = async (req, res) => {
   try {
     const { user } = req;
 
-    if (user.role !== "Admin") {
-      return res.status(403).json({
-        success: false,
-        msg: "You are not authorized to delete a staff member",
-      });
-    }
-
     const foundStaff = await Staff.findByIdAndDelete(user._id);
 
     if (!foundStaff) {
       return res.status(404).json({
         success: false,
         msg: "Staff member not found",
+      });
+    }
+    console.log(user.role);
+
+    if (user.role !== "Admin") {
+      return res.status(403).json({
+        success: false,
+        msg: "You are not authorized to delete a staff member",
       });
     }
 

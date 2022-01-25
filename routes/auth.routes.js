@@ -11,7 +11,7 @@ const verifyToken = require("../middlewares/auth.middleware");
 
 router.post("/", postUserDetails); //register a new user
 
-router.patch("/", verifyToken, updateUser); //update a user
+router.put("/", verifyToken, updateUser); //update a user
 
 router.delete("/:id", verifyToken, deleteStaff); //delete a user
 

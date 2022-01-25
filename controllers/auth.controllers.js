@@ -27,7 +27,7 @@ const postUserDetails = async (req, res) => {
   try {
     const { data } = await axios(config); //get user data from active directory
 
-    let checkEmail = data.mail.split("@"); //split the email address
+    const checkEmail = data.mail.split("@"); //split the email address
     if (
       checkEmail[1] !== "lotusbetaanalytics.com" ||
       !checkEmail.includes("lotusbetaanalytics.com") //check if the email address has lotusbetaanalytics.com domain
@@ -158,13 +158,13 @@ const uploadDp = async (req, res) => {
 const getAllStaff = async (req, res) => {
   try {
     const { user } = req;
-    if (user.role !== "admin") {
+    if (user.role !== "Admin") {
       return res.status(403).json({
         success: false,
         msg: "You are not authorized to view all staff",
       });
     }
-    const allStaff = await Staff.find();
+    const allStaff = await Staff.find().lean();
     res.status(200).json({
       success: true,
       data: allStaff,
@@ -181,7 +181,7 @@ const deleteStaff = async (req, res) => {
   try {
     const { user } = req;
 
-    if (user.role !== "admin") {
+    if (user.role !== "Admin") {
       return res.status(403).json({
         success: false,
         msg: "You are not authorized to delete a staff member",

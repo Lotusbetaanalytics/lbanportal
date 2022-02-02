@@ -126,10 +126,7 @@ const updateAppraisal = async (req, res) => {
 //Delete an appraisal
 const deleteAppraisal = async (req, res) => {
   try {
-    const appraisal = await Appraisal.findByIdAndUpdate(req.params.appraisal_id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const appraisal = await Appraisal.findByIdAndDelete(req.params.appraisal_id);
     if (!appraisal) {
       return res
         .status(400)

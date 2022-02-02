@@ -19,6 +19,6 @@ router.patch("/:id", verifyToken, startAppraisal); // start appraisal
 
 router.patch("/:id", verifyToken, updateAppraisal); // update appraisal
 
-router.patch("/:id", verifyToken, deleteAppraisal); // deleteAppraisal
+router.delete("/:id", verifyToken, deleteAppraisal); // deleteAppraisal
 
 module.exports = router;

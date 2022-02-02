@@ -17,3 +17,5 @@ router.get("/current", getAllAppraisalA); // get appraisalA
 router.patch("/:id", verifyToken, updateAppraisalA); // update appraisalA
 
 router.delete("/:id", verifyToken, deleteAppraisalA); // delete appraisalA
+
+module.exports = router;

@@ -40,15 +40,15 @@ const postUserDetails = async (req, res) => {
     if (checkStaff) {
       const token = generateToken({ staff: checkStaff }); //generate token
       return res.status(400).cookie("token", token).json({
-        success: false,
+        success: true,
         token,
-        msg: "Staff already exists. Register with a different account.",
+        msg: "Staff already exists. Please login",
       });
     }
 
     const newStaff = new Staff({ email: mail, fullname: displayName });
     await newStaff.save(); //add new user to the db
-    const token = generateToken({ staff: newStaff });
+    const token = generateToken({ staff: newStaff }); //generate token
     return res.status(200).cookie("token", token).json({
       success: true,
       msg: "Staff successfuly added",

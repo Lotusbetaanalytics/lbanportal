@@ -16,7 +16,7 @@ const verifyToken = async (req, res, next) => {
           .json({ message: "You are not authorized. Token is invalid." });
       }
       const { staff } = decoded;
-      req.user = staff._id;
+      req.user = staff._id; //tokenize the user's id
       next();
     });
   } catch {
@@ -48,7 +48,7 @@ const verifyTokenAdmin = async (req, res, next) => {
           message: "You are not authorized to perform this action.",
         });
       }
-      req.user = staff._id;
+      req.user = staff._id; //tokenize the user's id
       next();
     });
   } catch {

@@ -52,7 +52,7 @@ const getCurrentResult = async (req, res) => {
   try {
     const appraisal = await Appraisal.findOne({ status: "started"})
     const result = await Result.findOne({
-      status: "Started",
+      // status: "Started",
       user: req.user,
       session: appraisal.session,
       quarter: appraisal.quarter,

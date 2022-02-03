@@ -2,11 +2,22 @@ const mongoose = require("mongoose");
 
 const ResultSchema = new mongoose.Schema({
   score: {
-    type: Number,
-    required: [true, "Please add Score"],
+    type: Object,
+    default: {
+      financial: { type: Number, default: 0, max: 25 / 100 },
+      customer: { type: Number, default: 0, max: 25 / 100 },
+      internal: { type: Number, default: 0, max: 25 / 100 },
+      innovationlearningandgrowth: { type: Number, default: 0, max: 25 / 100 },
+    },
   },
   managerscore: {
-    type: Number,
+    type: Object,
+    default: {
+      financial: { type: Number, default: 0, max: 25 / 100 },
+      customer: { type: Number, default: 0, max: 25 / 100 },
+      internal: { type: Number, default: 0, max: 25 / 100 },
+      innovationlearningandgrowth: { type: Number, default: 0, max: 25 / 100 },
+    },
   },
   overall: {
     type: Number,

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Result = require('./Result')
 
 const InitiativeSchema = new mongoose.Schema({
   perspective: {
@@ -28,6 +29,11 @@ const InitiativeSchema = new mongoose.Schema({
     required: true,
     ref: "Staff",
   },
+  result: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "Result",
+  },
   year: {
     type: String,
     required: true,
@@ -37,5 +43,12 @@ const InitiativeSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+
+InitiativeSchema.pre("save", async function (next) {
+  defaultResult = await Result.create({session: this.session, quarter: this.quarter, user: this.user})
+  this.result = defaultResult.id
+  // this.save()
+})
 
 module.exports = mongoose.model("Initiative", InitiativeSchema);

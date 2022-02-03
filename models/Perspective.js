@@ -57,19 +57,19 @@ const PerspectiveSchema = new mongoose.Schema({
       ],
     },
   },
-  scores: {
-    type: Object,
-    default: {
-      financial: { type: Number, default: 0, max: 25 / 100 },
-      customer: { type: Number, default: 0, max: 25 / 100 },
-      internal: { type: Number, default: 0, max: 25 / 100 },
-      innovationlearningandgrowth: { type: Number, default: 0, max: 25 / 100 },
-    },
-  },
-  totalScore: {
-    type: Number,
-    default: 0,
-  },
+  //   scores: {
+  //     type: Object,
+  //     default: {
+  //       financial: { type: Number, default: 0, max: 25 / 100 },
+  //       customer: { type: Number, default: 0, max: 25 / 100 },
+  //       internal: { type: Number, default: 0, max: 25 / 100 },
+  //       innovationlearningandgrowth: { type: Number, default: 0, max: 25 / 100 },
+  //     },
+  //   },
+  //   totalScore: {
+  //     type: Number,
+  //     default: 0,
+  //   },
 });
 
 module.exports = mongoose.model("Perspective", PerspectiveSchema);

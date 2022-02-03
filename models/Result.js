@@ -4,19 +4,19 @@ const ResultSchema = new mongoose.Schema({
   score: {
     type: Object,
     default: {
-      financial: { type: Number, default: 0, max: 25 / 100 },
-      customer: { type: Number, default: 0, max: 25 / 100 },
-      internal: { type: Number, default: 0, max: 25 / 100 },
-      innovationlearningandgrowth: { type: Number, default: 0, max: 25 / 100 },
+      financial: 0,
+      customer: 0,
+      internal: 0,
+      innovationlearningandgrowth: 0,
     },
   },
   managerscore: {
     type: Object,
     default: {
-      financial: { type: Number, default: 0, max: 25 / 100 },
-      customer: { type: Number, default: 0, max: 25 / 100 },
-      internal: { type: Number, default: 0, max: 25 / 100 },
-      innovationlearningandgrowth: { type: Number, default: 0, max: 25 / 100 },
+      financial: 0,
+      customer: 0,
+      internal: 0,
+      innovationlearningandgrowth: 0,
     },
   },
   overall: {

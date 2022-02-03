@@ -46,7 +46,7 @@ const InitiativeSchema = new mongoose.Schema({
 
 
 InitiativeSchema.pre("save", async function (next) {
-  defaultResult = await Result.create({session: this.session, quarter: this.quarter, user: this.user})
+  defaultResult = await Result.create({session: this.session, user: this.user})
   this.result = defaultResult.id
   // this.save()
 })

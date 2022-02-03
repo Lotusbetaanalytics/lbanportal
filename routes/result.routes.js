@@ -8,7 +8,7 @@ const {
   updateResult,
   deleteResult
 } = require("../controllers/result.controllers")
-const verifyToken = require("../middlewares/auth.middleware")
+const { verifyToken } = require("../middlewares/auth.middleware")
 
 router.post("/", createResult); // create an result
 

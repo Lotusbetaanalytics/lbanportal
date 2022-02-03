@@ -31,7 +31,7 @@ const InitiativeSchema = new mongoose.Schema({
   },
   result: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
+    // required: true,
     ref: "Result",
   },
   year: {

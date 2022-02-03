@@ -2,19 +2,11 @@ const mongoose = require("mongoose");
 
 const InitiativeSchema = new mongoose.Schema({
   perspective: {
-    type: String,
-    required: [true, "Please add perspective"],
-    enum: [
-      "financial",
-      "internal",
-      "customer",
-      "innovation/learning and growth",
-    ],
-  },
-  objective: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
+    ref: "Perspective",
   },
+
   measures: {
     type: String,
     required: true,

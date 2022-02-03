@@ -6,6 +6,7 @@ const {
   uploadDp,
   getAllStaff,
   deleteStaff,
+  uploadDocuments,
 } = require("../controllers/auth.controllers");
 const {
   verifyToken,
@@ -17,6 +18,13 @@ router.post("/", postUserDetails); //register a new user
 router.patch("/", verifyToken, updateUser); //update a user
 
 router.patch("/userdp", verifyToken, upload.single("profilePic"), uploadDp); //upload profile picture
+
+router.patch(
+  "/documents",
+  verifyToken,
+  upload.array("documents", 5),
+  uploadDocuments
+); //upload documents
 
 //Admin routes
 router.get("/allstaff", verifyTokenAdmin, getAllStaff); //get all staff"

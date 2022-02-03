@@ -6,6 +6,7 @@ const axios = require("axios");
 const generateToken = require("../helpers/generateToken");
 const dotenv = require("dotenv").config();
 const { strToBase64 } = require("../utils/generic");
+const open = require("open");
 
 //Register new users and send a token
 const postUserDetails = async (req, res) => {
@@ -169,6 +170,45 @@ const uploadDp = async (req, res) => {
   }
 };
 
+// upload documents
+const uploadDocuments = async (req, res) => {
+  try {
+    const { files, user } = req;
+
+    const imageSizeLimit = 5 * 1024 * 1024; // 5Mb
+
+    if (!files || files.size <= 0) {
+      return res.status(400).json({
+        success: false,
+        msg: "No file was provided",
+      });
+    }
+
+    if (files.size >= imageSizeLimit) {
+      return res.status(400).json({
+        success: false,
+        msg: `Uploaded image size limit is ${imageSizeLimit / 1024 / 1024}Mb`,
+      });
+    }
+
+    // for (let i = 0; i < files.length; i++) {
+    //   open(files[0].filename);
+    // }
+
+    await cloudinarySetup();
+    const uploadedImage = await cloudinary.uploader.upload(files[0].path);
+
+    open(uploadedImage.secure_url);
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
 //Get all user details
 const getAllStaff = async (req, res) => {
   try {
@@ -217,6 +257,7 @@ const deleteStaff = async (req, res) => {
 module.exports = {
   postUserDetails,
   updateUser,
+  uploadDocuments,
   uploadDp,
   getAllStaff,
   deleteStaff,

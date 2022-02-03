@@ -2,11 +2,18 @@ const router = require("express").Router();
 const {
   addInitiative,
   removeInitiative,
+  updateInitiativeWithScore,
+  getInitiatives,
+  getStaffInitiatives,
 } = require("../controllers/initiative.controller");
 const { verifyToken } = require("../middlewares/auth.middleware");
 
-router.post("/add", verifyToken, addInitiative);
+router.post("/add", verifyToken, addInitiative); //staff add initiative
+router.patch("/add/:id", verifyToken, updateInitiativeWithScore); //manager add score to staff initiative
 
-router.delete("/remove", verifyToken, removeInitiative);
+router.get("/", verifyToken, getInitiatives); //staff initiatives
+router.get("/:id", verifyToken, getStaffInitiatives); //manager get single staff initiatives
+
+router.delete("/remove/:id", verifyToken, removeInitiative);
 
 module.exports = router;

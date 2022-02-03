@@ -3,7 +3,7 @@ const Appraisal = require("../models/Appraisal")
 //Create an appraisal
 const createAppraisal = async (req, res) => {
   try {
-    const { user, body } = req;
+    const { body } = req;
     if (!body) {
       return res
         .status(400)
@@ -59,7 +59,7 @@ const getCurrentAppraisal = async (req, res) => {
     const appraisal = await Appraisal.findOne({ status: "Started" });
     if (!appraisal) {
       return res
-        .status(400)
+        .status(404)
         .json({ success: false, msg: "Appraisal not found!" });
     }
     
@@ -75,32 +75,32 @@ const getCurrentAppraisal = async (req, res) => {
   }
 };
 
-//Get all appraisals
-const getAllAppraisal = async (req, res) => {
-  try {
-    const appraisal = await Appraisal.find({});
-    if (!appraisal) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Appraisals not found!" });
-    }
+// //Get all appraisals
+// const getAllAppraisal = async (req, res) => {
+//   try {
+//     const appraisal = await Appraisal.find({});
+//     if (!appraisal) {
+//       return res
+//         .status(404)
+//         .json({ success: false, msg: "Appraisals not found!" });
+//     }
     
-    res.status(200).json({
-      success: true,
-      data: appraisal,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       data: appraisal,
+//     });
+//   } catch (err) {
+//     return res.status(500).json({
+//       success: false,
+//       msg: err.message,
+//     });
+//   }
+// };
 
 //Upadate an appraisal's details
 const updateAppraisal = async (req, res) => {
   try {
-    const { user, body } = req;
+    const { body } = req;
     if (!body) {
       return res
         .status(400)
@@ -129,7 +129,7 @@ const deleteAppraisal = async (req, res) => {
     const appraisal = await Appraisal.findByIdAndDelete(req.params.appraisal_id);
     if (!appraisal) {
       return res
-        .status(400)
+        .status(404)
         .json({ success: false, msg: "Appraisal not found!" });
     }
     
@@ -149,7 +149,7 @@ module.exports = {
   createAppraisal,
   startAppraisal,
   getCurrentAppraisal,
-  getAllAppraisal,
+  // getAllAppraisal,
   updateAppraisal,
   deleteAppraisal
 }

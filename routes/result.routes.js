@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const {
   createResult,
-  getAllResult,
+  // getAllResult,
   getCurrentResult,
   getQuarterlyResult,
   getResult,
@@ -12,7 +12,7 @@ const verifyToken = require("../middlewares/auth.middleware")
 
 router.post("/", createResult); // create an result
 
-router.get("/", getAllResult); // get all results
+// router.get("/", getAllResult); // get all results
 
 router.get("/current/", getCurrentResult); // get current result
 

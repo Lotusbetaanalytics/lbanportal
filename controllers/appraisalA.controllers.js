@@ -1,6 +1,6 @@
 const AppraisalA = require("../models/AppraisalA")
 
-//Create an appraisal
+//Create an appraisalA
 const createAppraisalA = async (req, res) => {
   try {
     const { body } = req;
@@ -23,27 +23,27 @@ const createAppraisalA = async (req, res) => {
   }
 };
 
-//Get all appraisalAs
-const getAllAppraisalA = async (req, res) => {
-  try {
-    const appraisalA = await AppraisalA.find({});
-    if (!appraisalA) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "AppraisalAs not found!" });
-    }
+// //Get all appraisalAs
+// const getAllAppraisalA = async (req, res) => {
+//   try {
+//     const appraisalA = await AppraisalA.find({});
+//     if (!appraisalA) {
+//       return res
+//         .status(404)
+//         .json({ success: false, msg: "AppraisalAs not found!" });
+//     }
     
-    res.status(200).json({
-      success: true,
-      data: appraisalA,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       data: appraisalA,
+//     });
+//   } catch (err) {
+//     return res.status(500).json({
+//       success: false,
+//       msg: err.message,
+//     });
+//   }
+// };
 
 //Get appraisalA by ID
 const getAppraisalA = async (req, res) => {
@@ -51,7 +51,7 @@ const getAppraisalA = async (req, res) => {
     const appraisalA = await AppraisalA.findById(req.params.id);
     if (!appraisalA) {
       return res
-        .status(400)
+        .status(404)
         .json({ success: false, msg: "AppraisalAs not found!" });
     }
     
@@ -96,13 +96,10 @@ const updateAppraisalA = async (req, res) => {
 //Delete an appraisalA using ID
 const deleteAppraisalA = async (req, res) => {
   try {
-    const appraisalA = await AppraisalA.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const appraisalA = await AppraisalA.findByIdAndDelete(req.params.id);
     if (!appraisalA) {
       return res
-        .status(400)
+        .status(404)
         .json({ success: false, msg: "AppraisalA not found!" });
     }
     
@@ -121,7 +118,7 @@ const deleteAppraisalA = async (req, res) => {
 module.exports = {
   createAppraisalA,
   getAppraisalA,
-  getAllAppraisalA,
+  // getAllAppraisalA,
   updateAppraisalA,
   deleteAppraisalA
 }

@@ -24,27 +24,27 @@ const createResult = async (req, res) => {
   }
 };
 
-//Get all results
-const getAllResult = async (req, res) => {
-  try {
-    const result = await Result.find({});
-    if (!result) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Results not found!" });
-    }
+// //Get all results
+// const getAllResult = async (req, res) => {
+//   try {
+//     const result = await Result.find({});
+//     if (!result) {
+//       return res
+//         .status(404)
+//         .json({ success: false, msg: "Results not found!" });
+//     }
     
-    res.status(200).json({
-      success: true,
-      data: result,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       data: result,
+//     });
+//   } catch (err) {
+//     return res.status(500).json({
+//       success: false,
+//       msg: err.message,
+//     });
+//   }
+// };
 
 
 //Get the current appraisal result for a staff
@@ -53,6 +53,7 @@ const getCurrentResult = async (req, res) => {
     const appraisal = await Appraisal.findOne({ status: "started"})
     const result = await Result.findOne({
       status: "Started",
+      user: req.user,
       session: appraisal.session,
       quarter: appraisal.quarter,
     });
@@ -100,7 +101,7 @@ const getQuarterlyResult = async (req, res) => {
     });
     // if (!firstQuarterResult || !secondQuarterResult || !thirdQuarterResult || !fourthQuarterResult) {
     //   return res
-    //     .status(400)
+    //     .status(404)
     //     .json({ success: false, msg: "Results not found!" });
     // }
     
@@ -127,7 +128,7 @@ const getResult = async (req, res) => {
     const result = await Result.findById(req.params.id);
     if (!result) {
       return res
-        .status(400)
+        .status(404)
         .json({ success: false, msg: "Result not found!" });
     }
     
@@ -175,7 +176,7 @@ const deleteResult = async (req, res) => {
     const result = await Result.findByIdAndDelete(req.params.result_id);
     if (!result) {
       return res
-        .status(400)
+        .status(404)
         .json({ success: false, msg: "Result not found!" });
     }
     
@@ -193,7 +194,7 @@ const deleteResult = async (req, res) => {
 
 module.exports = {
   createResult,
-  getAllResult,
+  // getAllResult,
   getCurrentResult,
   getQuarterlyResult,
   getResult,

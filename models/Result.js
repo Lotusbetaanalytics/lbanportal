@@ -31,7 +31,7 @@ const ResultSchema = new mongoose.Schema({
   },
   quarter: {
     type: String,
-    // required: [true, "Please add Quarter"],
+    required: [true, "Please add Quarter"],
   },
   status: {
     type: String,

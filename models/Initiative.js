@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Result = require('./Result')
+const current = require("../utils/currentAppraisalDetails")
 
 const InitiativeSchema = new mongoose.Schema({
   perspective: {
@@ -46,9 +47,12 @@ const InitiativeSchema = new mongoose.Schema({
 
 
 InitiativeSchema.pre("save", async function (next) {
-  defaultResult = await Result.create({session: this.session, user: this.user})
-  this.result = defaultResult.id
-  // this.save()
+  const {currentSession, currentQuarter} = await current()
+
+  if (currentSession && currentQuarter) {
+    defaultResult = await Result.create({session: this.session, quarter: currentQuarter, user: this.user})
+    this.result = defaultResult.id
+  }
 })
 
 module.exports = mongoose.model("Initiative", InitiativeSchema);

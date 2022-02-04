@@ -14,9 +14,9 @@ router.post("/", createResult); // create an result
 
 // router.get("/", getAllResult); // get all results
 
-router.get("/current/", getCurrentResult); // get current result
+router.get("/current", getCurrentResult); // get current result
 
-router.get("/quaterly/", getQuarterlyResult); // get current result
+router.get("/quaterly", getQuarterlyResult); // get current result
 
 router.patch("/:id", verifyToken, getResult); // get result by id
 

@@ -75,27 +75,49 @@ const getCurrentAppraisal = async (req, res) => {
   }
 };
 
-// //Get all appraisals
-// const getAllAppraisal = async (req, res) => {
-//   try {
-//     const appraisal = await Appraisal.find({});
-//     if (!appraisal) {
-//       return res
-//         .status(404)
-//         .json({ success: false, msg: "Appraisals not found!" });
-//     }
+//Get all appraisals
+const getAllAppraisal = async (req, res) => {
+  try {
+    const appraisal = await Appraisal.find({});
+    if (!appraisal) {
+      return res
+        .status(404)
+        .json({ success: false, msg: "Appraisals not found!" });
+    }
     
-//     res.status(200).json({
-//       success: true,
-//       data: appraisal,
-//     });
-//   } catch (err) {
-//     return res.status(500).json({
-//       success: false,
-//       msg: err.message,
-//     });
-//   }
-// };
+    res.status(200).json({
+      success: true,
+      data: appraisal,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
+//Get an appraisal by ID
+const getAppraisal = async (req, res) => {
+  try {
+    const appraisal = await Appraisal.findById(req.params.id);
+    if (!appraisal) {
+      return res
+        .status(404)
+        .json({ success: false, msg: "Appraisal not found!" });
+    }
+    
+    res.status(200).json({
+      success: true,
+      data: appraisal,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
 
 //Upadate an appraisal's details
 const updateAppraisal = async (req, res) => {
@@ -149,7 +171,8 @@ module.exports = {
   createAppraisal,
   startAppraisal,
   getCurrentAppraisal,
-  // getAllAppraisal,
+  getAllAppraisal,
+  getAppraisal,
   updateAppraisal,
   deleteAppraisal
 }

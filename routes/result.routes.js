@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const {
   createResult,
-  // getAllResult,
+  getAllResult,
   getCurrentResult,
   getQuarterlyResult,
   getResult,
@@ -10,15 +10,15 @@ const {
 } = require("../controllers/result.controllers")
 const { verifyToken } = require("../middlewares/auth.middleware")
 
-router.post("/", createResult); // create an result
+router.post("/", verifyToken, createResult); // create an result
 
-// router.get("/", getAllResult); // get all results
+router.get("/", getAllResult); // get all results
 
-router.get("/current", getCurrentResult); // get current result
+router.get("/current", verifyToken, getCurrentResult); // get current result
 
-router.get("/quaterly", getQuarterlyResult); // get current result
+router.get("/quarterly", verifyToken, getQuarterlyResult); // get quarterly result
 
-router.patch("/:id", verifyToken, getResult); // get result by id
+router.get("/:id", verifyToken, getResult); // get result by id
 
 router.patch("/:id", verifyToken, updateResult); // update result
 

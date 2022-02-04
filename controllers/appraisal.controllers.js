@@ -33,7 +33,7 @@ const startAppraisal = async (req, res) => {
         .json({ success: false, msg: "An Appraisal has been started previously, stop to start a new one" });
     }
     const appraisal = await Appraisal.findByIdAndUpdate(
-      req.params.appraisal_id,
+      req.params.id,
       {status: "Started"},
       {
         new: true,
@@ -128,7 +128,7 @@ const updateAppraisal = async (req, res) => {
         .status(400)
         .json({ success: false, msg: "No data was provided!" });
     }
-    const appraisal = await Appraisal.findByIdAndUpdate(req.params.appraisal_id, req.body, {
+    const appraisal = await Appraisal.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
@@ -148,7 +148,7 @@ const updateAppraisal = async (req, res) => {
 //Delete an appraisal
 const deleteAppraisal = async (req, res) => {
   try {
-    const appraisal = await Appraisal.findByIdAndDelete(req.params.appraisal_id);
+    const appraisal = await Appraisal.findByIdAndDelete(req.params.id);
     if (!appraisal) {
       return res
         .status(404)

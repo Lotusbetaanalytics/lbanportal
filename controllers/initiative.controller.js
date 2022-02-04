@@ -1,5 +1,7 @@
 const UserInitiative = require("../models/Initiative");
 const Perspective = require("../models/Perspective");
+const Result = require("../models/Result");
+const Staff = require("../models/Staff");
 
 const addInitiative = async (req, res) => {
   try {
@@ -34,10 +36,11 @@ const addInitiative = async (req, res) => {
   }
 };
 
-//Manager score staff initiative
+//controller for score for staff initiative
 const updateInitiativeWithScore = async (req, res) => {
   try {
-    const { body, params } = req;
+    const { body, params, user } = req;
+
     const { financial, customer, internal, learning } = body;
 
     if (!financial || !customer || !internal || !learning) {
@@ -46,28 +49,43 @@ const updateInitiativeWithScore = async (req, res) => {
         .json({ success: false, msg: "No data was provided!" });
     }
 
-    const foundPerspective = await Perspective.findById(params.id);
+    const foundResult = await Result.findById(params.id);
 
-    if (!foundPerspective) {
-      return res.status(400).json({
+    if (!foundResult) {
+      return res.status(404).json({
         success: false,
-        msg: "Initiative not found",
+        msg: "Result details not found",
       });
     }
+    const checkStaff = await Staff.findById(user);
 
-    foundPerspective.scores.financial = financial;
-    foundPerspective.scores.internal = internal;
-    foundPerspective.scores.customer = customer;
-    foundPerspective.scores.innovationlearningandgrowth = learning;
-    foundPerspective.totalScore = financial + customer + internal + learning;
+    if (checkStaff.isManager) {
+      foundResult.managerscore.financial = financial;
+      foundResult.managerscore.internal = internal;
+      foundResult.managerscore.customer = customer;
+      foundResult.managerscore.innovationlearningandgrowth = learning;
 
-    await foundPerspective.save();
+      await foundResult.save();
 
-    return res.status(200).json({
-      success: true,
-      msg: "Initiative added",
-      data: foundPerspective,
-    });
+      return res.status(200).json({
+        success: true,
+        msg: "score added",
+        data: foundResult,
+      });
+    } else {
+      foundResult.score.financial = financial;
+      foundResult.score.internal = internal;
+      foundResult.score.customer = customer;
+      foundResult.score.innovationlearningandgrowth = learning;
+
+      await foundResult.save();
+
+      return res.status(200).json({
+        success: true,
+        msg: "staff score added",
+        data: foundResult,
+      });
+    }
   } catch (err) {
     return res.status(500).json({
       success: false,
@@ -76,6 +94,7 @@ const updateInitiativeWithScore = async (req, res) => {
   }
 };
 
+//delete an initiative
 const removeInitiative = async (req, res) => {
   try {
     const { id } = req.params;
@@ -110,7 +129,7 @@ const getInitiatives = async (req, res) => {
       user,
     })
       .sort({ _id: -1 })
-      .populate("perspective");
+      .populate("perspective result");
 
     if (!foundInitiatives) {
       return res.status(404).json({
@@ -130,14 +149,14 @@ const getInitiatives = async (req, res) => {
     });
   }
 };
-//Manager get staff initiative
+//Controller for a Manager to get staff initiative
 const getStaffInitiatives = async (req, res) => {
   try {
     const { id } = req.params;
 
     const foundStaffInitiatives = await UserInitiative.findById(id)
       .sort({ _id: -1 })
-      .populate("perspective");
+      .populate("perspective result");
 
     if (!foundStaffInitiatives) {
       return res.status(404).json({

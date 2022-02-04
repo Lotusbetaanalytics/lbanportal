@@ -5,24 +5,15 @@ const current = require("../utils/currentAppraisalDetails")
 //Create a result
 const createResult = async (req, res) => {
   const {currentSession, currentQuarter} = await current()
-  // console.log(currentSession, currentQuarter)
+
   try {
     let { user, body } = req;
-    // console.log(req.user)
-    // if (!body) {
-    //   return res
-    //     .status(400)
-    //     .json({ success: false, msg: "No data was provided!" });
-    // }
-    // const appraisal = await Appraisal.findOne({status: "Started"})
-    // console.log(appraisal)
     const {session, quarter} = body
+
     if (!session || !quarter)
       body.user = user
       body.session = currentSession
       body.quarter = currentQuarter
-
-    // console.log(body)
 
     const result = await Result.create(body);
 
@@ -64,12 +55,9 @@ const getAllResult = async (req, res) => {
 //Get the current appraisal result for a staff
 const getCurrentResult = async (req, res) => {
   try {
-    // console.log("Start")
-    // const appraisal = await Appraisal.findOne({ status: "Started"})
     const {currentSession, currentQuarter} = await current()
-    // console.log(appraisal.session)
+
     const result = await Result.findOne({
-      // status: "Started",
       user: req.user,
       session: currentSession,
       quarter: currentQuarter,
@@ -95,8 +83,8 @@ const getCurrentResult = async (req, res) => {
 //Get all results by quarter
 const getQuarterlyResult = async (req, res) => {
   try {
-    // const appraisal = await Appraisal.findOne({ status: "Started"})
     const {currentSession} = await current()
+
     const firstQuarterResult = await Result.find({
       user: req.user,
       session: currentSession,

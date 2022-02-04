@@ -46,6 +46,14 @@ const StaffSchema = new mongoose.Schema({
     enum: ["HR", "Admin", "Manager", "Staff", "Team Lead"],
     default: "Staff",
   },
+  isManager: {
+    type: Boolean,
+    default: false,
+  },
+
+  files: {
+    type: Array,
+  },
 
   location: {
     type: String,

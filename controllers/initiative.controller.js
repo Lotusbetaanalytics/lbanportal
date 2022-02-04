@@ -59,7 +59,7 @@ const updateInitiativeWithScore = async (req, res) => {
     }
     const checkStaff = await Staff.findById(user);
 
-    if (checkStaff.role === "Manager") {
+    if (checkStaff.isManager) {
       foundResult.managerscore.financial = financial;
       foundResult.managerscore.internal = internal;
       foundResult.managerscore.customer = customer;
@@ -82,7 +82,7 @@ const updateInitiativeWithScore = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        msg: "score added",
+        msg: "staff score added",
         data: foundResult,
       });
     }
@@ -156,7 +156,7 @@ const getStaffInitiatives = async (req, res) => {
 
     const foundStaffInitiatives = await UserInitiative.findById(id)
       .sort({ _id: -1 })
-      .populate("perspective");
+      .populate("perspective result");
 
     if (!foundStaffInitiatives) {
       return res.status(404).json({

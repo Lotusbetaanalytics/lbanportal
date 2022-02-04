@@ -175,8 +175,6 @@ const uploadDocuments = async (req, res) => {
   try {
     const { files, user } = req;
 
-    const imageSizeLimit = 5 * 1024 * 1024; // 5Mb
-
     if (!files || files.size <= 0) {
       return res.status(400).json({
         success: false,
@@ -184,23 +182,13 @@ const uploadDocuments = async (req, res) => {
       });
     }
 
-    if (files.size >= imageSizeLimit) {
-      return res.status(400).json({
-        success: false,
-        msg: `Uploaded image size limit is ${imageSizeLimit / 1024 / 1024}Mb`,
-      });
-    }
+    const findUser = await Staff.findByIdAndUpdate(
+      user,
+      { files: files },
+      { new: true, runValidators: true }
+    );
 
-    // for (let i = 0; i < files.length; i++) {
-    //   open(files[0].filename);
-    // }
-
-    await cloudinarySetup();
-    const uploadedImage = await cloudinary.uploader.upload(files[0].path);
-
-    open(uploadedImage.secure_url);
-
-    res.status(200).json({ success: true });
+    res.status(200).json({ success: true, data: files });
   } catch (err) {
     return res.status(500).json({
       success: false,

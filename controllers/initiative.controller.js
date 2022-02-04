@@ -57,9 +57,12 @@ const updateInitiativeWithScore = async (req, res) => {
         msg: "Result details not found",
       });
     }
-    const checkStaff = await Staff.findById(user);
+    // const checkStaff = await Staff.findById(user);
+    const staffResult = await Result.findById(params.id).populate("user")
+    console.log(staffResult.user.manager)
 
-    if (checkStaff.isManager) {
+    if (user == staffResult.user.manager) {
+    // if (checkStaff.isManager) {
       foundResult.managerscore.financial = financial;
       foundResult.managerscore.internal = internal;
       foundResult.managerscore.customer = customer;

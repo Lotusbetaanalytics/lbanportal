@@ -159,7 +159,7 @@ const updateResult = async (req, res) => {
         .status(400)
         .json({ success: false, msg: "No data was provided!" });
     }
-    const result = await Result.findByIdAndUpdate(req.params.result_id, req.body, {
+    const result = await Result.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
@@ -179,7 +179,7 @@ const updateResult = async (req, res) => {
 //Delete a result
 const deleteResult = async (req, res) => {
   try {
-    const result = await Result.findByIdAndDelete(req.params.result_id);
+    const result = await Result.findByIdAndDelete(req.params.id);
     if (!result) {
       return res
         .status(404)

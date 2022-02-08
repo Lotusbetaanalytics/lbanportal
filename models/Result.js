@@ -2,23 +2,14 @@ const mongoose = require("mongoose");
 
 const ResultSchema = new mongoose.Schema({
   score: {
-    type: Object,
-    default: {
-      financial: 0,
-      customer: 0,
-      internal: 0,
-      innovationlearningandgrowth: 0,
-    },
+    type: Number,
+    default: 0,
   },
   managerscore: {
-    type: Object,
-    default: {
-      financial: 0,
-      customer: 0,
-      internal: 0,
-      innovationlearningandgrowth: 0,
-    },
+    type: Number,
+    default: 0,
   },
+
   overall: {
     type: Number,
   },

@@ -51,8 +51,8 @@ app.use(cors());
 app.use("/api/v1/staff/auth", authRoute);
 app.use("/api/v1/appraisal", appraisalRoute);
 app.use("/api/v1/initiative", initiativeRoute);
-app.use("/api/v1/appraisala", appraisalARoute)
-app.use("/api/v1/result", resultRoute)
+app.use("/api/v1/appraisala", appraisalARoute);
+app.use("/api/v1/result", resultRoute);
 
 app.get("/", (req, res) => {
   return res.status(200).json({ msg: "This is the api for the lban portal" });

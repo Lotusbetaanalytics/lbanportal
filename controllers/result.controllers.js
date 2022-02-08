@@ -1,5 +1,4 @@
 const Result = require("../models/Result")
-const Appraisal = require("../models/Appraisal")
 const current = require("../utils/currentAppraisalDetails")
 
 //Create a result
@@ -32,7 +31,7 @@ const createResult = async (req, res) => {
 //Get all results
 const getAllResult = async (req, res) => {
   try {
-    const result = await Result.find({});
+    const result = await Result.find({}).populate("user");
     if (!result) {
       return res
         .status(404)
@@ -50,7 +49,6 @@ const getAllResult = async (req, res) => {
     });
   }
 };
-
 
 //Get the current appraisal result for a staff
 const getCurrentResult = async (req, res) => {
@@ -131,7 +129,7 @@ const getQuarterlyResult = async (req, res) => {
 //Get a result's details
 const getResult = async (req, res) => {
   try {
-    const result = await Result.findById(req.params.id);
+    const result = await Result.findById(req.params.id).populate("user");
     if (!result) {
       return res
         .status(404)

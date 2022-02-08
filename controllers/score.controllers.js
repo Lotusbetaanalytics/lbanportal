@@ -1,7 +1,5 @@
 const Score = require("../models/Score")
-// const Appraisal = require("../models/Appraisal")
 const current = require("../utils/currentAppraisalDetails");
-const { getCurrentAppraisal } = require("./appraisal.controllers");
 
 //Create a score
 const createScore = async (req, res) => {
@@ -52,7 +50,7 @@ const createScore = async (req, res) => {
 //Get all scores
 const getAllScores = async (req, res) => {
   try {
-    const score = await Score.find({});
+    const score = await Score.find({}).populate("user question");
     if (!score) {
       return res
         .status(404)
@@ -70,7 +68,6 @@ const getAllScores = async (req, res) => {
     });
   }
 };
-
 
 //Get the current scores for authenticated user
 const getCurrentUserScores = async (req, res) => {
@@ -121,7 +118,7 @@ const getUserScores = async (req, res) => {
 //Get a score's details
 const getScore = async (req, res) => {
   try {
-    const score = await Score.findById(req.params.id);
+    const score = await Score.findById(req.params.id).populate("user question");
     if (!score) {
       return res
         .status(404)

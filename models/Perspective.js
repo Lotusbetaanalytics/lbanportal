@@ -3,10 +3,11 @@ const mongoose = require("mongoose");
 const PerspectiveSchema = new mongoose.Schema({
   title: {
     type: String,
+    required: true,
   },
   percentage: {
     type: Number,
-    max: 25,
+    default: 25,
     required: true,
   },
 });

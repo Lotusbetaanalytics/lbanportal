@@ -3,12 +3,10 @@ const mongoose = require("mongoose");
 const ResultSchema = new mongoose.Schema({
   score: {
     type: Number,
-    default: 0,
+    required: [true, "Please add a Score"],
   },
   managerscore: {
     type: Number,
-    default: 0,
-    required: [true, "Please add a Score"],
   },
 
   overall: {

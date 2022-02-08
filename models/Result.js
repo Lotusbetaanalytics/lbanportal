@@ -8,6 +8,7 @@ const ResultSchema = new mongoose.Schema({
   managerscore: {
     type: Number,
     default: 0,
+    required: [true, "Please add a Score"],
   },
 
   overall: {
@@ -22,7 +23,7 @@ const ResultSchema = new mongoose.Schema({
   },
   quarter: {
     type: String,
-    // required: [true, "Please add Quarter"],
+    required: [true, "Please add Quarter"],
   },
   status: {
     type: String,

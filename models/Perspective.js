@@ -7,6 +7,7 @@ const PerspectiveSchema = new mongoose.Schema({
   percentage: {
     type: Number,
     max: 25,
+    required: true,
   },
 });
 

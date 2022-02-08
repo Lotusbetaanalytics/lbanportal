@@ -15,6 +15,7 @@ const appraisalRoute = require("./routes/appraisal.routes");
 const initiativeRoute = require("./routes/initiative.routes");
 const appraisalARoute = require("./routes/appraisalA.routes");
 const resultRoute = require("./routes/result.routes");
+const perspectiveRoute = require("./routes/perspective.routes");
 
 // configure express
 const app = express();
@@ -53,6 +54,7 @@ app.use("/api/v1/appraisal", appraisalRoute);
 app.use("/api/v1/initiative", initiativeRoute);
 app.use("/api/v1/appraisala", appraisalARoute)
 app.use("/api/v1/result", resultRoute)
+app.use("/api/v1/perspective", perspectiveRoute)
 
 app.get("/", (req, res) => {
   return res.status(200).json({ msg: "This is the api for the lban portal" });

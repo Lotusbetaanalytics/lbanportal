@@ -8,9 +8,13 @@ const InitiativeSchema = new mongoose.Schema({
     required: true,
     ref: "Perspective",
   },
-
+  objective: {
+    type: String,
+    required: true,
+  },
   measures: {
     type: String,
+    enum: ["Quarterly", "Annual", "Monthly", "Bi-annual"],
     required: true,
   },
   target: {
@@ -30,11 +34,6 @@ const InitiativeSchema = new mongoose.Schema({
     required: true,
     ref: "Staff",
   },
-  result: {
-    type: mongoose.Schema.Types.ObjectId,
-    // required: true,
-    ref: "Result",
-  },
   year: {
     type: String,
     required: true,
@@ -44,15 +43,5 @@ const InitiativeSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
-
-InitiativeSchema.pre("save", async function (next) {
-  const {currentSession, currentQuarter} = await current()
-
-  if (currentSession && currentQuarter) {
-    defaultResult = await Result.create({session: this.session, quarter: currentQuarter, user: this.user})
-    this.result = defaultResult.id
-  }
-})
 
 module.exports = mongoose.model("Initiative", InitiativeSchema);

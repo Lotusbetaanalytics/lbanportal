@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const Result = require('./Result')
-const current = require("../utils/currentAppraisalDetails")
 
 const InitiativeSchema = new mongoose.Schema({
   perspective: {
@@ -40,6 +38,10 @@ const InitiativeSchema = new mongoose.Schema({
   year: {
     type: String,
     required: true,
+  },
+  section: {
+    type: String,
+    default: "B",
   },
   createdAt: {
     type: Date,

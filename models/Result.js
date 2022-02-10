@@ -21,6 +21,7 @@ const ResultSchema = new mongoose.Schema({
   quarter: {
     type: String,
     required: [true, "Please add Quarter"],
+    enum: ["First Quarter", "Second Quarter", "Third Quarter", "Fourth Quarter"],
   },
   status: {
     type: String,

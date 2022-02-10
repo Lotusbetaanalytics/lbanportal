@@ -10,7 +10,6 @@ const InitiativeSchema = new mongoose.Schema({
   },
   objective: {
     type: String,
-    required: true,
   },
   measures: {
     type: String,
@@ -33,6 +32,10 @@ const InitiativeSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: "Staff",
+  },
+  result: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Result",
   },
   year: {
     type: String,

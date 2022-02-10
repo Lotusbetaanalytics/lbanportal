@@ -48,50 +48,41 @@ const updateInitiativeWithScore = async (req, res) => {
 
     const { financial, customer, internal, learning } = body;
 
-    if (!financial || !customer || !internal || !learning) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "No data was provided!" });
-    }
+    const staffResult = await Result.findById(params.id).populate("user");
 
-    const foundResult = await Result.findById(params.id);
-
-    if (!foundResult) {
+    if (!staffResult) {
       return res.status(404).json({
         success: false,
         msg: "Result details not found",
       });
     }
-    // const checkStaff = await Staff.findById(user);
-    const staffResult = await Result.findById(params.id).populate("user")
-    console.log(staffResult.user.manager)
+
+    const { score, managerscore } = staffResult;
 
     if (user == staffResult.user.manager) {
-    // if (checkStaff.isManager) {
-      foundResult.managerscore.financial = financial;
-      foundResult.managerscore.internal = internal;
-      foundResult.managerscore.customer = customer;
-      foundResult.managerscore.innovationlearningandgrowth = learning;
-
-      await foundResult.save();
+      // if (checkStaff.isManager) {
+      staffResult.managerscore.financial = financial;
+      staffResult.managerscore.internal = internal;
+      staffResult.managerscore.customer = customer;
+      staffResult.managerscore.innovationlearningandgrowth = learning;
 
       return res.status(200).json({
         success: true,
         msg: "score added",
-        data: foundResult,
+        data: staffResult,
       });
     } else {
-      foundResult.score.financial = financial;
-      foundResult.score.internal = internal;
-      foundResult.score.customer = customer;
-      foundResult.score.innovationlearningandgrowth = learning;
+      staffResult.score.financial = financial;
+      staffResult.score.internal = internal;
+      staffResult.score.customer = customer;
+      staffResult.score.innovationlearningandgrowth = learning;
 
-      await foundResult.save();
+      await staffResult.save();
 
       return res.status(200).json({
         success: true,
         msg: "staff score added",
-        data: foundResult,
+        data: staffResult,
       });
     }
   } catch (err) {

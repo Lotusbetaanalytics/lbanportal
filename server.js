@@ -58,6 +58,7 @@ app.use("/api/v1/result", resultRoute)
 app.use("/api/v1/score", scoreRoute)
 app.use("/api/v1/perspective", perspectiveRoute)
 
+
 app.get("/", (req, res) => {
   return res.status(200).json({ msg: "This is the api for the lban portal" });
 });

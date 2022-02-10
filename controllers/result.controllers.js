@@ -1,5 +1,6 @@
 const Result = require("../models/Result")
 const current = require("../utils/currentAppraisalDetails")
+const resultScore = require("../utils/calculateScore")
 
 //Create a result
 const createResult = async (req, res) => {
@@ -37,7 +38,8 @@ const getAllResult = async (req, res) => {
         .status(404)
         .json({ success: false, msg: "Results not found!" });
     }
-    
+    const testScore = await resultScore(req)
+    console.log(`The final score is ${testScore}`)
     res.status(200).json({
       success: true,
       data: result,

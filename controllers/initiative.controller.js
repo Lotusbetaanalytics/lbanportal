@@ -1,3 +1,4 @@
+const Initiative = require("../models/Initiative");
 const UserInitiative = require("../models/Initiative");
 const Perspective = require("../models/Perspective");
 const Result = require("../models/Result");
@@ -13,15 +14,19 @@ const addInitiative = async (req, res) => {
         .json({ success: false, msg: "No data was provided!" });
     }
 
-    const newPerspective = new Perspective();
-    await newPerspective.save();
-    const initiative = new UserInitiative({
-      ...body,
-      perspective: newPerspective._id,
-      user,
-    });
+    // const newPerspective = new Perspective();
+    // await newPerspective.save();
+    // const initiative = new UserInitiative({
+    //   ...body,
+    //   perspective: newPerspective._id,
+    //   user,
+    // });
 
-    await initiative.save();
+    // await initiative.save();
+
+    body.user = user
+
+    const initiative = await Initiative.create(body)
 
     return res.status(200).json({
       success: true,

@@ -17,10 +17,11 @@ const createPerspective = async (req, res) => {
       });
     };
 
-    for (const perspective in allPerspectives) {
+    for (const [key, perspective] of Object.entries(allPerspectives)) {
       totalPercentage += perspective.percentage
     }
 
+    totalPercentage += body.percentage
     if (totalPercentage > 100) {
       return res.status(400).json({
         success: false,
@@ -98,11 +99,26 @@ const updatePerspective = async (req, res) => {
     }
 
     const allPerspectives = await Perspective.find();
+    const currentPerspective = await Perspective.findById(req.params.id)
     let totalPercentage = 0
+    
+    // console.log(totalPercentage)
+    // console.log(`\nperspective: ${perspective}\n\nallPerspectives: ${allPerspectives[0]}\n`)
 
-    for (const perspective in allPerspectives) {
-      totalPercentage += perspective.percentage
+    console.log(`\ncurrentPerspective: ${currentPerspective.title}\n`)
+    
+    for (const [key, perspective] of Object.entries(allPerspectives)) {
+      console.log(`\nkey: ${key}\n\nperspective: ${perspective}\n`)
+      if (perspective.title != currentPerspective.title) {
+        totalPercentage += perspective.percentage
+      }
+      // console.log(`\nperspective: ${perspective}\n\nallPerspectives: ${allPerspectives[0].title}\n`)
+      // totalPercentage += perspective.percentage
     }
+
+    console.log(`\nbody: ${body.percentage}\n`)
+    totalPercentage += body.percentage
+    console.log(`\ntotalPercentage: ${totalPercentage}\n`)
 
     if (totalPercentage > 100) {
       return res.status(400).json({
@@ -111,7 +127,7 @@ const updatePerspective = async (req, res) => {
       });
     }
 
-    const perspective = await Perspective.findByIdAndUpdate(req.params._id, req.body, {
+    const perspective = await Perspective.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
@@ -131,7 +147,7 @@ const updatePerspective = async (req, res) => {
 //Delete a perspective
 const deletePerspective = async (req, res) => {
   try {
-    const perspective = await Perspective.findByIdAndDelete(req.params._id);
+    const perspective = await Perspective.findByIdAndDelete(req.params.id);
     if (!perspective) {
       return res
         .status(404)

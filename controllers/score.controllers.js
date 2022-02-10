@@ -146,7 +146,7 @@ const updateScore = async (req, res) => {
         .status(400)
         .json({ success: false, msg: "No data was provided!" });
     }
-    const score = await Score.findByIdAndUpdate(req.params._id, req.body, {
+    const score = await Score.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
@@ -166,7 +166,7 @@ const updateScore = async (req, res) => {
 //Delete a score
 const deleteScore = async (req, res) => {
   try {
-    const score = await Score.findByIdAndDelete(req.params._id);
+    const score = await Score.findByIdAndDelete(req.params.id);
     if (!score) {
       return res
         .status(404)

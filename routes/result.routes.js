@@ -11,7 +11,7 @@ const {
 const { verifyToken } = require("../middlewares/auth.middleware")
 
 router.post("/", verifyToken, createResult); // create a result
-router.get("/", getAllResult); // get all results
+router.get("/", verifyToken, getAllResult); // get all results
 router.get("/current", verifyToken, getCurrentResult); // get current result for autheticated user
 router.get("/quarterly", verifyToken, getQuarterlyResult); // get quarterly result for authenticated user
 router.get("/:id", verifyToken, getResult); // get result details by id

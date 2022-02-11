@@ -7,6 +7,7 @@ const ResultSchema = new mongoose.Schema({
   },
   managerscore: {
     type: Number,
+    default: 0,
   },
   overall: {
     type: Number,

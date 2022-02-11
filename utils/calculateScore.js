@@ -5,7 +5,7 @@ const Result = require("../models/Result")
 const current = require("./currentAppraisalDetails")
 const Perspective = require("../models/Perspective")
 
-const ResultScore = async (req, finalResult=null) => {
+const ResultScore = async (req, scoreType="score", finalResult=null) => {
   const {currentSession, currentQuarter} = await current()
   const userScores = await Score.find({
     user: req.user,
@@ -33,7 +33,7 @@ const ResultScore = async (req, finalResult=null) => {
   // console.log(`${perspectiveTitles[0]}`)
 
   for (const [key, score] of Object.entries(userScores)) {
-    console.log(`${score._qid}: ${score}\nscoreValue: ${score.score}`)
+    console.log(`${score._qid}: ${score}\nscoreValue: ${score[`${scoreType}`]}`)
     if (score.question.perspective || score._qid == "Initiative"){
       const question = await Initiative.findById(score.question).populate("perspective")
       let scorePerspectiveTitle = question.perspective.title
@@ -54,14 +54,14 @@ const ResultScore = async (req, finalResult=null) => {
             oldValue = resultDict[`${title}`].score
             oldLength = resultDict[`${title}`].len
           }
-          scoreValue = oldValue + score.score
+          scoreValue = oldValue + score[`${scoreType}`]
           resultDict[`${title}`] = {"score": 0, "percentage": 0, "len": 0, "maxScore": 0, "maxPercentage": scorePerspective.percentage}
           // resultDict[`${title}`] = 0
 
           // resultDict[`${title}`] += scoreValue
           // resultDict.title = 0
           // resultDict.title += scoreValue
-          // resultDict[`${title}`] += score.score
+          // resultDict[`${title}`] += score[` ${scoreType}`]
           resultDict[`${title}`].score += scoreValue
           resultDict[`${title}`].len = oldLength + 1
           resultDict[`${title}`].maxScore = resultDict[`${title}`].len * 5
@@ -96,7 +96,7 @@ const ResultScore = async (req, finalResult=null) => {
       })
 
       for (const [key, score] of Object.entries(appraisalAScores)) {
-        appraisalACurrentScore += score.score
+        appraisalACurrentScore += score[`${scoreType}`]
         let appraisalAMaxScore = appraisalAScores.length * 5
         finalAppraisalAScore = (appraisalACurrentScore / appraisalAMaxScore) * 100
         console.log(`appraisalAMaxScore: ${appraisalAMaxScore}, finalAppraisalAScore: ${finalAppraisalAScore}`)

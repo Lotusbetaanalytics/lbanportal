@@ -54,9 +54,7 @@ const getAllResult = async (req, res) => {
         .status(404)
         .json({ success: false, msg: "Results not found!" });
     }
-    const testScore = await resultScore(req)
-    const managerScore = await resultScore(req, scoreType="managerscore")
-    console.log(`The final staff score is ${testScore} and the final manager score is ${managerScore}`)
+
     res.status(200).json({
       success: true,
       data: result,

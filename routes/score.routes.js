@@ -4,6 +4,7 @@ const {
   getAllScores,
   getCurrentUserScores,
   getUserScores,
+  getScoresByUserId,
   getScore,
   updateScore,
   deleteScore
@@ -17,5 +18,6 @@ router.get("/all", verifyToken, getUserScores); // get quarterly score for authe
 router.get("/:id", verifyToken, getScore); // get score details by id
 router.patch("/:id", verifyToken, updateScore); // update score details by id
 router.delete("/:id", verifyToken, deleteScore); // delete score by id
+router.get("/staff/:id", verifyToken, getScoresByUserId); // get scores for a staff by staff id
 
 module.exports = router;

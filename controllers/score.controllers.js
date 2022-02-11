@@ -1,4 +1,5 @@
 const Score = require("../models/Score")
+const Staff = require("../models/Staff")
 const current = require("../utils/currentAppraisalDetails");
 
 //Create a score
@@ -23,7 +24,7 @@ const createScore = async (req, res) => {
     });
 
     if (findScore.length > 0) {
-      const updateScore = await Score.findByIdAndUpdate(score[0]._id, body, {
+      const updateScore = await Score.findByIdAndUpdate(findScore[0]._id, body, {
         new: true,
         runValidators: true,
       });
@@ -116,6 +117,37 @@ const getUserScores = async (req, res) => {
   }
 };
 
+//Get all scores for a user using their id
+const getScoresByUserId = async (req, res) => {
+  try {
+    const {currentQuarter, currentSession} = await current()
+    const staff = Staff.findById(req.params.id)
+    const scores = await Score.find({
+      user: req.params.id,
+      session: currentSession,
+      quarter: currentQuarter,
+    }).populate("question");
+    
+    if (scores.length < 1) {
+      res.status(404).json({
+        success: false,
+        msg: "Staff's scores not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      staff: staff,
+      data: scores,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
 //Get a score's details
 const getScore = async (req, res) => {
   try {
@@ -191,6 +223,7 @@ module.exports = {
   getAllScores,
   getCurrentUserScores,
   getUserScores,
+  getScoresByUserId,
   getScore,
   updateScore,
   deleteScore

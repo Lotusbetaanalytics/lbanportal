@@ -177,10 +177,41 @@ const getStaffInitiatives = async (req, res) => {
   }
 };
 
+//Get all initiatives for a user using their id
+const getInitiativeByStaffId = async (req, res) => {
+  try {
+    const {currentSession} = await current()
+    const staff = Staff.findById(req.params.id)
+    const initiatives = await Score.find({
+      user: req.params.id,
+      session: currentSession,
+    }).populate("question");
+    
+    if (initiatives.length < 1) {
+      res.status(404).json({
+        success: false,
+        msg: "Staff's initiatives not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      staff: staff,
+      data: initiatives,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
 module.exports = {
   addInitiative,
   removeInitiative,
   getInitiatives,
   // updateInitiativeWithScore,
   getStaffInitiatives,
+  getInitiativeByStaffId,
 };

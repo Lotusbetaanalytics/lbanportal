@@ -1,15 +1,13 @@
 const Perspective = require("../models/Perspective")
-const current = require("../utils/currentAppraisalDetails");
 
 //Create a perspective
 const createPerspective = async (req, res) => {
-  // const {currentSession, currentQuarter} = await current()
-
   try {
     let { body } = req;
     const findPerspective = await Perspective.find({title: body.title});
     const allPerspectives = await Perspective.find();
     let totalPercentage = 0
+
     if (findPerspective.length > 0) {
       return res.status(400).json({
         success: false,
@@ -102,23 +100,13 @@ const updatePerspective = async (req, res) => {
     const currentPerspective = await Perspective.findById(req.params.id)
     let totalPercentage = 0
     
-    // console.log(totalPercentage)
-    // console.log(`\nperspective: ${perspective}\n\nallPerspectives: ${allPerspectives[0]}\n`)
-
-    console.log(`\ncurrentPerspective: ${currentPerspective.title}\n`)
-    
     for (const [key, perspective] of Object.entries(allPerspectives)) {
       console.log(`\nkey: ${key}\n\nperspective: ${perspective}\n`)
       if (perspective.title != currentPerspective.title) {
         totalPercentage += perspective.percentage
       }
-      // console.log(`\nperspective: ${perspective}\n\nallPerspectives: ${allPerspectives[0].title}\n`)
-      // totalPercentage += perspective.percentage
     }
-
-    console.log(`\nbody: ${body.percentage}\n`)
     totalPercentage += body.percentage
-    console.log(`\ntotalPercentage: ${totalPercentage}\n`)
 
     if (totalPercentage > 100) {
       return res.status(400).json({

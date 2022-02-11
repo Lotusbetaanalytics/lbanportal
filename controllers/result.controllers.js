@@ -10,10 +10,26 @@ const createResult = async (req, res) => {
     let { user, body } = req;
     const {session, quarter} = body
 
-    if (!session || !quarter)
-      body.user = user
+    const existingResult = await Result.find({
+      user: req.user,
+      session: currentSession,
+      quarter: currentQuarter
+    });
+    if (existingResult.length > 0) {
+      res.status(200).json({
+        success: true,
+        msg: "Result already exists",
+      });
+    }
+
+    const score = await resultScore(req)
+
+    if (!session || !quarter) {
       body.session = currentSession
       body.quarter = currentQuarter
+    }
+    body.user = user
+    body.score = score
 
     const result = await Result.create(body);
 
@@ -39,7 +55,8 @@ const getAllResult = async (req, res) => {
         .json({ success: false, msg: "Results not found!" });
     }
     const testScore = await resultScore(req)
-    console.log(`The final score is ${testScore}`)
+    const managerScore = await resultScore(req, scoreType="managerscore")
+    console.log(`The final staff score is ${testScore} and the final manager score is ${managerScore}`)
     res.status(200).json({
       success: true,
       data: result,
@@ -131,7 +148,7 @@ const getQuarterlyResult = async (req, res) => {
 //Get a result's details
 const getResult = async (req, res) => {
   try {
-    const result = await Result.findById(req.params.id).populate("user");
+    const result = await Result.findById(req.params.id).populate("user").populate("user");
     if (!result) {
       return res
         .status(404)
@@ -154,11 +171,11 @@ const getResult = async (req, res) => {
 const updateResult = async (req, res) => {
   try {
     const { body } = req;
-    if (!body) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "No data was provided!" });
-    }
+    const score = await resultScore(req)
+    const managerScore = await resultScore(req, scoreType="managerscore")
+    body.score = score
+    body.managerscore = managerScore
+
     const result = await Result.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,

@@ -9,10 +9,11 @@ const createScore = async (req, res) => {
     let { user, body } = req;
     const {session, quarter} = body
 
-    if (!session || !quarter)
-      body.user = user
+    if (!session || !quarter) {
       body.session = currentSession
       body.quarter = currentQuarter
+    }
+    body.user = user
 
     const findScore = await Score.find({
       user: user,
@@ -20,6 +21,7 @@ const createScore = async (req, res) => {
       session: body.session,
       quarter: body.quarter,
     });
+
     if (findScore.length > 0) {
       const updateScore = await Score.findByIdAndUpdate(score[0]._id, body, {
         new: true,
@@ -31,7 +33,6 @@ const createScore = async (req, res) => {
       });
     } else {
       const score = await Score.create(body);
-      // const score = await Score.create(body);
 
       res.status(200).json({
         success: true,
@@ -78,7 +79,8 @@ const getCurrentUserScores = async (req, res) => {
       user: req.user,
       session: currentSession,
       quarter: currentQuarter,
-    });
+    }).populate("question");
+
     if (!score) {
       return res
         .status(400)
@@ -100,8 +102,7 @@ const getCurrentUserScores = async (req, res) => {
 //Get all scores for authenticated user
 const getUserScores = async (req, res) => {
   try {
-
-    const scores = await Score.find({user: req.user});
+    const scores = await Score.find({user: req.user}).populate("question");
     
     res.status(200).json({
       success: true,

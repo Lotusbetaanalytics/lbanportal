@@ -1,9 +1,11 @@
 const Score = require("../models/Score")
 const Initiative = require("../models/Initiative")
-const current = require("./currentAppraisalDetails")
+const AppraisalA = require("../models/AppraisalA")
 const Perspective = require("../models/Perspective")
+const current = require("./currentAppraisalDetails")
 
 const ResultScore = async (req, scoreType="score", finalResult=null) => {
+  // scoreType options are "score" or "managerscore"
   const {currentSession, currentQuarter} = await current()
   const userScores = await Score.find({
     user: req.user,
@@ -18,12 +20,13 @@ const ResultScore = async (req, scoreType="score", finalResult=null) => {
   let finalInitiativeScore = 0
   let finalAppraisalAScore = 0
 
+  // create a list of perspective titles
   for (const [key, perspective] of Object.entries(allPerspectives)) {
     perspectiveTitles.push(perspective.title)
   } 
 
   for (const [key, score] of Object.entries(userScores)) {
-
+    // check if question is an initiative
     if (score.question.perspective || score._qid == "Initiative"){
       const question = await Initiative.findById(score.question).populate("perspective")
       let scorePerspectiveTitle = question.perspective.title
@@ -35,25 +38,33 @@ const ResultScore = async (req, scoreType="score", finalResult=null) => {
           let title = perspectiveTitles[i]
           let oldValue = 0
           let oldLength = 0
-
+          // store old resultDict[`${title}`] values if they exist
           if (resultDict[`${title}`]) {
             oldValue = resultDict[`${title}`].score
             oldLength = resultDict[`${title}`].len
           }
-
+          // increment old score by new score
           scoreValue = oldValue + score[`${scoreType}`]
-          resultDict[`${title}`] = {"score": 0, "percentage": 0, "len": 0, "maxScore": 0, "maxPercentage": scorePerspective.percentage}
+          // initialize resultDict[`${title}`]
+          resultDict[`${title}`] = {
+            "score": 0,
+            "percentage": 0,
+            "len": 0,
+            "maxScore": 0,
+            "maxPercentage": scorePerspective.percentage
+          }
 
           resultDict[`${title}`].score += scoreValue
           resultDict[`${title}`].len = oldLength + 1
           resultDict[`${title}`].maxScore = resultDict[`${title}`].len * 5
+          // calculate score as a percentage out of 25%
           resultDict[`${title}`].percentage = (resultDict[`${title}`].score / resultDict[`${title}`].maxScore) * resultDict[`${title}`].maxPercentage
         }
       }
-
+      // reset scoreValue to 0
       scoreValue = 0
     }
-
+    // check if question is an appraisal A
     if (score.question.description || score._qid == "AppraisalA") {
       const appraisalAScores = await Score.find({
         user: req.user,
@@ -61,10 +72,11 @@ const ResultScore = async (req, scoreType="score", finalResult=null) => {
         quarter: currentQuarter,
         session: currentSession,
       })
-
+      const appraisalA = await AppraisalA.find()
+      // calculate appraisal A score
       for (const [key, score] of Object.entries(appraisalAScores)) {
         appraisalACurrentScore += score[`${scoreType}`]
-        let appraisalAMaxScore = appraisalAScores.length * 5
+        let appraisalAMaxScore = appraisalA.length * 5
         finalAppraisalAScore = (appraisalACurrentScore / appraisalAMaxScore) * 100
       }
     }

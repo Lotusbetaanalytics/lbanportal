@@ -117,13 +117,75 @@ const getUserScores = async (req, res) => {
   }
 };
 
+//Get current score for a question using the question id for an authenticated user
+const getCurrentUserScoresByQuestionId = async (req, res) => {
+  try {
+    const {currentQuarter, currentSession} = await current()
+    const scores = await Score.find({
+      user: req.user,
+      question: req.params.id,
+      session: currentSession,
+      quarter: currentQuarter,
+    }).populate("question");
+    
+    if (scores.length < 1) {
+      res.status(404).json({
+        success: false,
+        msg: "Staff's scores not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: scores,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
 //Get all scores for a user using their id
 const getScoresByUserId = async (req, res) => {
   try {
     const {currentQuarter, currentSession} = await current()
-    const staff = Staff.findById(req.params.id)
+    const staff = await Staff.findById(req.params.id)
     const scores = await Score.find({
       user: req.params.id,
+      session: currentSession,
+      quarter: currentQuarter,
+    }).populate("question");
+    
+    if (scores.length < 1) {
+      res.status(404).json({
+        success: false,
+        msg: "Staff's scores not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      staff: staff,
+      data: scores,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
+//Get current score for a question using the question id for an authenticated user
+const geScoreByUserIdAndQuestionId = async (req, res) => {
+  try {
+    const {currentQuarter, currentSession} = await current()
+    const staff = await Staff.findById(req.params.id)
+    const scores = await Score.find({
+      user: req.params.id,
+      question: req.params.q_id,
       session: currentSession,
       quarter: currentQuarter,
     }).populate("question");
@@ -222,8 +284,10 @@ module.exports = {
   createScore,
   getAllScores,
   getCurrentUserScores,
+  getCurrentUserScoresByQuestionId,
   getUserScores,
   getScoresByUserId,
+  geScoreByUserIdAndQuestionId,
   getScore,
   updateScore,
   deleteScore

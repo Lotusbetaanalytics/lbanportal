@@ -3,8 +3,10 @@ const {
   createScore,
   getAllScores,
   getCurrentUserScores,
+  getCurrentUserScoresByQuestionId,
   getUserScores,
   getScoresByUserId,
+  geScoreByUserIdAndQuestionId,
   getScore,
   updateScore,
   deleteScore
@@ -18,6 +20,8 @@ router.get("/all", verifyToken, getUserScores); // get quarterly score for authe
 router.get("/:id", verifyToken, getScore); // get score details by id
 router.patch("/:id", verifyToken, updateScore); // update score details by id
 router.delete("/:id", verifyToken, deleteScore); // delete score by id
+router.get("/question/:id", verifyToken, getCurrentUserScoresByQuestionId); // get current score for autheticated user
 router.get("/staff/:id", verifyToken, getScoresByUserId); // get scores for a staff by staff id
+router.get("/staff/:id/:q_id", verifyToken, geScoreByUserIdAndQuestionId); // get scores for a staff by staff id and question
 
 module.exports = router;

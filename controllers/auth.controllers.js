@@ -64,6 +64,32 @@ const postUserDetails = async (req, res) => {
   }
 };
 
+//Get authenticated user's details
+const getUser = async (req, res) => {
+  try {
+    const { user } = req;
+
+    const staff = await Staff.findById(user).populate("manager");
+
+    if (!staff) {
+      return res.status(404).json({
+        success: false,
+        msg: "Staff not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: staff,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
 //Upadate a user's details
 const updateUser = async (req, res) => {
   try {
@@ -244,6 +270,7 @@ const deleteStaff = async (req, res) => {
 
 module.exports = {
   postUserDetails,
+  getUser,
   updateUser,
   uploadDocuments,
   uploadDp,

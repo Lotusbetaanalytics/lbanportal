@@ -3,6 +3,7 @@ const UserInitiative = require("../models/Initiative");
 const Perspective = require("../models/Perspective");
 const Result = require("../models/Result");
 const Staff = require("../models/Staff");
+const current = require("../utils/currentAppraisalDetails")
 
 const addInitiative = async (req, res) => {
   try {
@@ -40,58 +41,6 @@ const addInitiative = async (req, res) => {
     });
   }
 };
-
-//controller for score for staff initiative
-// const updateInitiativeWithScore = async (req, res) => {
-//   try {
-//     const { body, params, user } = req;
-
-//     const { financial, customer, internal, learning } = body;
-
-//     const staffResult = await Result.findById(params.id).populate("user");
-
-//     if (!staffResult) {
-//       return res.status(404).json({
-//         success: false,
-//         msg: "Result details not found",
-//       });
-//     }
-
-//     const { score, managerscore } = staffResult;
-
-//     if (user == staffResult.user.manager) {
-//       // if (checkStaff.isManager) {
-//       staffResult.managerscore.financial = financial;
-//       staffResult.managerscore.internal = internal;
-//       staffResult.managerscore.customer = customer;
-//       staffResult.managerscore.innovationlearningandgrowth = learning;
-
-//       return res.status(200).json({
-//         success: true,
-//         msg: "score added",
-//         data: staffResult,
-//       });
-//     } else {
-//       staffResult.score.financial = financial;
-//       staffResult.score.internal = internal;
-//       staffResult.score.customer = customer;
-//       staffResult.score.innovationlearningandgrowth = learning;
-
-//       await staffResult.save();
-
-//       return res.status(200).json({
-//         success: true,
-//         msg: "staff score added",
-//         data: staffResult,
-//       });
-//     }
-//   } catch (err) {
-//     return res.status(500).json({
-//       success: false,
-//       msg: err.message,
-//     });
-//   }
-// };
 
 //delete an initiative
 const removeInitiative = async (req, res) => {
@@ -211,7 +160,6 @@ module.exports = {
   addInitiative,
   removeInitiative,
   getInitiatives,
-  // updateInitiativeWithScore,
   getStaffInitiatives,
   getInitiativeByStaffId,
 };

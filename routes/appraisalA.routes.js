@@ -9,7 +9,7 @@ const {
 const { verifyToken } = require("../middlewares/auth.middleware");
 
 router.post("/", createAppraisalA); // create an appraisalA
-router.get("/all", getAllAppraisalA); // get all appraisalAs
+router.get("/", getAllAppraisalA); // get all appraisalAs
 router.get("/:id", getAppraisalA); // get appraisalA details by id
 router.patch("/:id", verifyToken, updateAppraisalA); // update appraisalA by id
 router.delete("/:id", verifyToken, deleteAppraisalA); // delete appraisalA by id

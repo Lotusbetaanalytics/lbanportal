@@ -53,7 +53,7 @@ app.use(cors());
 app.use("/api/v1/staff/auth", authRoute);
 app.use("/api/v1/appraisal", appraisalRoute);
 app.use("/api/v1/initiative", initiativeRoute);
-app.use("/api/v1/appraisala", appraisalARoute)
+app.use("/api/v1/section/a", appraisalARoute)
 app.use("/api/v1/result", resultRoute)
 app.use("/api/v1/score", scoreRoute)
 app.use("/api/v1/perspective", perspectiveRoute)

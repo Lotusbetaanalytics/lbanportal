@@ -17,6 +17,7 @@ const appraisalARoute = require("./routes/appraisalA.routes");
 const resultRoute = require("./routes/result.routes");
 const scoreRoute = require("./routes/score.routes");
 const perspectiveRoute = require("./routes/perspective.routes");
+const calibrationRoute = require("./routes/calibration.routes");
 
 // configure express
 const app = express();
@@ -57,6 +58,7 @@ app.use("/api/v1/section/a", appraisalARoute)
 app.use("/api/v1/result", resultRoute)
 app.use("/api/v1/score", scoreRoute)
 app.use("/api/v1/perspective", perspectiveRoute)
+app.use("/api/v1/calibration", calibrationRoute)
 
 
 app.get("/", (req, res) => {

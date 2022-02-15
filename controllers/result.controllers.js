@@ -1,4 +1,5 @@
 const Result = require("../models/Result")
+const Staff = require("../models/Staff")
 const current = require("../utils/currentAppraisalDetails")
 const resultScore = require("../utils/calculateScore")
 
@@ -67,7 +68,7 @@ const getAllResult = async (req, res) => {
   }
 };
 
-//Get the current appraisal result for a staff
+//Get the current appraisal result for an authenticated staff
 const getCurrentResult = async (req, res) => {
   try {
     const {currentSession, currentQuarter} = await current()
@@ -95,7 +96,7 @@ const getCurrentResult = async (req, res) => {
   }
 };
 
-//Get all results by quarter
+//Get all results by quarter for an authenticated staff
 const getQuarterlyResult = async (req, res) => {
   try {
     const {currentSession} = await current()
@@ -129,6 +130,56 @@ const getQuarterlyResult = async (req, res) => {
     res.status(200).json({
       success: true,
       data: {
+        firstQuarter: firstQuarterResult,
+        secondQuarter: secondQuarterResult,
+        thirdQuarter: thirdQuarterResult,
+        fourthQuarter: fourthQuarterResult,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
+//Get the current appraisal result for a staff
+const getCurrentResultByStaffId = async (req, res) => {
+  try {
+    const {currentSession, currentQuarter} = await current()
+
+    const staff = await Staff.findById(req.params.id)
+    const firstQuarterResult = await Result.find({
+      user: req.params.id,
+      session: currentSession,
+      quarter: "First Quarter",
+    });
+    const secondQuarterResult = await Result.find({
+      user: req.params.id,
+      session: currentSession,
+      quarter: "Second Quarter",
+    });
+    const thirdQuarterResult = await Result.find({
+      user: req.params.id,
+      session: currentSession,
+      quarter: "Third Quarter",
+    });
+    const fourthQuarterResult = await Result.find({
+      user: req.params.id,
+      session: currentSession,
+      quarter: "Fourth Quarter",
+    });
+    if (!firstQuarterResult || !secondQuarterResult || !thirdQuarterResult || !fourthQuarterResult) {
+      return res
+        .status(404)
+        .json({ success: false, msg: "Results not found!" });
+    }
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        staff: staff,
         firstQuarter: firstQuarterResult,
         secondQuarter: secondQuarterResult,
         thirdQuarter: thirdQuarterResult,
@@ -218,6 +269,7 @@ module.exports = {
   getAllResult,
   getCurrentResult,
   getQuarterlyResult,
+  getCurrentResultByStaffId,
   getResult,
   updateResult,
   deleteResult

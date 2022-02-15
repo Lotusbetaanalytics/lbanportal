@@ -4,11 +4,12 @@ const {
   getAllResult,
   getCurrentResult,
   getQuarterlyResult,
+  getCurrentResultByStaffId,
   getResult,
   updateResult,
   deleteResult
 } = require("../controllers/result.controllers")
-const { verifyToken } = require("../middlewares/auth.middleware")
+const { verifyToken, verifyTokenAdmin } = require("../middlewares/auth.middleware")
 
 router.post("/", verifyToken, createResult); // create a result
 router.get("/", verifyToken, getAllResult); // get all results
@@ -17,5 +18,6 @@ router.get("/quarterly", verifyToken, getQuarterlyResult); // get quarterly resu
 router.get("/:id", verifyToken, getResult); // get result details by id
 router.patch("/:id", verifyToken, updateResult); // update result details by id
 router.delete("/:id", verifyToken, deleteResult); // delete result by id
+router.get("/staff/:id", verifyTokenAdmin, getCurrentResultByStaffId); // get current result using user id
 
 module.exports = router;

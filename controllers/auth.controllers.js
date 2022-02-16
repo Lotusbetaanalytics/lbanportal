@@ -1,4 +1,6 @@
 const Staff = require("../models/Staff");
+const Result = require("../models/Result")
+const Calibration = require("../models/Calibration")
 const cloudinary = require("cloudinary").v2;
 const cloudinarySetup = require("../config/cloudinarysetup");
 const fs = require("fs");
@@ -7,6 +9,7 @@ const generateToken = require("../helpers/generateToken");
 const dotenv = require("dotenv").config();
 const { strToBase64 } = require("../utils/generic");
 const open = require("open");
+const current = require("../utils/currentAppraisalDetails")
 
 //Register new users and send a token
 const postUserDetails = async (req, res) => {
@@ -64,12 +67,42 @@ const postUserDetails = async (req, res) => {
   }
 };
 
-//Get authenticated user's details
+//Get authenticated user's details (account)
 const getUser = async (req, res) => {
   try {
     const { user } = req;
+    const {currentSession} = await current()
 
     const staff = await Staff.findById(user).populate("manager");
+
+    const firstQuarterResult = await Result.find({
+      user: user,
+      session: currentSession,
+      quarter: "First Quarter",
+    });
+    const secondQuarterResult = await Result.find({
+      user: user,
+      session: currentSession,
+      quarter: "Second Quarter",
+    });
+    const thirdQuarterResult = await Result.find({
+      user: user,
+      session: currentSession,
+      quarter: "Third Quarter",
+    });
+    const fourthQuarterResult = await Result.find({
+      user: user,
+      session: currentSession,
+      quarter: "Fourth Quarter",
+    });
+
+    const calibration = await Calibration.findOne({
+      staff: user,
+      session: currentSession
+    }).populate({
+        path: "hr",
+        select: "fullname email department manager role isManager"
+      })
 
     if (!staff) {
       return res.status(404).json({
@@ -80,7 +113,14 @@ const getUser = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: staff,
+      data: {
+        staff: staff,
+        firstQuarterResult: firstQuarterResult,
+        secondQuarterResult: secondQuarterResult,
+        thirdQuarterResult: thirdQuarterResult,
+        fourthQuarterResult: fourthQuarterResult,
+        calibration: calibration,
+      },
     });
   } catch (err) {
     return res.status(500).json({

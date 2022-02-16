@@ -52,7 +52,13 @@ const createScore = async (req, res) => {
 //Get all scores
 const getAllScores = async (req, res) => {
   try {
-    const score = await Score.find({}).populate("user question");
+    const score = await Score.find({})
+      .populate("question")
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
+      
     if (!score) {
       return res
         .status(404)
@@ -80,7 +86,11 @@ const getCurrentUserScores = async (req, res) => {
       user: req.user,
       session: currentSession,
       quarter: currentQuarter,
-    }).populate("question");
+    }).populate("question")
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
 
     if (!score) {
       return res
@@ -103,7 +113,12 @@ const getCurrentUserScores = async (req, res) => {
 //Get all scores for authenticated user
 const getUserScores = async (req, res) => {
   try {
-    const scores = await Score.find({user: req.user}).populate("question");
+    const scores = await Score.find({user: req.user})
+      .populate("question")
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
     
     res.status(200).json({
       success: true,
@@ -126,7 +141,11 @@ const getCurrentUserScoresByQuestionId = async (req, res) => {
       question: req.params.id,
       session: currentSession,
       quarter: currentQuarter,
-    }).populate("question");
+    }).populate("question")
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
     
     if (scores.length < 1) {
       res.status(404).json({
@@ -156,7 +175,11 @@ const getScoresByUserId = async (req, res) => {
       user: req.params.id,
       session: currentSession,
       quarter: currentQuarter,
-    }).populate("question");
+    }).populate("question")
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
     
     if (scores.length < 1) {
       res.status(404).json({
@@ -188,7 +211,11 @@ const geScoreByUserIdAndQuestionId = async (req, res) => {
       question: req.params.q_id,
       session: currentSession,
       quarter: currentQuarter,
-    }).populate("question");
+    }).populate("question")
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
     
     if (scores.length < 1) {
       res.status(404).json({
@@ -213,7 +240,13 @@ const geScoreByUserIdAndQuestionId = async (req, res) => {
 //Get a score's details
 const getScore = async (req, res) => {
   try {
-    const score = await Score.findById(req.params.id).populate("user question");
+    const score = await Score.findById(req.params.id)
+      .populate("question")
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
+
     if (!score) {
       return res
         .status(404)

@@ -77,7 +77,11 @@ const getInitiatives = async (req, res) => {
       user,
     })
       .sort({ _id: -1 })
-      .populate("perspective");
+      .populate("perspective")
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
 
     if (!foundInitiatives) {
       return res.status(404).json({
@@ -105,7 +109,11 @@ const getStaffInitiatives = async (req, res) => {
 
     const foundStaffInitiatives = await UserInitiative.findById(id)
       .sort({ _id: -1 })
-      .populate("perspective");
+      .populate("perspective")
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
 
     if (!foundStaffInitiatives) {
       return res.status(404).json({
@@ -130,11 +138,15 @@ const getStaffInitiatives = async (req, res) => {
 const getInitiativeByStaffId = async (req, res) => {
   try {
     const {currentSession} = await current()
-    const staff = Staff.findById(req.params.id)
-    const initiatives = await Score.find({
+    const staff = await Staff.findById(req.params.id)
+    const initiatives = await Initiative.find({
       user: req.params.id,
       session: currentSession,
-    }).populate("question");
+    }).populate("perspective")
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
     
     if (initiatives.length < 1) {
       res.status(404).json({

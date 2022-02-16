@@ -44,7 +44,16 @@ const createCalibration = async (req, res) => {
 //Get all results
 const getAllCalibration = async (req, res) => {
   try {
-    const calibration = await Calibration.find({}).populate("hr staff");
+    const calibration = await Calibration.find()
+      .populate({
+        path: "hr",
+        select: "fullname email department manager role isManager"
+      })
+      .populate({
+        path: "staff",
+        select: "fullname email department manager role isManager"
+      });
+
     if (!calibration) {
       return res
         .status(404)
@@ -71,7 +80,15 @@ const getCurrentCalibration = async (req, res) => {
     const calibration = await Calibration.findOne({
       staff: req.user,
       session: currentSession
-    });
+    }).populate({
+        path: "hr",
+        select: "fullname email department manager role isManager"
+      })
+      .populate({
+        path: "staff",
+        select: "fullname email department manager role isManager"
+      });
+
     if (!calibration) {
       return res
         .status(400)
@@ -126,7 +143,14 @@ const getCurrentCalibrationByStaffId = async (req, res) => {
     const calibration = await Calibration.findOne({
       staff: req.params.id,
       session: currentSession
-    });
+    }).populate({
+        path: "hr",
+        select: "fullname email department manager role isManager"
+      })
+      .populate({
+        path: "staff",
+        select: "fullname email department manager role isManager"
+      });
 
     if (!calibration) {
       return res
@@ -136,14 +160,14 @@ const getCurrentCalibrationByStaffId = async (req, res) => {
     
     res.status(200).json({
       success: true,
-      staff: staff,
-      result: {
+      data: {
+        staff: staff,
+        calibration: calibration,
         firstQuarter: firstQuarterResult,
         secondQuarter: secondQuarterResult,
         thirdQuarter: thirdQuarterResult,
         fourthQuarter: fourthQuarterResult,
       },
-      data: calibration,
     });
   } catch (err) {
     return res.status(500).json({
@@ -156,7 +180,16 @@ const getCurrentCalibrationByStaffId = async (req, res) => {
 //Get a calibration's details
 const getCalibration = async (req, res) => {
   try {
-    const calibration = await Calibration.findById(req.params.id).populate("hr staff");
+    const calibration = await Calibration.findById(req.params.id)
+      .populate({
+        path: "hr",
+        select: "fullname email department manager role isManager"
+      })
+      .populate({
+        path: "staff",
+        select: "fullname email department manager role isManager"
+      });
+
     if (!calibration) {
       return res
         .status(404)

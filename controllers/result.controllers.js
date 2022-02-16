@@ -49,7 +49,12 @@ const createResult = async (req, res) => {
 //Get all results
 const getAllResult = async (req, res) => {
   try {
-    const result = await Result.find({}).populate("user");
+    const result = await Result.find({})
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
+
     if (!result) {
       return res
         .status(404)
@@ -77,7 +82,11 @@ const getCurrentResult = async (req, res) => {
       user: req.user,
       session: currentSession,
       quarter: currentQuarter,
-    });
+    }).populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
+
     if (!result) {
       return res
         .status(400)
@@ -101,6 +110,7 @@ const getQuarterlyResult = async (req, res) => {
   try {
     const {currentSession} = await current()
 
+    const staff = await Staff.findById(req.user)
     const firstQuarterResult = await Result.find({
       user: req.user,
       session: currentSession,
@@ -130,6 +140,7 @@ const getQuarterlyResult = async (req, res) => {
     res.status(200).json({
       success: true,
       data: {
+        staff: staff,
         firstQuarter: firstQuarterResult,
         secondQuarter: secondQuarterResult,
         thirdQuarter: thirdQuarterResult,
@@ -197,7 +208,12 @@ const getCurrentResultByStaffId = async (req, res) => {
 //Get a result's details
 const getResult = async (req, res) => {
   try {
-    const result = await Result.findById(req.params.id).populate("user").populate("user");
+    const result = await Result.findById(req.params.id)
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager"
+      });
+
     if (!result) {
       return res
         .status(404)

@@ -2,6 +2,9 @@ const Result = require("../models/Result")
 const Staff = require("../models/Staff")
 const current = require("../utils/currentAppraisalDetails")
 const resultScore = require("../utils/calculateScore")
+const sendEmail = require("../utils/sendEmail")
+const firstName = require("../utils/getFirstName")
+const convertQuarter = require("../utils/convertQuarter")
 
 //Create a result
 const createResult = async (req, res) => {
@@ -33,6 +36,46 @@ const createResult = async (req, res) => {
     body.score = score
 
     const result = await Result.create(body);
+
+    const userDetails = await Staff.findById(user.id).populate("manager")
+
+    // Send email to staff
+    try {
+      let salutation = ``
+      let content = `
+      Kudos, you have completed your ${convertQuarter(existingResult.quarter)} performance appraisal and you score is ${result.score}.
+      Your manager will be informed to proceed with the manager rating
+      
+      Thank you
+      `
+      await sendEmail({
+        email: userDetails.email,
+        subject: "Completed Quarterly Appraisal",
+        salutation,
+        content,
+      });
+    } catch (err) {
+      console.log(err)
+    }
+    
+    // Send email to staff's manager
+    try {
+      let managerFirstName = firstName(userDetails.manager.fullname)
+      let managerEmail = userDetails.manager.email
+      let salutation = `Dear Manager,`
+      let content = `
+      Kindly be aware that ${userDetails.fullname}  has completed the self-appraisal section of the ${convertQuarter(existingResult.quarter)} performance appraisal with an overall score of ${result.score}. 
+      Kindly log on to the <a href="https://lbanstaffportal.herokuapp.com/dashboard">Portal</a> for your final rating.
+      `
+      await sendEmail({
+        email: managerEmail,
+        subject: "Quarterly Appraisal for Team Member",
+        salutation,
+        content,
+      });
+    } catch (err) {
+      console.log(err)
+    }
 
     res.status(200).json({
       success: true,
@@ -205,6 +248,136 @@ const getCurrentResultByStaffId = async (req, res) => {
   }
 };
 
+//update the current appraisal result for a staff using staff id
+const UpdateCurrentResultByStaffId = async (req, res) => {
+  try {
+    const {currentSession, currentQuarter} = await current()
+    const { body } = req;
+
+    const staff = await Staff.findById(req.params.id)
+    const existingResult = await Result.find({
+      user: req.params.id,
+      session: currentSession,
+      quarter: currentQuarter,
+    });
+    const score = await resultScore(req)
+    const managerScore = await resultScore(req, scoreType="managerscore")
+    const hrEmail = "akinwalejude@gmail.com"
+    body.score = score
+    body.managerscore = managerScore
+
+    if (!existingResult) {
+      return res
+        .status(404)
+        .json({ success: false, msg: "Results not found!" });
+    }
+
+    const result = await Result.findByIdAndUpdate(existingResult.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    const userDetails = await Staff.findById(result.user)
+
+    if (existingResult.score != body.score) {
+      // Send email to staff
+      try {
+        let salutation = ``
+        let content = `
+        Kudos, you have updated your ${convertQuarter(existingResult.quarter)} performance appraisal and you score is ${result.score}.,
+        Your manager will be informed to proceed with the manager rating
+        
+        Thank you
+        `
+        await sendEmail({
+          email: userDetails.email,
+          cc: [hrEmail],
+          subject: "Upated Quarterly Appraisal",
+          salutation,
+          content,
+        });
+      } catch (err) {
+        console.log(err)
+      }
+
+      // Send email to staff's manager
+      try {
+        // let managerFirstName = firstName(userDetails.manager.fullname)
+        salutation = `Dear Manager,`
+        content = `
+        Kindly be aware that (name of staff member)  has updated the self-appraisal section of the ${convertQuarter(existingResult.quarter)} performance appraisal with an overall score of ${result.score}., 
+        Kindly log on to the <a href="https://lbanstaffportal.herokuapp.com/dashboard">Portal</a> for your final rating.
+        `
+        await sendEmail({
+          email: userDetails.manager.email,
+          cc: [hrEmail],
+          subject: "Quarterly Appraisal for Team Member",
+          salutation,
+          content,
+        });
+      } catch (err) {
+        console.log(err)
+      }
+
+
+      
+    }
+    
+    if (existingResult.managerscore != body.managerscore) {
+      // Send email to staff
+      try {
+        let salutation = ``
+        let content = `
+        Kindly be aware that your manager has rated your ${convertQuarter(existingResult.quarter)} performance appraisal and your manager's score is ${result.managerscore}.
+        
+        Thank you
+        `
+        await sendEmail({
+          email: userDetails.email,
+          cc: [hrEmail],
+          subject: "Upated Quarterly Appraisal",
+          salutation,
+          content,
+        });
+      } catch (err) {
+        console.log(err)
+      }
+
+      // Send email to staff's manager
+      try {
+        // let managerFirstName = firstName(userDetails.manager.fullname)
+        salutation = `Dear Manager,`
+        content = `
+        Kindly be aware that the manager's rating score for ${existingResult.user.fullname} for the ${convertQuarter(existingResult.quarter)} performance appraisal is ${result.managerscore}, 
+        
+        Thank you
+        `
+        await sendEmail({
+          email: userDetails.manager.email,
+          cc: [hrEmail],
+          subject: "Quarterly Appraisal for Team Member",
+          salutation,
+          content,
+        });
+      } catch (err) {
+        console.log(err)
+      }
+      
+    }
+    
+    res.status(200).json({
+      success: true,
+      data: result,
+      staff: staff,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
 //Get a result's details
 const getResult = async (req, res) => {
   try {
@@ -236,8 +409,10 @@ const getResult = async (req, res) => {
 const updateResult = async (req, res) => {
   try {
     const { body } = req;
+    const existingResult = await Result.findById(req.params.id).populate("user")
     const score = await resultScore(req)
     const managerScore = await resultScore(req, scoreType="managerscore")
+    const hrEmail = "akinwalejude@gmail.com"
     body.score = score
     body.managerscore = managerScore
 
@@ -245,6 +420,94 @@ const updateResult = async (req, res) => {
       new: true,
       runValidators: true,
     });
+
+    const userDetails = await Staff.findById(result.user)
+
+    if (existingResult.score != body.score) {
+      // Send email to staff
+      try {
+        let salutation = ``
+        let content = `
+        Kudos, you have updated your ${convertQuarter(existingResult.quarter)} performance appraisal and you score is ${result.score}.,
+        Your manager will be informed to proceed with the manager rating
+        
+        Thank you
+        `
+        await sendEmail({
+          email: userDetails.email,
+          cc: [hrEmail],
+          subject: "Upated Quarterly Appraisal",
+          salutation,
+          content,
+        });
+      } catch (err) {
+        console.log(err)
+      }
+
+      // Send email to staff's manager
+      try {
+        // let managerFirstName = firstName(userDetails.manager.fullname)
+        salutation = `Dear Manager,`
+        content = `
+        Kindly be aware that (name of staff member)  has updated the self-appraisal section of the ${convertQuarter(existingResult.quarter)} performance appraisal with an overall score of ${result.score}., 
+        Kindly log on to the <a href="https://lbanstaffportal.herokuapp.com/dashboard">Portal</a> for your final rating.
+        `
+        await sendEmail({
+          email: userDetails.manager.email,
+          cc: [hrEmail],
+          subject: "Quarterly Appraisal for Team Member",
+          salutation,
+          content,
+        });
+      } catch (err) {
+        console.log(err)
+      }
+
+
+      
+    }
+    
+    if (existingResult.managerscore != body.managerscore) {
+      // Send email to staff
+      try {
+        let salutation = ``
+        let content = `
+        Kindly be aware that your manager has rated your ${convertQuarter(existingResult.quarter)} performance appraisal and your manager's score is ${result.managerscore}.
+        
+        Thank you
+        `
+        await sendEmail({
+          email: userDetails.email,
+          cc: [hrEmail],
+          subject: "Upated Quarterly Appraisal",
+          salutation,
+          content,
+        });
+      } catch (err) {
+        console.log(err)
+      }
+
+      // Send email to staff's manager
+      try {
+        // let managerFirstName = firstName(userDetails.manager.fullname)
+        salutation = `Dear Manager,`
+        content = `
+        Kindly be aware that the manager's rating score for ${existingResult.user.fullname} for the ${convertQuarter(existingResult.quarter)} performance appraisal is ${result.managerscore}, 
+        
+        Thank you
+        `
+        await sendEmail({
+          email: userDetails.manager.email,
+          cc: [hrEmail],
+          subject: "Quarterly Appraisal for Team Member",
+          salutation,
+          content,
+        });
+      } catch (err) {
+        console.log(err)
+      }
+      
+    }
 
     res.status(200).json({
       success: true,
@@ -286,6 +549,7 @@ module.exports = {
   getCurrentResult,
   getQuarterlyResult,
   getCurrentResultByStaffId,
+  UpdateCurrentResultByStaffId,
   getResult,
   updateResult,
   deleteResult

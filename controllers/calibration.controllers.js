@@ -28,7 +28,26 @@ const createCalibration = async (req, res) => {
     body.hr = user
 
     const calibration = await Calibration.create(body);
+    const hr = await Staff.findById(user)
+    const staff = await Staff.findById(calibration.staff).populate("manager")
 
+    // Send email to staff, manager and hr
+    try {
+      let salutation = ``
+      let content = `
+      Kindly be aware that the calibration for ${staff.fullname}, for the ${currentSession} session,  has been completed. The calibrated score is ${calibration.score}.
+      `
+      await sendEmail({
+        email: staff.email,
+        cc: [hr.email, staff.manager.email],
+        subject: "Completed Appraisal Calibration",
+        salutation,
+        content,
+      });
+    } catch (err) {
+      console.log(err)
+    }
+    
     res.status(200).json({
       success: true,
       data: calibration,
@@ -215,6 +234,25 @@ const updateCalibration = async (req, res) => {
       new: true,
       runValidators: true,
     });
+    const hr = await Staff.findById(user)
+    const staff = await Staff.findById(calibration.staff).populate("manager")
+
+    // Send email to staff, manager and hr
+    try {
+      let salutation = ``
+      let content = `
+      Kindly be aware that the calibration for ${staff.fullname}, for the ${currentSession} session,  has been updated. The calibrated score is ${calibration.score}.
+      `
+      await sendEmail({
+        email: staff.email,
+        cc: [hr.email, staff.manager.email],
+        subject: "Updated Appraisal Calibration",
+        salutation,
+        content,
+      });
+    } catch (err) {
+      console.log(err)
+    }
 
     res.status(200).json({
       success: true,

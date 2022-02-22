@@ -41,7 +41,7 @@ const sendEmail = async (options) => {
                                         <tr>
                                             <td align="center"
                                                 style="font-family: 'Raleway', sans-serif; font-size:37px; color:#ffffff;font-weight: bold;">
-                                                Lagos State Ministry of Science 
+                                                Lotus Beta Analytics 
                                             </td>
                                         </tr>
                                     </tbody>

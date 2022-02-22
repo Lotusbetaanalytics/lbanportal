@@ -5,4 +5,11 @@ const convertQuarter = (quarter) => {
   return quarterDict[quarter]
 }
 
-module.exports = convertQuarter
+const firstName = (words) => {
+  var n = words.split(" ");
+  return n[n.length - 1];
+}
+
+const hrEmail = "akinwalejude@gmail.com"
+
+module.exports = {convertQuarter, hrEmail, firstName}

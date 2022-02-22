@@ -1,30 +1,25 @@
 const Perspective = require("../models/Perspective")
 
-//Create a perspective
+// Create a perspective
 const createPerspective = async (req, res) => {
   try {
     let { body } = req;
+
     const findPerspective = await Perspective.find({title: body.title});
     const allPerspectives = await Perspective.find();
     let totalPercentage = 0
 
     if (findPerspective.length > 0) {
-      return res.status(400).json({
-        success: false,
-        msg: "This perspective already exists, update it instead",
-      });
+      return new ErrorResponseJSON(res, "This perspective already exists, update it instead!", 400)
     };
 
     for (const [key, perspective] of Object.entries(allPerspectives)) {
       totalPercentage += perspective.percentage
     }
-
     totalPercentage += body.percentage
+
     if (totalPercentage > 100) {
-      return res.status(400).json({
-        success: false,
-        msg: "Total percentage for all perspective exceeeds 100%",
-      });
+      return new ErrorResponseJSON(res, "Total percentage for all perspective exceeeds 100!", 400)
     }
 
     const perspective = await Perspective.create(body);
@@ -35,21 +30,16 @@ const createPerspective = async (req, res) => {
     });
 
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get all perspectives
+// Get all perspectives
 const getAllPerspectives = async (req, res) => {
   try {
     const perspective = await Perspective.find({});
     if (!perspective) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Perspectives not found!" });
+      return new ErrorResponseJSON(res, "Perspectives not found!", 404)
     }
     
     res.status(200).json({
@@ -57,21 +47,16 @@ const getAllPerspectives = async (req, res) => {
       data: perspective,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get a perspective's details
+// Get a perspective's details
 const getPerspective = async (req, res) => {
   try {
     const perspective = await Perspective.findById(req.params.id);
     if (!perspective) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Perspective not found!" });
+      return new ErrorResponseJSON(res, "Perspective not found!", 404)
     }
     
     res.status(200).json({
@@ -79,22 +64,14 @@ const getPerspective = async (req, res) => {
       data: perspective,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Upadate a perspective's details
+// Upadate a perspective's details
 const updatePerspective = async (req, res) => {
   try {
     const { body } = req;
-    if (!body) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "No data was provided!" });
-    }
 
     const allPerspectives = await Perspective.find();
     const currentPerspective = await Perspective.findById(req.params.id)
@@ -109,10 +86,7 @@ const updatePerspective = async (req, res) => {
     totalPercentage += body.percentage
 
     if (totalPercentage > 100) {
-      return res.status(400).json({
-        success: false,
-        msg: "Total percentage for all perspective exceeeds 100%",
-      });
+      return new ErrorResponseJSON(res, "Total percentage for all perspective exceeeds 100!", 400)
     }
 
     const perspective = await Perspective.findByIdAndUpdate(req.params.id, req.body, {
@@ -125,21 +99,16 @@ const updatePerspective = async (req, res) => {
       data: perspective,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Delete a perspective
+// Delete a perspective
 const deletePerspective = async (req, res) => {
   try {
     const perspective = await Perspective.findByIdAndDelete(req.params.id);
     if (!perspective) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Perspective not found!" });
+      return new ErrorResponseJSON(res, "Perspective not found!", 404)
     }
     
     res.status(200).json({
@@ -147,10 +116,7 @@ const deletePerspective = async (req, res) => {
       data: perspective,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 

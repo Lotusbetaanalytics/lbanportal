@@ -3,7 +3,7 @@ const Result = require("../models/Result");
 const Staff = require("../models/Staff");
 const current = require("../utils/currentAppraisalDetails");
 
-//Create a calibration
+// Create a calibration
 const createCalibration = async (req, res) => {
   const {currentSession} = await current()
 
@@ -16,10 +16,7 @@ const createCalibration = async (req, res) => {
       session: currentSession
     });
     if (existingCalibration.length > 0) {
-      res.status(200).json({
-        success: true,
-        msg: "Calibration already exists",
-      });
+      return new ErrorResponseJSON(res, "Calibration already exists", 400)
     }
 
     if (!session) {
@@ -53,30 +50,23 @@ const createCalibration = async (req, res) => {
       data: calibration,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get all results
+// Get all results
 const getAllCalibration = async (req, res) => {
   try {
-    const calibration = await Calibration.find()
-      .populate({
-        path: "hr",
-        select: "fullname email department manager role isManager"
-      })
-      .populate({
-        path: "staff",
-        select: "fullname email department manager role isManager"
-      });
+    const calibration = await Calibration.find().populate({
+      path: "hr",
+      select: "fullname email department manager role isManager"
+    }).populate({
+      path: "staff",
+      select: "fullname email department manager role isManager"
+    });
 
     if (!calibration) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Calibrations not found!" });
+      return new ErrorResponseJSON(res, "Calibrations not found!", 404)
     }
 
     res.status(200).json({
@@ -84,14 +74,11 @@ const getAllCalibration = async (req, res) => {
       data: calibration,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get the current appraisal calibration for authenticated staff
+// Get the current appraisal calibration for authenticated staff
 const getCurrentCalibration = async (req, res) => {
   try {
     const {currentSession} = await current()
@@ -100,18 +87,15 @@ const getCurrentCalibration = async (req, res) => {
       staff: req.user,
       session: currentSession
     }).populate({
-        path: "hr",
-        select: "fullname email department manager role isManager"
-      })
-      .populate({
-        path: "staff",
-        select: "fullname email department manager role isManager"
-      });
+      path: "hr",
+      select: "fullname email department manager role isManager"
+    }).populate({
+      path: "staff",
+      select: "fullname email department manager role isManager"
+    });
 
     if (!calibration) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Calibration not found!" });
+      return new ErrorResponseJSON(res, "Calibration not found!", 404)
     }
     
     res.status(200).json({
@@ -119,14 +103,11 @@ const getCurrentCalibration = async (req, res) => {
       data: calibration,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get the current appraisal calibration for a staff
+// Get the current appraisal calibration for a staff
 const getCurrentCalibrationByStaffId = async (req, res) => {
   try {
     const {currentSession, currentQuarter} = await current()
@@ -153,28 +134,23 @@ const getCurrentCalibrationByStaffId = async (req, res) => {
       quarter: "Fourth Quarter",
     });
 
-    if (!firstQuarterResult || !secondQuarterResult || !thirdQuarterResult || !fourthQuarterResult) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Results not found!" });
-    }
+    // if (!firstQuarterResult || !secondQuarterResult || !thirdQuarterResult || !fourthQuarterResult) {
+    //   return new ErrorResponseJSON(res, "There are no results to be calibrated!", 404)
+    // }
 
     const calibration = await Calibration.findOne({
       staff: req.params.id,
       session: currentSession
     }).populate({
-        path: "hr",
-        select: "fullname email department manager role isManager"
-      })
-      .populate({
-        path: "staff",
-        select: "fullname email department manager role isManager"
-      });
+      path: "hr",
+      select: "fullname email department manager role isManager"
+    }).populate({
+      path: "staff",
+      select: "fullname email department manager role isManager"
+    });
 
     if (!calibration) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Calibration not found!" });
+      return new ErrorResponseJSON(res, "Calibration not found!", 404)
     }
     
     res.status(200).json({
@@ -189,30 +165,23 @@ const getCurrentCalibrationByStaffId = async (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get a calibration's details
+// Get a calibration's details
 const getCalibration = async (req, res) => {
   try {
-    const calibration = await Calibration.findById(req.params.id)
-      .populate({
-        path: "hr",
-        select: "fullname email department manager role isManager"
-      })
-      .populate({
-        path: "staff",
-        select: "fullname email department manager role isManager"
-      });
+    const calibration = await Calibration.findById(req.params.id).populate({
+      path: "hr",
+      select: "fullname email department manager role isManager"
+    }).populate({
+      path: "staff",
+      select: "fullname email department manager role isManager"
+    });
 
     if (!calibration) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Calibration not found!" });
+      return new ErrorResponseJSON(res, "Calibration not found!", 404)
     }
     
     res.status(200).json({
@@ -220,14 +189,11 @@ const getCalibration = async (req, res) => {
       data: calibration,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Upadate a calibration's details
+// Upadate a calibration's details
 const updateCalibration = async (req, res) => {
   try {
     const calibration = await Calibration.findByIdAndUpdate(req.params.id, req.body, {
@@ -259,21 +225,16 @@ const updateCalibration = async (req, res) => {
       data: calibration,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Delete a calibration
+// Delete a calibration
 const deleteCalibration = async (req, res) => {
   try {
     const calibration = await Calibration.findByIdAndDelete(req.params.id);
     if (!calibration) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Calibration not found!" });
+      return new ErrorResponseJSON(res, "Calibration not found!", 404)
     }
     
     res.status(200).json({
@@ -281,10 +242,7 @@ const deleteCalibration = async (req, res) => {
       data: calibration,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 

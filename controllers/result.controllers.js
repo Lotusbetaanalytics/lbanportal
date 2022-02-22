@@ -4,11 +4,10 @@ const current = require("../utils/currentAppraisalDetails")
 const resultScore = require("../utils/calculateScore")
 const sendEmail = require("../utils/sendEmail")
 const {createResultEmail, updateResultEmail} = require("../utils/sendResultEmail")
-// const firstName = require("../utils/getFirstName")
 const {convertQuarter, hrEmail, firstName} = require("../utils/utils")
 const {ErrorResponseJSON} = require("../utils/errorResponse")
 
-//Create a result
+// Create a result
 const createResult = async (req, res) => {
   const {currentSession, currentQuarter} = await current()
 
@@ -59,14 +58,13 @@ const createResult = async (req, res) => {
   }
 };
 
-//Get all results
+// Get all results
 const getAllResult = async (req, res) => {
   try {
-    const result = await Result.find({})
-      .populate({
-        path: "user",
-        select: "fullname email department manager role isManager"
-      });
+    const result = await Result.find({}).populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
 
     if (!result) {
       return new ErrorResponseJSON(res, "Results not found!", 404)
@@ -81,7 +79,7 @@ const getAllResult = async (req, res) => {
   }
 };
 
-//Get the current appraisal result for an authenticated staff
+// Get the current appraisal result for an authenticated staff
 const getCurrentResult = async (req, res) => {
   try {
     const {currentSession, currentQuarter} = await current()
@@ -91,9 +89,9 @@ const getCurrentResult = async (req, res) => {
       session: currentSession,
       quarter: currentQuarter,
     }).populate({
-        path: "user",
-        select: "fullname email department manager role isManager"
-      });
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
 
     if (!result) {
       return new ErrorResponseJSON(res, "Result not found!", 404)
@@ -108,7 +106,7 @@ const getCurrentResult = async (req, res) => {
   }
 };
 
-//Upadate the current appraisal result for an authenticated staff
+// Upadate the current appraisal result for an authenticated staff
 const updateCurrentResult = async (req, res) => {
   try {
     const {currentSession, currentQuarter} = await current()
@@ -118,7 +116,10 @@ const updateCurrentResult = async (req, res) => {
       user: req.user,
       session: currentSession,
       quarter: currentQuarter,
-    }).populate("user")
+    }).populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
 
     if (!existingResult){
       return new ErrorResponseJSON(res, "Result not found!", 400)
@@ -145,7 +146,7 @@ const updateCurrentResult = async (req, res) => {
   }
 };
 
-//Get all results by quarter for an authenticated staff
+// Get all results by quarter for an authenticated staff
 const getQuarterlyResult = async (req, res) => {
   try {
     const {currentSession} = await current()
@@ -190,7 +191,7 @@ const getQuarterlyResult = async (req, res) => {
   }
 };
 
-//Get the current appraisal result for a staff
+// Get the current appraisal result for a staff
 const getCurrentResultByStaffId = async (req, res) => {
   try {
     const {currentSession, currentQuarter} = await current()
@@ -235,7 +236,7 @@ const getCurrentResultByStaffId = async (req, res) => {
   }
 };
 
-//update the current appraisal result for a staff using staff id
+// Update the current appraisal result for a staff using staff id
 const UpdateCurrentResultByStaffId = async (req, res) => {
   try {
     const {currentSession, currentQuarter} = await current()
@@ -279,14 +280,13 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
   }
 };
 
-//Get a result's details
+// Get a result's details
 const getResult = async (req, res) => {
   try {
-    const result = await Result.findById(req.params.id)
-      .populate({
-        path: "user",
-        select: "fullname email department manager role isManager"
-      });
+    const result = await Result.findById(req.params.id).populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
 
     if (!result) {
       return new ErrorResponseJSON(res, "Result not found!", 404)
@@ -301,12 +301,16 @@ const getResult = async (req, res) => {
   }
 };
 
-//Upadate a result's details
+// Upadate a result's details
 const updateResult = async (req, res) => {
   try {
     const { body } = req;
 
-    const existingResult = await Result.findById(req.params.id).populate("user")
+    const existingResult = await Result.findById(req.params.id).populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
+
     if (!existingResult){
       return new ErrorResponseJSON(res, "Result not found!", 400)
     }
@@ -332,7 +336,7 @@ const updateResult = async (req, res) => {
   }
 };
 
-//Delete a result
+// Delete a result
 const deleteResult = async (req, res) => {
   try {
     const result = await Result.findByIdAndDelete(req.params.id);

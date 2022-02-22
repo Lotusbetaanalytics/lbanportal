@@ -3,8 +3,10 @@ const Staff = require("../models/Staff")
 const current = require("../utils/currentAppraisalDetails")
 const resultScore = require("../utils/calculateScore")
 const sendEmail = require("../utils/sendEmail")
-const firstName = require("../utils/getFirstName")
-const convertQuarter = require("../utils/convertQuarter")
+const {createResultEmail, updateResultEmail} = require("../utils/sendResultEmail")
+// const firstName = require("../utils/getFirstName")
+const {convertQuarter, hrEmail, firstName} = require("../utils/utils")
+const {ErrorResponseJSON} = require("../utils/errorResponse")
 
 //Create a result
 const createResult = async (req, res) => {
@@ -14,19 +16,14 @@ const createResult = async (req, res) => {
     let { user, body } = req;
     const {session, quarter} = body
 
-    const existingResult = await Result.find({
+    const existingResult = await Result.findOne({
       user: req.user,
       session: currentSession,
       quarter: currentQuarter
     });
-    if (existingResult.length > 0) {
-      res.status(200).json({
-        success: true,
-        msg: "Result already exists",
-      });
-    }
 
     const score = await resultScore(req)
+    const managerScore = await resultScore(req, scoreType="managerscore")
 
     if (!session || !quarter) {
       body.session = currentSession
@@ -34,58 +31,31 @@ const createResult = async (req, res) => {
     }
     body.user = user
     body.score = score
+    body.managerscore = managerScore
 
-    const result = await Result.create(body);
+    if (existingResult) {
 
-    const userDetails = await Staff.findById(user.id).populate("manager")
-
-    // Send email to staff
-    try {
-      let salutation = ``
-      let content = `
-      Kudos, you have completed your ${convertQuarter(existingResult.quarter)} performance appraisal and you score is ${result.score}.
-      Your manager will be informed to proceed with the manager rating
-      
-      Thank you
-      `
-      await sendEmail({
-        email: userDetails.email,
-        subject: "Completed Quarterly Appraisal",
-        salutation,
-        content,
+      const result = await Result.findByIdAndUpdate(existingResult.id, body, {
+        new: true,
+        runValidators: true,
       });
-    } catch (err) {
-      console.log(err)
-    }
-    
-    // Send email to staff's manager
-    try {
-      let managerFirstName = firstName(userDetails.manager.fullname)
-      let managerEmail = userDetails.manager.email
-      let salutation = `Dear Manager,`
-      let content = `
-      Kindly be aware that ${userDetails.fullname}  has completed the self-appraisal section of the ${convertQuarter(existingResult.quarter)} performance appraisal with an overall score of ${result.score}. 
-      Kindly log on to the <a href="https://lbanstaffportal.herokuapp.com/dashboard">Portal</a> for your final rating.
-      `
-      await sendEmail({
-        email: managerEmail,
-        subject: "Quarterly Appraisal for Team Member",
-        salutation,
-        content,
-      });
-    } catch (err) {
-      console.log(err)
+  
+      await updateResultEmail(req, existingResult, result, hrEmail)
+
+      // return new ErrorResponseJSON(res, "Result already exists", 400)
+    } else {
+      const result = await Result.create(body);
+  
+      await createResultEmail(req, existingResult, result, hrEmail)
     }
 
-    res.status(200).json({
+
+    return res.status(200).json({
       success: true,
       data: result,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
@@ -99,9 +69,7 @@ const getAllResult = async (req, res) => {
       });
 
     if (!result) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Results not found!" });
+      return new ErrorResponseJSON(res, "Results not found!", 404)
     }
 
     res.status(200).json({
@@ -109,10 +77,7 @@ const getAllResult = async (req, res) => {
       data: result,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
@@ -131,9 +96,7 @@ const getCurrentResult = async (req, res) => {
       });
 
     if (!result) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Result not found!" });
+      return new ErrorResponseJSON(res, "Result not found!", 404)
     }
     
     res.status(200).json({
@@ -141,10 +104,44 @@ const getCurrentResult = async (req, res) => {
       data: result,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
+    return new ErrorResponseJSON(res, err.message, 500)
+  }
+};
+
+//Upadate the current appraisal result for an authenticated staff
+const updateCurrentResult = async (req, res) => {
+  try {
+    const {currentSession, currentQuarter} = await current()
+    const { body } = req;
+
+    const existingResult = await Result.findOne({
+      user: req.user,
+      session: currentSession,
+      quarter: currentQuarter,
+    }).populate("user")
+
+    if (!existingResult){
+      return new ErrorResponseJSON(res, "Result not found!", 400)
+    }
+    
+    const score = await resultScore(req)
+    const managerScore = await resultScore(req, scoreType="managerscore")
+    body.score = score
+    body.managerscore = managerScore
+
+    const result = await Result.findByIdAndUpdate(existingResult.id, body, {
+      new: true,
+      runValidators: true,
     });
+
+    await updateResultEmail(req, existingResult, result, hrEmail)
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
@@ -175,9 +172,7 @@ const getQuarterlyResult = async (req, res) => {
       quarter: "Fourth Quarter",
     });
     if (!firstQuarterResult || !secondQuarterResult || !thirdQuarterResult || !fourthQuarterResult) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Results not found!" });
+      return new ErrorResponseJSON(res, "Results not found!", 404)
     }
     
     res.status(200).json({
@@ -191,10 +186,7 @@ const getQuarterlyResult = async (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
@@ -225,9 +217,7 @@ const getCurrentResultByStaffId = async (req, res) => {
       quarter: "Fourth Quarter",
     });
     if (!firstQuarterResult || !secondQuarterResult || !thirdQuarterResult || !fourthQuarterResult) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Results not found!" });
+      return new ErrorResponseJSON(res, "Results not found!", 404)
     }
     
     res.status(200).json({
@@ -241,10 +231,7 @@ const getCurrentResultByStaffId = async (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
@@ -252,118 +239,35 @@ const getCurrentResultByStaffId = async (req, res) => {
 const UpdateCurrentResultByStaffId = async (req, res) => {
   try {
     const {currentSession, currentQuarter} = await current()
-    const { body } = req;
+    const { user, body } = req;
 
-    const staff = await Staff.findById(req.params.id)
-    const existingResult = await Result.find({
+    const existingResult = await Result.findOne({
       user: req.params.id,
       session: currentSession,
       quarter: currentQuarter,
     });
+    if (!existingResult) {
+      return new ErrorResponseJSON(res, "Result not found!", 404)
+    }
+
+    const staff = await Staff.findById(req.params.id)
+    const manager = await Staff.findById(user)
+
+    if (staff.manager != user || manager.role != "HR") {
+      return new ErrorResponseJSON(res, "You are not authorized!", 404)
+    }
+
     const score = await resultScore(req)
     const managerScore = await resultScore(req, scoreType="managerscore")
-    const hrEmail = "akinwalejude@gmail.com"
     body.score = score
     body.managerscore = managerScore
-
-    if (!existingResult) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Results not found!" });
-    }
 
     const result = await Result.findByIdAndUpdate(existingResult.id, req.body, {
       new: true,
       runValidators: true,
     });
 
-    const userDetails = await Staff.findById(result.user)
-
-    if (existingResult.score != body.score) {
-      // Send email to staff
-      try {
-        let salutation = ``
-        let content = `
-        Kudos, you have updated your ${convertQuarter(existingResult.quarter)} performance appraisal and you score is ${result.score}.,
-        Your manager will be informed to proceed with the manager rating
-        
-        Thank you
-        `
-        await sendEmail({
-          email: userDetails.email,
-          cc: [hrEmail],
-          subject: "Upated Quarterly Appraisal",
-          salutation,
-          content,
-        });
-      } catch (err) {
-        console.log(err)
-      }
-
-      // Send email to staff's manager
-      try {
-        // let managerFirstName = firstName(userDetails.manager.fullname)
-        salutation = `Dear Manager,`
-        content = `
-        Kindly be aware that (name of staff member)  has updated the self-appraisal section of the ${convertQuarter(existingResult.quarter)} performance appraisal with an overall score of ${result.score}., 
-        Kindly log on to the <a href="https://lbanstaffportal.herokuapp.com/dashboard">Portal</a> for your final rating.
-        `
-        await sendEmail({
-          email: userDetails.manager.email,
-          cc: [hrEmail],
-          subject: "Quarterly Appraisal for Team Member",
-          salutation,
-          content,
-        });
-      } catch (err) {
-        console.log(err)
-      }
-
-
-      
-    }
-    
-    if (existingResult.managerscore != body.managerscore) {
-      // Send email to staff
-      try {
-        let salutation = ``
-        let content = `
-        Kindly be aware that your manager has rated your ${convertQuarter(existingResult.quarter)} performance appraisal and your manager's score is ${result.managerscore}.
-        
-        Thank you
-        `
-        await sendEmail({
-          email: userDetails.email,
-          cc: [hrEmail],
-          subject: "Upated Quarterly Appraisal",
-          salutation,
-          content,
-        });
-      } catch (err) {
-        console.log(err)
-      }
-
-      // Send email to staff's manager
-      try {
-        // let managerFirstName = firstName(userDetails.manager.fullname)
-        salutation = `Dear Manager,`
-        content = `
-        Kindly be aware that the manager's rating score for ${existingResult.user.fullname} for the ${convertQuarter(existingResult.quarter)} performance appraisal is ${result.managerscore}, 
-        
-        Thank you
-        `
-        await sendEmail({
-          email: userDetails.manager.email,
-          cc: [hrEmail],
-          subject: "Quarterly Appraisal for Team Member",
-          salutation,
-          content,
-        });
-      } catch (err) {
-        console.log(err)
-      }
-      
-    }
+    await updateResultEmail(req, existingResult, result, hrEmail)
     
     res.status(200).json({
       success: true,
@@ -371,10 +275,7 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
       staff: staff,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
@@ -388,9 +289,7 @@ const getResult = async (req, res) => {
       });
 
     if (!result) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Result not found!" });
+      return new ErrorResponseJSON(res, "Result not found!", 404)
     }
     
     res.status(200).json({
@@ -398,10 +297,7 @@ const getResult = async (req, res) => {
       data: result,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
@@ -409,115 +305,30 @@ const getResult = async (req, res) => {
 const updateResult = async (req, res) => {
   try {
     const { body } = req;
+
     const existingResult = await Result.findById(req.params.id).populate("user")
+    if (!existingResult){
+      return new ErrorResponseJSON(res, "Result not found!", 400)
+    }
+    
     const score = await resultScore(req)
     const managerScore = await resultScore(req, scoreType="managerscore")
-    const hrEmail = "akinwalejude@gmail.com"
     body.score = score
     body.managerscore = managerScore
 
-    const result = await Result.findByIdAndUpdate(req.params.id, req.body, {
+    const result = await Result.findByIdAndUpdate(req.params.id, body, {
       new: true,
       runValidators: true,
     });
 
-    const userDetails = await Staff.findById(result.user)
-
-    if (existingResult.score != body.score) {
-      // Send email to staff
-      try {
-        let salutation = ``
-        let content = `
-        Kudos, you have updated your ${convertQuarter(existingResult.quarter)} performance appraisal and you score is ${result.score}.,
-        Your manager will be informed to proceed with the manager rating
-        
-        Thank you
-        `
-        await sendEmail({
-          email: userDetails.email,
-          cc: [hrEmail],
-          subject: "Upated Quarterly Appraisal",
-          salutation,
-          content,
-        });
-      } catch (err) {
-        console.log(err)
-      }
-
-      // Send email to staff's manager
-      try {
-        // let managerFirstName = firstName(userDetails.manager.fullname)
-        salutation = `Dear Manager,`
-        content = `
-        Kindly be aware that (name of staff member)  has updated the self-appraisal section of the ${convertQuarter(existingResult.quarter)} performance appraisal with an overall score of ${result.score}., 
-        Kindly log on to the <a href="https://lbanstaffportal.herokuapp.com/dashboard">Portal</a> for your final rating.
-        `
-        await sendEmail({
-          email: userDetails.manager.email,
-          cc: [hrEmail],
-          subject: "Quarterly Appraisal for Team Member",
-          salutation,
-          content,
-        });
-      } catch (err) {
-        console.log(err)
-      }
-
-
-      
-    }
-    
-    if (existingResult.managerscore != body.managerscore) {
-      // Send email to staff
-      try {
-        let salutation = ``
-        let content = `
-        Kindly be aware that your manager has rated your ${convertQuarter(existingResult.quarter)} performance appraisal and your manager's score is ${result.managerscore}.
-        
-        Thank you
-        `
-        await sendEmail({
-          email: userDetails.email,
-          cc: [hrEmail],
-          subject: "Upated Quarterly Appraisal",
-          salutation,
-          content,
-        });
-      } catch (err) {
-        console.log(err)
-      }
-
-      // Send email to staff's manager
-      try {
-        // let managerFirstName = firstName(userDetails.manager.fullname)
-        salutation = `Dear Manager,`
-        content = `
-        Kindly be aware that the manager's rating score for ${existingResult.user.fullname} for the ${convertQuarter(existingResult.quarter)} performance appraisal is ${result.managerscore}, 
-        
-        Thank you
-        `
-        await sendEmail({
-          email: userDetails.manager.email,
-          cc: [hrEmail],
-          subject: "Quarterly Appraisal for Team Member",
-          salutation,
-          content,
-        });
-      } catch (err) {
-        console.log(err)
-      }
-      
-    }
+    await updateResultEmail(req, existingResult, result, hrEmail)
 
     res.status(200).json({
       success: true,
       data: result,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
@@ -526,9 +337,7 @@ const deleteResult = async (req, res) => {
   try {
     const result = await Result.findByIdAndDelete(req.params.id);
     if (!result) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Result not found!" });
+      return new ErrorResponseJSON(res, "Result not found!", 404)
     }
     
     res.status(200).json({
@@ -536,10 +345,7 @@ const deleteResult = async (req, res) => {
       data: result,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
@@ -547,6 +353,7 @@ module.exports = {
   createResult,
   getAllResult,
   getCurrentResult,
+  updateCurrentResult,
   getQuarterlyResult,
   getCurrentResultByStaffId,
   UpdateCurrentResultByStaffId,

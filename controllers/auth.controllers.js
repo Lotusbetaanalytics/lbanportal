@@ -40,13 +40,11 @@ const postUserDetails = async (req, res) => {
     const checkStaff = await Staff.findOne({ email: mail }); //check if there is a staff with the email in the db
     if (checkStaff) {
       const token = generateToken({ staff: checkStaff }); //generate token
-      return res.status(400).cookie("token", token).json({
+      return res.status(201).cookie("token", token).json({
         success: true,
         token,
-        msg: "Staff already exists. Please login",
       });
     }
-
     const newStaff = new Staff({ email: mail, fullname: displayName });
     await newStaff.save(); //add new user to the db
     const token = generateToken({ staff: newStaff }); //generate token
@@ -170,6 +168,34 @@ const uploadDp = async (req, res) => {
   }
 };
 
+const getUserDP = async (req, res) => {
+  const { accessToken } = req.body;
+  if (!accessToken) {
+    return res
+      .status(400)
+      .json({ success: false, msg: "No access token provided" });
+  }
+  const config = {
+    method: "get",
+    url: "https://graph.microsoft.com/v1.0/me/photo/$value",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  };
+
+  try {
+    const { data } = await axios(config);
+    return res.status(200).json({
+      photo: data,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
 // upload documents
 const uploadDocuments = async (req, res) => {
   try {
@@ -249,4 +275,5 @@ module.exports = {
   uploadDp,
   getAllStaff,
   deleteStaff,
+  getUserDP,
 };

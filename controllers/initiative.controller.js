@@ -8,25 +8,9 @@ const addInitiative = async (req, res) => {
   try {
     const { body, user } = req;
 
-    if (!body) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "No data was provided!" });
-    }
+    body.user = user;
 
-    // const newPerspective = new Perspective();
-    // await newPerspective.save();
-    // const initiative = new UserInitiative({
-    //   ...body,
-    //   perspective: newPerspective._id,
-    //   user,
-    // });
-
-    // await initiative.save();
-
-    body.user = user
-
-    const initiative = await Initiative.create(body)
+    const initiative = await Initiative.create(body);
 
     return res.status(200).json({
       success: true,
@@ -40,58 +24,6 @@ const addInitiative = async (req, res) => {
     });
   }
 };
-
-//controller for score for staff initiative
-// const updateInitiativeWithScore = async (req, res) => {
-//   try {
-//     const { body, params, user } = req;
-
-//     const { financial, customer, internal, learning } = body;
-
-//     const staffResult = await Result.findById(params.id).populate("user");
-
-//     if (!staffResult) {
-//       return res.status(404).json({
-//         success: false,
-//         msg: "Result details not found",
-//       });
-//     }
-
-//     const { score, managerscore } = staffResult;
-
-//     if (user == staffResult.user.manager) {
-//       // if (checkStaff.isManager) {
-//       staffResult.managerscore.financial = financial;
-//       staffResult.managerscore.internal = internal;
-//       staffResult.managerscore.customer = customer;
-//       staffResult.managerscore.innovationlearningandgrowth = learning;
-
-//       return res.status(200).json({
-//         success: true,
-//         msg: "score added",
-//         data: staffResult,
-//       });
-//     } else {
-//       staffResult.score.financial = financial;
-//       staffResult.score.internal = internal;
-//       staffResult.score.customer = customer;
-//       staffResult.score.innovationlearningandgrowth = learning;
-
-//       await staffResult.save();
-
-//       return res.status(200).json({
-//         success: true,
-//         msg: "staff score added",
-//         data: staffResult,
-//       });
-//     }
-//   } catch (err) {
-//     return res.status(500).json({
-//       success: false,
-//       msg: err.message,
-//     });
-//   }
-// };
 
 //delete an initiative
 const removeInitiative = async (req, res) => {
@@ -180,13 +112,13 @@ const getStaffInitiatives = async (req, res) => {
 //Get all initiatives for a user using their id
 const getInitiativeByStaffId = async (req, res) => {
   try {
-    const {currentSession} = await current()
-    const staff = Staff.findById(req.params.id)
+    const { currentSession } = await current();
+    const staff = Staff.findById(req.params.id);
     const initiatives = await Score.find({
       user: req.params.id,
       session: currentSession,
-    }).populate("question");
-    
+    }).populate({ path: "question", path: "perspective" });
+
     if (initiatives.length < 1) {
       res.status(404).json({
         success: false,
@@ -211,7 +143,6 @@ module.exports = {
   addInitiative,
   removeInitiative,
   getInitiatives,
-  // updateInitiativeWithScore,
   getStaffInitiatives,
   getInitiativeByStaffId,
 };

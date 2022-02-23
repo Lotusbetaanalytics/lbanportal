@@ -1,8 +1,13 @@
 const Result = require("../models/Result")
+const Staff = require("../models/Staff")
 const current = require("../utils/currentAppraisalDetails")
 const resultScore = require("../utils/calculateScore")
+const sendEmail = require("../utils/sendEmail")
+const {createResultEmail, updateResultEmail} = require("../utils/sendResultEmail")
+const {convertQuarter, hrEmail, firstName} = require("../utils/utils")
+const {ErrorResponseJSON} = require("../utils/errorResponse")
 
-//Create a result
+// Create a result
 const createResult = async (req, res) => {
   const {currentSession, currentQuarter} = await current()
 
@@ -10,19 +15,14 @@ const createResult = async (req, res) => {
     let { user, body } = req;
     const {session, quarter} = body
 
-    const existingResult = await Result.find({
+    const existingResult = await Result.findOne({
       user: req.user,
       session: currentSession,
       quarter: currentQuarter
     });
-    if (existingResult.length > 0) {
-      res.status(200).json({
-        success: true,
-        msg: "Result already exists",
-      });
-    }
 
     const score = await resultScore(req)
+    const managerScore = await resultScore(req, scoreType="managerscore")
 
     if (!session || !quarter) {
       body.session = currentSession
@@ -30,29 +30,44 @@ const createResult = async (req, res) => {
     }
     body.user = user
     body.score = score
+    body.managerscore = managerScore
 
-    const result = await Result.create(body);
+    if (existingResult) {
 
-    res.status(200).json({
+      const result = await Result.findByIdAndUpdate(existingResult.id, body, {
+        new: true,
+        runValidators: true,
+      });
+  
+      await updateResultEmail(req, existingResult, result, hrEmail)
+
+      // return new ErrorResponseJSON(res, "Result already exists", 400)
+    } else {
+      const result = await Result.create(body);
+  
+      await createResultEmail(req, existingResult, result, hrEmail)
+    }
+
+
+    return res.status(200).json({
       success: true,
       data: result,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get all results
+// Get all results
 const getAllResult = async (req, res) => {
   try {
-    const result = await Result.find({}).populate("user");
+    const result = await Result.find({}).populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
+
     if (!result) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Results not found!" });
+      return new ErrorResponseJSON(res, "Results not found!", 404)
     }
 
     res.status(200).json({
@@ -60,14 +75,11 @@ const getAllResult = async (req, res) => {
       data: result,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get the current appraisal result for a staff
+// Get the current appraisal result for an authenticated staff
 const getCurrentResult = async (req, res) => {
   try {
     const {currentSession, currentQuarter} = await current()
@@ -76,11 +88,13 @@ const getCurrentResult = async (req, res) => {
       user: req.user,
       session: currentSession,
       quarter: currentQuarter,
+    }).populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
     });
+
     if (!result) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Result not found!" });
+      return new ErrorResponseJSON(res, "Result not found!", 404)
     }
     
     res.status(200).json({
@@ -88,18 +102,56 @@ const getCurrentResult = async (req, res) => {
       data: result,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get all results by quarter
+// Upadate the current appraisal result for an authenticated staff
+const updateCurrentResult = async (req, res) => {
+  try {
+    const {currentSession, currentQuarter} = await current()
+    const { body } = req;
+
+    const existingResult = await Result.findOne({
+      user: req.user,
+      session: currentSession,
+      quarter: currentQuarter,
+    }).populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
+
+    if (!existingResult){
+      return new ErrorResponseJSON(res, "Result not found!", 400)
+    }
+    
+    const score = await resultScore(req)
+    const managerScore = await resultScore(req, scoreType="managerscore")
+    body.score = score
+    body.managerscore = managerScore
+
+    const result = await Result.findByIdAndUpdate(existingResult.id, body, {
+      new: true,
+      runValidators: true,
+    });
+
+    await updateResultEmail(req, existingResult, result, hrEmail)
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500)
+  }
+};
+
+// Get all results by quarter for an authenticated staff
 const getQuarterlyResult = async (req, res) => {
   try {
     const {currentSession} = await current()
 
+    const staff = await Staff.findById(req.user)
     const firstQuarterResult = await Result.find({
       user: req.user,
       session: currentSession,
@@ -121,14 +173,13 @@ const getQuarterlyResult = async (req, res) => {
       quarter: "Fourth Quarter",
     });
     if (!firstQuarterResult || !secondQuarterResult || !thirdQuarterResult || !fourthQuarterResult) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Results not found!" });
+      return new ErrorResponseJSON(res, "Results not found!", 404)
     }
     
     res.status(200).json({
       success: true,
       data: {
+        staff: staff,
         firstQuarter: firstQuarterResult,
         secondQuarter: secondQuarterResult,
         thirdQuarter: thirdQuarterResult,
@@ -136,69 +187,109 @@ const getQuarterlyResult = async (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get a result's details
-const getResult = async (req, res) => {
+// Get the current appraisal result for a staff
+const getCurrentResultByStaffId = async (req, res) => {
   try {
-    const result = await Result.findById(req.params.id).populate("user").populate("user");
-    if (!result) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Result not found!" });
+    const {currentSession, currentQuarter} = await current()
+
+    const staff = await Staff.findById(req.params.id)
+    const firstQuarterResult = await Result.find({
+      user: req.params.id,
+      session: currentSession,
+      quarter: "First Quarter",
+    });
+    const secondQuarterResult = await Result.find({
+      user: req.params.id,
+      session: currentSession,
+      quarter: "Second Quarter",
+    });
+    const thirdQuarterResult = await Result.find({
+      user: req.params.id,
+      session: currentSession,
+      quarter: "Third Quarter",
+    });
+    const fourthQuarterResult = await Result.find({
+      user: req.params.id,
+      session: currentSession,
+      quarter: "Fourth Quarter",
+    });
+    if (!firstQuarterResult || !secondQuarterResult || !thirdQuarterResult || !fourthQuarterResult) {
+      return new ErrorResponseJSON(res, "Results not found!", 404)
     }
     
     res.status(200).json({
       success: true,
-      data: result,
+      data: {
+        staff: staff,
+        firstQuarter: firstQuarterResult,
+        secondQuarter: secondQuarterResult,
+        thirdQuarter: thirdQuarterResult,
+        fourthQuarter: fourthQuarterResult,
+      },
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Upadate a result's details
-const updateResult = async (req, res) => {
+// Update the current appraisal result for a staff using staff id
+const UpdateCurrentResultByStaffId = async (req, res) => {
   try {
-    const { body } = req;
+    const {currentSession, currentQuarter} = await current()
+    const { user, body } = req;
+
+    const existingResult = await Result.findOne({
+      user: req.params.id,
+      session: currentSession,
+      quarter: currentQuarter,
+    });
+    if (!existingResult) {
+      return new ErrorResponseJSON(res, "Result not found!", 404)
+    }
+
+    const staff = await Staff.findById(req.params.id)
+    const manager = await Staff.findById(user)
+
+    if (staff.manager != user || manager.role != "HR") {
+      return new ErrorResponseJSON(res, "You are not authorized!", 404)
+    }
+
     const score = await resultScore(req)
     const managerScore = await resultScore(req, scoreType="managerscore")
     body.score = score
     body.managerscore = managerScore
 
-    const result = await Result.findByIdAndUpdate(req.params.id, req.body, {
+    const result = await Result.findByIdAndUpdate(existingResult.id, req.body, {
       new: true,
       runValidators: true,
     });
 
+    await updateResultEmail(req, existingResult, result, hrEmail)
+    
     res.status(200).json({
       success: true,
       data: result,
+      staff: staff,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Delete a result
-const deleteResult = async (req, res) => {
+// Get a result's details
+const getResult = async (req, res) => {
   try {
-    const result = await Result.findByIdAndDelete(req.params.id);
+    const result = await Result.findById(req.params.id).populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
+
     if (!result) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Result not found!" });
+      return new ErrorResponseJSON(res, "Result not found!", 404)
     }
     
     res.status(200).json({
@@ -206,10 +297,59 @@ const deleteResult = async (req, res) => {
       data: result,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
+    return new ErrorResponseJSON(res, err.message, 500)
+  }
+};
+
+// Upadate a result's details
+const updateResult = async (req, res) => {
+  try {
+    const { body } = req;
+
+    const existingResult = await Result.findById(req.params.id).populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
     });
+
+    if (!existingResult){
+      return new ErrorResponseJSON(res, "Result not found!", 400)
+    }
+    
+    const score = await resultScore(req)
+    const managerScore = await resultScore(req, scoreType="managerscore")
+    body.score = score
+    body.managerscore = managerScore
+
+    const result = await Result.findByIdAndUpdate(req.params.id, body, {
+      new: true,
+      runValidators: true,
+    });
+
+    await updateResultEmail(req, existingResult, result, hrEmail)
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500)
+  }
+};
+
+// Delete a result
+const deleteResult = async (req, res) => {
+  try {
+    const result = await Result.findByIdAndDelete(req.params.id);
+    if (!result) {
+      return new ErrorResponseJSON(res, "Result not found!", 404)
+    }
+    
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
@@ -217,7 +357,10 @@ module.exports = {
   createResult,
   getAllResult,
   getCurrentResult,
+  updateCurrentResult,
   getQuarterlyResult,
+  getCurrentResultByStaffId,
+  UpdateCurrentResultByStaffId,
   getResult,
   updateResult,
   deleteResult

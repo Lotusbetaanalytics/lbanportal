@@ -1,14 +1,8 @@
 const AppraisalA = require("../models/AppraisalA")
 
-//Create an appraisalA
+// Create an appraisalA
 const createAppraisalA = async (req, res) => {
   try {
-    const { body } = req;
-    if (!body) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "No data was provided!" });
-    }
     const appraisal = await AppraisalA.create(req.body);
 
     res.status(200).json({
@@ -16,21 +10,16 @@ const createAppraisalA = async (req, res) => {
       data: appraisal,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get all appraisalAs
+// Get all appraisalAs
 const getAllAppraisalA = async (req, res) => {
   try {
     const appraisalA = await AppraisalA.find({});
     if (!appraisalA) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "AppraisalAs not found!" });
+      return new ErrorResponseJSON(res, "AppraisalAs not found!", 404)
     }
     
     res.status(200).json({
@@ -38,21 +27,16 @@ const getAllAppraisalA = async (req, res) => {
       data: appraisalA,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get appraisalA by ID
+// Get appraisalA by ID
 const getAppraisalA = async (req, res) => {
   try {
     const appraisalA = await AppraisalA.findById(req.params.id);
     if (!appraisalA) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "AppraisalAs not found!" });
+      return new ErrorResponseJSON(res, "AppraisalA not found!", 404)
     }
     
     res.status(200).json({
@@ -60,22 +44,13 @@ const getAppraisalA = async (req, res) => {
       data: appraisalA,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Upadate an appraisalA's details using ID
+// Upadate an appraisalA's details using ID
 const updateAppraisalA = async (req, res) => {
   try {
-    const { body } = req;
-    if (!body) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "No data was provided!" });
-    }
     const appraisalA = await AppraisalA.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -86,21 +61,16 @@ const updateAppraisalA = async (req, res) => {
       data: appraisalA,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Delete an appraisalA using ID
+// Delete an appraisalA using ID
 const deleteAppraisalA = async (req, res) => {
   try {
     const appraisalA = await AppraisalA.findByIdAndDelete(req.params.id);
     if (!appraisalA) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "AppraisalA not found!" });
+      return new ErrorResponseJSON(res, "AppraisalA not found!", 404)
     }
     
     res.status(200).json({
@@ -108,10 +78,7 @@ const deleteAppraisalA = async (req, res) => {
       data: appraisalA,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 

@@ -19,6 +19,7 @@ const ResultScore = async (req, scoreType="score", finalResult=null) => {
   let resultDict = {}
   let finalInitiativeScore = 0
   let finalAppraisalAScore = 0
+  let appraisalACurrentScore = 0
 
   // create a list of perspective titles
   for (const [key, perspective] of Object.entries(allPerspectives)) {

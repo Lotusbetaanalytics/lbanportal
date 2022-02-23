@@ -2,12 +2,11 @@ const Score = require("../models/Score")
 const Staff = require("../models/Staff")
 const current = require("../utils/currentAppraisalDetails");
 
-//Create a score
+// Create a score
 const createScore = async (req, res) => {
-  const {currentSession, currentQuarter} = await current()
-
   try {
     let { user, body } = req;
+    const {currentSession, currentQuarter} = await current()
     const {session, quarter} = body
 
     if (!session || !quarter) {
@@ -28,6 +27,7 @@ const createScore = async (req, res) => {
         new: true,
         runValidators: true,
       });
+
       res.status(200).json({
         success: true,
         data: updateScore,
@@ -42,17 +42,18 @@ const createScore = async (req, res) => {
     }
 
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get all scores
+// Get all scores
 const getAllScores = async (req, res) => {
   try {
-    const score = await Score.find({}).populate("user question");
+    const score = await Score.find({}).populate("question").populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
+      
     if (!score) {
       return res
         .status(404)
@@ -64,14 +65,11 @@ const getAllScores = async (req, res) => {
       data: score,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get the current scores for authenticated user
+// Get the current scores for authenticated user
 const getCurrentUserScores = async (req, res) => {
   try {
     const {currentSession, currentQuarter} = await current()
@@ -80,12 +78,13 @@ const getCurrentUserScores = async (req, res) => {
       user: req.user,
       session: currentSession,
       quarter: currentQuarter,
-    }).populate("question");
+    }).populate("question").populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
 
     if (!score) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Scores not found!" });
+      return new ErrorResponseJSON(res, "Scores not found!", 404)
     }
     
     res.status(200).json({
@@ -93,46 +92,72 @@ const getCurrentUserScores = async (req, res) => {
       data: score,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get all scores for authenticated user
+// Get all scores for authenticated user
 const getUserScores = async (req, res) => {
   try {
-    const scores = await Score.find({user: req.user}).populate("question");
+    const scores = await Score.find({user: req.user}).populate("question").populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
     
     res.status(200).json({
       success: true,
       data: scores,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get all scores for a user using their id
+// Get current score for a question using the question id for an authenticated user
+const getCurrentUserScoresByQuestionId = async (req, res) => {
+  try {
+    const {currentQuarter, currentSession} = await current()
+      
+    const scores = await Score.find({
+      user: req.user,
+      question: req.params.id,
+      session: currentSession,
+      quarter: currentQuarter,
+    }).populate("question").populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
+    
+    if (scores.length < 1) {
+      return new ErrorResponseJSON(res, "Staff's scores not found!", 404)
+    }
+
+    res.status(200).json({
+      success: true,
+      data: scores,
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500)
+  }
+};
+
+// Get all scores for a user using their id
 const getScoresByUserId = async (req, res) => {
   try {
     const {currentQuarter, currentSession} = await current()
-    const staff = Staff.findById(req.params.id)
+
+    const staff = await Staff.findById(req.params.id)
     const scores = await Score.find({
       user: req.params.id,
       session: currentSession,
       quarter: currentQuarter,
-    }).populate("question");
+    }).populate("question").populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
     
     if (scores.length < 1) {
-      res.status(404).json({
-        success: false,
-        msg: "Staff's scores not found",
-      });
+      return new ErrorResponseJSON(res, "Staff's scores not found!", 404)
     }
 
     res.status(200).json({
@@ -141,21 +166,51 @@ const getScoresByUserId = async (req, res) => {
       data: scores,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Get a score's details
+// Get current score for a question using the question id for an authenticated user
+const geScoreByUserIdAndQuestionId = async (req, res) => {
+  try {
+    const {currentQuarter, currentSession} = await current()
+
+    const staff = await Staff.findById(req.params.id)
+    const scores = await Score.find({
+      user: req.params.id,
+      question: req.params.q_id,
+      session: currentSession,
+      quarter: currentQuarter,
+    }).populate("question").populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
+    
+    if (scores.length < 1) {
+      return new ErrorResponseJSON(res, "Staff's scores not found!", 404)
+    }
+
+    res.status(200).json({
+      success: true,
+      staff: staff,
+      data: scores,
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500)
+  }
+};
+
+// Get a score's details
 const getScore = async (req, res) => {
   try {
-    const score = await Score.findById(req.params.id).populate("user question");
+    const score = await Score.findById(req.params.id)
+      .populate("question").populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
+
     if (!score) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Score not found!" });
+      return new ErrorResponseJSON(res, "Score not found!", 404)
     }
     
     res.status(200).json({
@@ -163,22 +218,15 @@ const getScore = async (req, res) => {
       data: score,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Upadate a score's details
+// Upadate a score's details
 const updateScore = async (req, res) => {
   try {
     const { body } = req;
-    if (!body) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "No data was provided!" });
-    }
+
     const score = await Score.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -189,21 +237,16 @@ const updateScore = async (req, res) => {
       data: score,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
-//Delete a score
+// Delete a score
 const deleteScore = async (req, res) => {
   try {
     const score = await Score.findByIdAndDelete(req.params.id);
     if (!score) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Score not found!" });
+      return new ErrorResponseJSON(res, "Score not found!", 404)
     }
     
     res.status(200).json({
@@ -211,10 +254,7 @@ const deleteScore = async (req, res) => {
       data: score,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500)
   }
 };
 
@@ -222,8 +262,10 @@ module.exports = {
   createScore,
   getAllScores,
   getCurrentUserScores,
+  getCurrentUserScoresByQuestionId,
   getUserScores,
   getScoresByUserId,
+  geScoreByUserIdAndQuestionId,
   getScore,
   updateScore,
   deleteScore

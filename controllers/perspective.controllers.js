@@ -1,4 +1,5 @@
 const Perspective = require("../models/Perspective")
+const {ErrorResponseJSON} = require("../utils/errorResponse")
 
 // Create a perspective
 const createPerspective = async (req, res) => {

@@ -1,6 +1,7 @@
 const Score = require("../models/Score")
 const Staff = require("../models/Staff")
 const current = require("../utils/currentAppraisalDetails");
+const {ErrorResponseJSON} = require("../utils/errorResponse")
 
 // Create a score
 const createScore = async (req, res) => {

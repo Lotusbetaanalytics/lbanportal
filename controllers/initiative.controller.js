@@ -3,7 +3,7 @@ const UserInitiative = require("../models/Initiative");
 const Perspective = require("../models/Perspective");
 const Result = require("../models/Result");
 const Staff = require("../models/Staff");
-const current = require("../utils/currentAppraisalDetails")
+const current = require("../utils/currentAppraisalDetails");
 const {ErrorResponseJSON} = require("../utils/errorResponse")
 
 // Create an initiative
@@ -11,9 +11,9 @@ const addInitiative = async (req, res) => {
   try {
     const { body, user } = req;
 
-    body.user = user
+    body.user = user;
 
-    const initiative = await Initiative.create(body)
+    const initiative = await Initiative.create(body);
 
     return res.status(200).json({
       success: true,
@@ -21,7 +21,7 @@ const addInitiative = async (req, res) => {
       data: initiative,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -33,7 +33,7 @@ const removeInitiative = async (req, res) => {
     const foundInitiative = await UserInitiative.findByIdAndDelete(id);
 
     if (!foundInitiative) {
-      return new ErrorResponseJSON(res, "Initiative not found!", 404)
+      return new ErrorResponseJSON(res, "Initiative not found!", 404);
     }
 
     res.status(200).json({
@@ -41,7 +41,7 @@ const removeInitiative = async (req, res) => {
       data: foundInitiative,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -50,13 +50,16 @@ const getInitiatives = async (req, res) => {
   try {
     const { user } = req;
 
-    const foundInitiatives = await UserInitiative.find({user}).sort({ _id: -1 }).populate({
-      path: "user",
-      select: "fullname email department manager role isManager"
-    }).populate("perspective");
+    const foundInitiatives = await UserInitiative.find({ user })
+      .sort({ _id: -1 })
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager",
+      })
+      .populate("perspective");
 
     if (!foundInitiatives) {
-      return new ErrorResponseJSON(res, "Initiative not found!", 404)
+      return new ErrorResponseJSON(res, "Initiative not found!", 404);
     }
 
     res.status(200).json({
@@ -64,7 +67,7 @@ const getInitiatives = async (req, res) => {
       data: foundInitiatives,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -73,13 +76,16 @@ const getStaffInitiatives = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const initiative = await UserInitiative.findById(id).sort({ _id: -1 }).populate({
-      path: "user",
-      select: "fullname email manager role isManager"
-    }).populate("perspective");
+    const initiative = await UserInitiative.findById(id)
+      .sort({ _id: -1 })
+      .populate({
+        path: "user",
+        select: "fullname email manager role isManager",
+      })
+      .populate("perspective");
 
     if (!initiative) {
-      return new ErrorResponseJSON(res, "Initiative not found!", 404)
+      return new ErrorResponseJSON(res, "Initiative not found!", 404);
     }
 
     res.status(200).json({
@@ -87,24 +93,26 @@ const getStaffInitiatives = async (req, res) => {
       data: initiative,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
 // Get all initiatives for a user using their id
 const getInitiativeByStaffId = async (req, res) => {
   try {
-    const {currentSession} = await current()
+    const { currentSession } = await current();
 
-    const staff = await Staff.findById(req.params.id)
+    const staff = await Staff.findById(req.params.id);
     const initiatives = await Initiative.find({
       user: req.params.id,
       session: currentSession,
-    }).populate({
-      path: "user",
-      select: "fullname email department manager role isManager"
-    }).populate("perspective");
-    
+    })
+      .populate({
+        path: "user",
+        select: "fullname email department manager role isManager",
+      })
+      .populate("perspective");
+
     if (initiatives.length < 1) {
       res.status(404).json({
         success: false,
@@ -118,7 +126,7 @@ const getInitiativeByStaffId = async (req, res) => {
       data: initiatives,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 

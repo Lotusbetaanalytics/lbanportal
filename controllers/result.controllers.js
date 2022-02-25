@@ -3,7 +3,12 @@ const Staff = require("../models/Staff")
 const current = require("../utils/currentAppraisalDetails")
 const resultScore = require("../utils/calculateScore")
 const sendEmail = require("../utils/sendEmail")
-const {createResultEmail, updateResultEmail} = require("../utils/sendResultEmail")
+const {
+  createResultEmail,
+  updateResultEmail,
+  rejectedResultEmail,
+  acceptedResultEmail,
+} = require("../utils/sendResultEmail")
 const {convertQuarter, hrEmail, firstName} = require("../utils/utils")
 const {ErrorResponseJSON} = require("../utils/errorResponse")
 
@@ -47,7 +52,6 @@ const createResult = async (req, res) => {
   
       await createResultEmail(req, existingResult, result, hrEmail)
     }
-
 
     return res.status(200).json({
       success: true,
@@ -280,6 +284,78 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
   }
 };
 
+// Reject the current appraisal result's manager score for an authenticated user
+const rejectCurrentManagerScore = async (req, res) => {
+  try {
+    const {currentSession, currentQuarter} = await current()
+    const { user, body } = req;
+
+    const existingResult = await Result.findOne({
+      user: user,
+      session: currentSession,
+      quarter: currentQuarter,
+    });
+    if (!existingResult) {
+      return new ErrorResponseJSON(res, "Result not found!", 404)
+    }
+
+    body.status = "Rejected"
+
+    const result = await Result.findByIdAndUpdate(existingResult.id, req.body, {
+      new: true,
+      runValidators: true,
+    }).populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });;
+
+    await rejectedResultEmail(req, existingResult, result, hrEmail)
+    
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500)
+  }
+};
+
+// Accept the current appraisal result's manager score for an authenticated user
+const acceptCurrentManagerScore = async (req, res) => {
+  try {
+    const {currentSession, currentQuarter} = await current()
+    const { user, body } = req;
+
+    const existingResult = await Result.findOne({
+      user: user,
+      session: currentSession,
+      quarter: currentQuarter,
+    });
+    if (!existingResult) {
+      return new ErrorResponseJSON(res, "Result not found!", 404)
+    }
+
+    body.status = "Accepted"
+
+    const result = await Result.findByIdAndUpdate(existingResult.id, req.body, {
+      new: true,
+      runValidators: true,
+    }).populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });;
+
+    await acceptedResultEmail(req, existingResult, result, hrEmail)
+    
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500)
+  }
+};
+
 // Get a result's details
 const getResult = async (req, res) => {
   try {
@@ -361,6 +437,8 @@ module.exports = {
   getQuarterlyResult,
   getCurrentResultByStaffId,
   UpdateCurrentResultByStaffId,
+  rejectCurrentManagerScore,
+  acceptCurrentManagerScore,
   getResult,
   updateResult,
   deleteResult

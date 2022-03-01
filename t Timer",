@@ -1,0 +1,493 @@
+[33mcommit 261d4cf61385c9ccbdda54c48c82499b4a7e4dc2[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 25 08:49:29 2022 +0100
+
+    Update accept and reject endpoints
+
+[33mcommit a411680a834acc40422acafba5bef9ceec832a5a[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 25 08:30:15 2022 +0100
+
+    Add accept and reject manager score routes
+
+[33mcommit 3624b1f5bc5a8f6d67a7967e765e89a21d85c272[m
+Merge: e5e10ce 75ff784
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Wed Feb 23 10:02:07 2022 +0100
+
+    Merge branch 'main' of https://github.com/Lotusbetaanalytics/lbanportal
+
+[33mcommit e5e10cea5dfab0b1793efd9968f6e813f1d4c2cd[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Wed Feb 23 09:59:51 2022 +0100
+
+    Fix import error in controllers
+
+[33mcommit 75ff784f8aab7de080b5058f3c99f5be15b44957[m
+Merge: d75cafb b7d3052
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Wed Feb 23 09:25:04 2022 +0100
+
+    Merge branch 'main' of https://github.com/Lotusbetaanalytics/lbanportal
+
+[33mcommit d75cafbe85e0d0a46817296b60977f4d14fc92da[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Wed Feb 23 09:22:13 2022 +0100
+
+    get user photo from microsoft graph
+
+[33mcommit b7d30525b4a827dcf765482bd92c4334a23c100d[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Tue Feb 22 14:36:59 2022 +0100
+
+    Refactor controllers, except auth
+
+[33mcommit b614e262f38404c4afe1350c936f1d64e18a097b[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Tue Feb 22 12:35:53 2022 +0100
+
+    Add routes for updating result convieniently
+
+[33mcommit 9e612611091c4de9a221180cb1c21cf2ce794fa5[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Tue Feb 22 12:31:48 2022 +0100
+
+    Fix error's and clean code in the result controllers
+
+[33mcommit 08a2e74756477d15feb627b6f7e576ecdb938862[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Tue Feb 22 12:16:32 2022 +0100
+
+    Add util functions for result emails and misc. Update calculateScore and sendEmail
+
+[33mcommit 5eac827e3e160a8fc9341d1308d2ad8e0ea8e123[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 18 16:28:32 2022 +0100
+
+    Setup logic for email in result and calibration
+
+[33mcommit de61f393da354c99c898c41f3c950ecb440b9b18[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 18 15:38:46 2022 +0100
+
+    Add sendmail and other qol functions
+
+[33mcommit afcbcfbcab838b242aadcab0330ad4b02e104a77[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 18 15:38:09 2022 +0100
+
+    Add sendmail and other qol functions
+
+[33mcommit 8e7297fa145f292e6786b311bd88ad36a4ce33ec[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Wed Feb 16 16:10:56 2022 +0100
+
+    Update user account controller
+
+[33mcommit 8591ac2a4f656c7d5dd67d62df379defc5b2ecc3[m[33m ([m[1;31morigin/testing[m[33m, [m[1;32mtesting[m[33m)[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Wed Feb 16 13:11:25 2022 +0100
+
+    Update calibration, initiative, result and score controllers
+
+[33mcommit 55b7966eeaed2a36c57bc44c70955796b40ea254[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Tue Feb 15 21:08:50 2022 +0100
+
+    Add calibration
+
+[33mcommit ad3562ca4d262a6af4a3d768041e5379b5c7f622[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Tue Feb 15 21:08:01 2022 +0100
+
+    Add endpoint to get current result by staff id
+
+[33mcommit e070525b480fb1727f94b453e5d26f3893703e0a[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Tue Feb 15 21:06:31 2022 +0100
+
+    Fix bug in verifyTokenAdmin and add verifyTokenHR
+
+[33mcommit eec40b861bf29f0663849fdcaf69587c23b3e087[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Mon Feb 14 13:35:34 2022 +0100
+
+    Minor improvements to controllers, routes and server.js
+
+[33mcommit 951e8f8ad8b39395c7073d0609f9f4783c29a253[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Mon Feb 14 13:34:25 2022 +0100
+
+    Add endpoints to score
+
+[33mcommit c12da433ac1e70cc30201eebd352459504e935d3[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 11 15:34:07 2022 +0100
+
+    Increase token expiration time
+
+[33mcommit 5dd69bc00bd5953646df25a72694ff113d80a804[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 11 15:33:15 2022 +0100
+
+    Add routes for getting initiatives and scores by staff id
+
+[33mcommit 88e5a1427e48c9a228022716f914828a4a30f21d[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 11 06:36:00 2022 +0100
+
+    Improve and Comment the calculateScore function
+
+[33mcommit 4621de319b27b7ef8d41f4f0ce4d1ab33c7082c0[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 11 06:12:17 2022 +0100
+
+    Minor changes
+
+[33mcommit d35866a3696fa13c47b10f38a546c6a5d51e73ad[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 11 06:10:57 2022 +0100
+
+    Clean code in calculateScore function
+
+[33mcommit 122ba9cd0b65f70ac08f8ecf361e969166b78af0[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 11 06:10:19 2022 +0100
+
+    Comment unused code in initiative routes
+
+[33mcommit 5965b00179534c2c95882957c54567ae871760d1[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 11 06:00:03 2022 +0100
+
+    Clean and bug fix code in controllers
+
+[33mcommit 5572e990b98e3a9644cb48e5f53799a9833cec9c[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 11 05:12:34 2022 +0100
+
+    Improve calculateScore function and add defaults for managerscore
+
+[33mcommit 0a0b7364c09ac0f8005d7b74ad4a93fda97dff9b[m
+Merge: 7b69d28 d08a768
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 10 16:33:21 2022 +0100
+
+    Merge branch 'main' of https://github.com/Lotusbetaanalytics/lbanportal
+
+[33mcommit 7b69d28c906708d0ffae24ef22e52ed79f6eea31[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 10 16:28:15 2022 +0100
+
+    Fix bugs in controllers
+
+[33mcommit 04f5b7f2593fd78ba45ab24dcafe0bb71eddc78b[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 10 16:26:35 2022 +0100
+
+    Minor improvements to models, add score routes to server.js
+
+[33mcommit b8e085db5cfa780f42857db44ae3af920829c413[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 10 16:14:17 2022 +0100
+
+    Add result and objective not required in Initiative model
+
+[33mcommit d91aa3a892ca0c6e38052ea986c291f503df134f[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 10 16:07:23 2022 +0100
+
+    Remove result and add objective to Initiative model
+
+[33mcommit 37ca35717dd716f741772c3d6ef1bbeb7c96b875[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 10 16:02:05 2022 +0100
+
+    Minor changes to result an score routes
+
+[33mcommit 5ce4f437d1b365e55a0a8d3fe367f3c7b1d9fb8f[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 10 16:00:34 2022 +0100
+
+    Add logic for calculating scores
+
+[33mcommit d08a768e93903c8d3b9b91331c1516d88d7c7c36[m
+Merge: 24224f5 d32ed41
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Tue Feb 8 14:16:24 2022 +0100
+
+    Merge branch 'main' of https://github.com/Lotusbetaanalytics/lbanportal
+
+[33mcommit 24224f5c8a23d42f4efb4fbccdbf8b1e101cfdf4[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Tue Feb 8 14:14:20 2022 +0100
+
+    resolving conflict
+
+[33mcommit 6a5f03823abb4c724d2cf6d7b3f9f4d859d28b1f[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Tue Feb 8 14:02:29 2022 +0100
+
+    perspective schema
+
+[33mcommit d32ed4197d488b80a9273349d11228a4c8b95567[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Tue Feb 8 10:48:01 2022 +0100
+
+    Add perspective routes to server.js
+
+[33mcommit 07b539e21040efbcd04943ee0c424f198158f65c[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Tue Feb 8 10:45:12 2022 +0100
+
+    update perspective
+
+[33mcommit 1380353a0f83d9f27d27d46b542f23a5016d04c7[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Mon Feb 7 15:52:26 2022 +0100
+
+    Add Score
+
+[33mcommit 0514e829eca232c1c3074975effdd40f1ea79f3b[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Mon Feb 7 13:08:39 2022 +0100
+
+    Fix result update and delete bug
+
+[33mcommit 7a5f6568de5d837f5eb04219ac99982b1fd89a63[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Mon Feb 7 12:36:04 2022 +0100
+
+    Change result model's score type to number
+
+[33mcommit 8039efa55a6b18316d83cab0e6c0f91e998ad64b[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 4 17:46:37 2022 +0100
+
+    Clean up code in routes and controllers
+
+[33mcommit 2d28a812821456b65c16d619f23f4512f0283b64[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 4 17:23:08 2022 +0100
+
+    Fix errors in appraisal and result create and get controllers
+
+[33mcommit b77e1de72a2c0ae0e74a8721aa046d6d747919b3[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 4 17:21:38 2022 +0100
+
+    Update function for current appraisal
+
+[33mcommit 485df777840a7b68be207b7b3c171b0ef53034cf[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 4 17:20:56 2022 +0100
+
+    Update initiative pre save function
+
+[33mcommit e6ded0b282684078d528eaba4c6036cd87ef1ff4[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 4 14:07:11 2022 +0100
+
+    Minor changes
+
+[33mcommit 18a8b0ead688f12a5bd5decf511434f5e7bcf27d[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 4 14:06:00 2022 +0100
+
+    Minor changes
+
+[33mcommit 1767d50b1177e65f69b13b315be543e54d33deab[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 4 11:44:47 2022 +0100
+
+    Update initiative controller
+
+[33mcommit 39c4190bb58651d7dcc32664506f50a7df35ecdf[m
+Merge: e2d098a 9c73324
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 4 10:47:19 2022 +0100
+
+    Merge branch 'main' of https://github.com/Lotusbetaanalytics/lbanportal
+
+[33mcommit e2d098af7e29f0f1fc558b9fcbfd915745f32555[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Fri Feb 4 10:47:15 2022 +0100
+
+    Minor changes to appraisal models and controllers. Add appraisal util func
+
+[33mcommit 9c733246c25b233bdc35cafc34bdeab1a31f4aac[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Fri Feb 4 10:46:18 2022 +0100
+
+    modifying the Staff model
+
+[33mcommit 9097b18df8f72e6d97d0e0cb80d57a051ba6ac9c[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Thu Feb 3 19:23:32 2022 +0100
+
+    changing the result model and adding scoring controller
+
+[33mcommit 422667959a3ceff1c37356a0180a0e642f1edb6d[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 3 16:54:26 2022 +0100
+
+    Minor changes to initiative model
+
+[33mcommit 0d35e94cf55cf8320bc7cf5af0f88fbb09698b93[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 3 16:41:07 2022 +0100
+
+    Make quarter not required in result model
+
+[33mcommit 03b43d445291a144d82f1fb70d311a1ef424f4a5[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 3 16:29:31 2022 +0100
+
+    Update initiative and result models
+
+[33mcommit af3b7ee900f138c379503ab83d2a077834b89579[m
+Merge: fd824f0 9c217c8
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Thu Feb 3 15:28:08 2022 +0100
+
+    Merge branch 'main' of https://github.com/Lotusbetaanalytics/lbanportal
+
+[33mcommit fd824f00687dbfab2da191e4fbd3749c76b4b9cc[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Thu Feb 3 15:27:46 2022 +0100
+
+    adding initiative routes and perspective
+
+[33mcommit 9c217c845644483b0ebf7f90ad199b94840cbc88[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 3 08:31:06 2022 +0100
+
+    Update appraisala and result routes and add to server, upd
+
+[33mcommit f8fff5afe3800aa09fff061e30a47e12e7a43203[m
+Merge: 87d5424 1ca35f6
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 3 08:20:55 2022 +0100
+
+    Merge branch 'testing'
+
+[33mcommit 1ca35f690b270a680c80dcde8d397224a2f78fe6[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Thu Feb 3 08:19:51 2022 +0100
+
+    Update controllers and routes
+
+[33mcommit 1ba7badfabe2b9842eaccf1ad78f2f12ebf56ca4[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Wed Feb 2 16:56:36 2022 +0100
+
+    Add result and update appraisal model
+
+[33mcommit 0cef484c064d26b6b58bb864754d735d8b963659[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Wed Feb 2 16:11:06 2022 +0100
+
+    Update appraisal routes and controllers
+
+[33mcommit 44c620a114c3bf3e83572dcb6d15502e2fb18501[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Wed Feb 2 16:10:13 2022 +0100
+
+    Add appraisalA
+
+[33mcommit 87d542429320349c80bd8bc37083bfad6eb25a56[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Wed Feb 2 12:48:34 2022 +0100
+
+    adding initiative route and controller
+
+[33mcommit 91a1ec8dd34f9637fca7582a9973d14461532eb1[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Tue Jan 25 12:54:42 2022 +0100
+
+    new changes
+
+[33mcommit b4f1b90a81d75ecc1352718151d3b33820dafc5c[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Tue Jan 25 11:15:02 2022 +0100
+
+    new adjustments to route and controller
+
+[33mcommit ae748e9b0a656eff2ba870e9cb0681334a37b0ed[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Tue Jan 25 10:31:08 2022 +0100
+
+    fixing the controller and route
+
+[33mcommit 309942eb5fdb93abb093cca7d99083588570a23c[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Tue Jan 25 10:24:41 2022 +0100
+
+    making some changes on the auth controller
+
+[33mcommit 732d558e8c4d75cea63815168d72fed5726b2c1a[m
+Author: judeakinwale <judeakinwale@gmail.com>
+Date:   Mon Jan 24 14:41:43 2022 +0100
+
+    Add appraisal
+
+[33mcommit 2336c0ca419af37b4a4f981b45fc2ade17668dc1[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Mon Jan 24 12:28:49 2022 +0100
+
+    increasing expiry date for token
+
+[33mcommit 277aeddf6015098c61ec293ba0dc2d7cc6c0529b[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Mon Jan 24 12:09:12 2022 +0100
+
+    adding some checks to delete and view all user controller
+
+[33mcommit 1d5482df76946dce889113a1e7e8e690e451c39f[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Mon Jan 24 11:41:29 2022 +0100
+
+    adding controller, routes to get all user and delete user
+
+[33mcommit e52592d4066ea5075703b8ce2a25aa3ab3e403a8[m
+Merge: 5dc0d9d ae61bba
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Mon Jan 24 09:51:54 2022 +0100
+
+    Merge branch 'main' of https://github.com/Lotusbetaanalytics/lbanportal
+
+[33mcommit 5dc0d9dabfdeb15e2e924a84588837070da1ff8e[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Mon Jan 24 09:51:43 2022 +0100
+
+    adding util function to convert string to base64
+
+[33mcommit ae61bbae836b4923431ba878881dd4a6ae70790c[m
+Author: Lotusbetaanalytics <supervisor@lotusbetaanalytics.com>
+Date:   Thu Jan 20 12:18:05 2022 +0100
+
+    Create README.md
+
+[33mcommit 80ec60530a487f995e78ef15f5ea27258b26a262[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Thu Jan 20 11:42:26 2022 +0100
+
+    new change
+
+[33mcommit 7ea9e40150a4cd2efb6b9ab475ef272e6c675d47[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Thu Jan 20 11:42:13 2022 +0100
+
+    adding home route
+
+[33mcommit 2b7e3955a4f7a5a6aaf563113673e1b48da42e3f[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Thu Jan 20 11:04:23 2022 +0100
+
+    send token if user exits
+
+[33mcommit 8a352bb0cc58ccf01cbf0ae34f1015e4e88cdf85[m
+Author: ejoor emmanuel <ejooremmanuel@gmail.com>
+Date:   Thu Jan 20 10:16:18 2022 +0100
+
+    initial commit

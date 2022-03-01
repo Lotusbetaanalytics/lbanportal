@@ -15,12 +15,12 @@ const createOption = async (req, res) => {
     };
 
     for (const [key, option] of Object.entries(allOptions)) {
-      totalValue += option.percentage
+      totalValue += option.value
     }
-    totalValue += body.percentage
+    totalValue += body.value
 
     if (totalValue > 15) {
-      return new ErrorResponseJSON(res, "Total percentage for all option exceeeds 15!", 400)
+      return new ErrorResponseJSON(res, "Total value for all option exceeeds 15!", 400)
     }
 
     const option = await Option.create(body);
@@ -81,13 +81,13 @@ const updateOption = async (req, res) => {
     for (const [key, option] of Object.entries(allOptions)) {
       console.log(`\nkey: ${key}\n\noption: ${option}\n`)
       if (option.title != currentOption.title) {
-        totalValue += option.percentage
+        totalValue += option.value
       }
     }
-    totalValue += body.percentage
+    totalValue += body.value
 
     if (totalValue > 15) {
-      return new ErrorResponseJSON(res, "Total percentage for all option exceeeds 15!", 400)
+      return new ErrorResponseJSON(res, "Total value for all option exceeeds 15!", 400)
     }
 
     const option = await Option.findByIdAndUpdate(req.params.id, req.body, {

@@ -56,10 +56,12 @@ const postUserDetails = async (req, res) => {
 
     const checkStaff = await Staff.findOne({ email: mail }).populate("photo"); //check if there is a staff with the email in the db
     if (checkStaff) {
-      if (checkStaff.photo.image != avatar) {
-        const staffPhoto = await Photo.create({image: avatar});
+      if (!checkStaff.photo || checkStaff.photo.image != avatar) {
+        const staffPhoto = new Photo({image: avatar});
+        await staffPhoto.save()
+
         checkStaff.photo = staffPhoto.id;
-        checkStaff.save();
+        await checkStaff.save();
       }
       const token = generateToken({ staff: checkStaff }); //generate token
       return res.status(201).cookie("token", token).json({
@@ -68,8 +70,11 @@ const postUserDetails = async (req, res) => {
       });
     }
 
-    const staffPhoto = await Photo.create({image: avatar});
+    const staffPhoto = new Photo({image: avatar});
+    await staffPhoto.save()
+
     const newStaff = new Staff({ email: mail, fullname: displayName, photo: staffPhoto.id });
+    // const newStaff = new Staff({ email: mail, fullname: displayName});
     await newStaff.save(); //add new user to the db
 
     const token = generateToken({ staff: newStaff }); //generate token
@@ -252,10 +257,32 @@ const getUserDP = async (req, res) => {
     },
   };
 
+  const photoConfig = {
+    method: "get",
+    url: "https://graph.microsoft.com/v1.0/me/photo/$value",
+    headers: {
+    Authorization: `Bearer ${accessToken}`,
+    },
+    responseType: "arraybuffer",
+  };
+
   try {
     const { data } = await axios(config);
+
+    const photo = await axios(photoConfig); //get user data from active directory
+    const avatar = new Buffer.from(photo.data, "binary").toString("base64");
+    
+    const checkStaff = await Staff.findById(req.user).populate("photo");
+
+    if (!checkStaff.photo || checkStaff.photo.image != avatar) {
+      const staffPhoto = new Photo({image: avatar});
+      await staffPhoto.save()
+
+      checkStaff.photo = staffPhoto.id;
+      await checkStaff.save();
+    }
     return res.status(200).json({
-      photo: data,
+      photo: photo,
     });
   } catch (err) {
     return res.status(500).json({
@@ -337,6 +364,29 @@ const deleteStaff = async (req, res) => {
   }
 };
 
+const getPhoto = async (req, res) => {
+  try {
+    const photo = await Photo.findById(req.params.id);
+
+    if (!photo) {
+      return res.status(404).json({
+        success: false,
+        msg: "Photo not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: photo,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
 module.exports = {
   postUserDetails,
   getUser,
@@ -346,4 +396,5 @@ module.exports = {
   getAllStaff,
   deleteStaff,
   getUserDP,
+  getPhoto,
 };

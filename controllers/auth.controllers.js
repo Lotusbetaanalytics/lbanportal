@@ -1,5 +1,6 @@
 const Staff = require("../models/Staff");
 const Result = require("../models/Result")
+const Photo = require("../models/Photo")
 const Calibration = require("../models/Calibration")
 const cloudinary = require("cloudinary").v2;
 const cloudinarySetup = require("../config/cloudinarysetup");
@@ -29,6 +30,18 @@ const postUserDetails = async (req, res) => {
     },
   };
 
+  const photoConfig = {
+  method: "get",
+  url: "https://graph.microsoft.com/v1.0/me/photo/$value",
+  headers: {
+  Authorization: `Bearer ${accessToken}`,
+  },
+  responseType: "arraybuffer",
+  };
+
+  const photo = await axios(photoConfig); //get user data from active directory
+  const avatar = new Buffer.from(photo.data, "binary").toString("base64");
+
   try {
     const { data } = await axios(config); //get user data from active directory
 
@@ -41,16 +54,24 @@ const postUserDetails = async (req, res) => {
     }
     const { mail, displayName } = data;
 
-    const checkStaff = await Staff.findOne({ email: mail }); //check if there is a staff with the email in the db
+    const checkStaff = await Staff.findOne({ email: mail }).populate("photo"); //check if there is a staff with the email in the db
     if (checkStaff) {
+      if (checkStaff.photo.image != avatar) {
+        const staffPhoto = await Photo.create({image: avatar});
+        checkStaff.photo = staffPhoto.id;
+        checkStaff.save();
+      }
       const token = generateToken({ staff: checkStaff }); //generate token
       return res.status(201).cookie("token", token).json({
         success: true,
         token,
       });
     }
-    const newStaff = new Staff({ email: mail, fullname: displayName });
+
+    const staffPhoto = await Photo.create({image: avatar});
+    const newStaff = new Staff({ email: mail, fullname: displayName, photo: staffPhoto.id });
     await newStaff.save(); //add new user to the db
+
     const token = generateToken({ staff: newStaff }); //generate token
     return res.status(200).cookie("token", token).json({
       success: true,

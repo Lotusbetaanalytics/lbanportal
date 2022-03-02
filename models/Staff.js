@@ -59,8 +59,8 @@ const StaffSchema = new mongoose.Schema({
     type: String,
   },
   photo: {
-    type: String,
-    default: "user.png",
+    type: mongoose.Schema.ObjectId,
+    ref: "Staff",
   },
   emergencyContactName: {
     type: String,

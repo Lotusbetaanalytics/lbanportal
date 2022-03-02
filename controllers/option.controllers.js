@@ -6,11 +6,12 @@ const createOption = async (req, res) => {
   try {
     let { body } = req;
 
-    const findOption = await Option.find({title: body.title});
+    const existingOptionTitle = await Option.find({title: body.title});
+    const existingOptionValue = await Option.find({value: body.value});
     const allOptions = await Option.find();
     let totalValue = 0
 
-    if (findOption.length > 0) {
+    if (existingOptionTitle.length > 0 || existingOptionValue.length > 0) {
       return new ErrorResponseJSON(res, "This option already exists, update it instead!", 400)
     };
 
@@ -38,11 +39,11 @@ const createOption = async (req, res) => {
 // Get all options
 const getAllOptions = async (req, res) => {
   try {
-    const option = await Option.find({});
-    if (!option) {
+    const option = await Option.find();
+
+    if (option.length < 1) {
       return new ErrorResponseJSON(res, "Options not found!", 404)
     }
-    
     res.status(200).json({
       success: true,
       data: option,

@@ -17,12 +17,14 @@ const ScoreSchema = new mongoose.Schema({
     required: true,
   },
   score: {
-    type: Number,
-    required: [true, "Please add a Score"],
+    type: mongoose.Schema.ObjectId,
+    ref: "Option",
+    required: true,
   },
   managerscore: {
-    type: Number,
-    default: 0
+    type: mongoose.Schema.ObjectId,
+    ref: "Option",
+    required: true,
   },
   section: {
     type: String,

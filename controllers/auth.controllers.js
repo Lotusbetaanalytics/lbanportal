@@ -74,25 +74,9 @@ const getUser = async (req, res) => {
 
     const staff = await Staff.findById(user).populate("manager");
 
-    const firstQuarterResult = await Result.find({
+    const currentResult = await Result.find({
       user: user,
       session: currentSession,
-      quarter: "First Quarter",
-    });
-    const secondQuarterResult = await Result.find({
-      user: user,
-      session: currentSession,
-      quarter: "Second Quarter",
-    });
-    const thirdQuarterResult = await Result.find({
-      user: user,
-      session: currentSession,
-      quarter: "Third Quarter",
-    });
-    const fourthQuarterResult = await Result.find({
-      user: user,
-      session: currentSession,
-      quarter: "Fourth Quarter",
     });
 
     const calibration = await Calibration.findOne({
@@ -114,10 +98,7 @@ const getUser = async (req, res) => {
       success: true,
       data: {
         staff: staff,
-        firstQuarterResult: firstQuarterResult,
-        secondQuarterResult: secondQuarterResult,
-        thirdQuarterResult: thirdQuarterResult,
-        fourthQuarterResult: fourthQuarterResult,
+        currentResult: currentResult,
         calibration: calibration,
       },
     });

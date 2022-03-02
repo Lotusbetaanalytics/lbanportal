@@ -1,11 +1,19 @@
 const Appraisal = require("../models/Appraisal")
 
 const current = async () => {
-  const appraisal = await Appraisal.findOne({status: "Started"})
-  return {
-    currentAppraisal: appraisal,
-    currentSession: appraisal.session,
-    currentQuarter: appraisal.quarter
+  try {
+    const appraisal = await Appraisal.findOne({status: "Started"})
+    return {
+      currentAppraisal: appraisal,
+      currentSession: appraisal.session,
+      currentQuarter: appraisal.quarter
+    }
+  } catch (err) {
+    return {
+      currentAppraisal: "Not Available",
+      currentSession: "Not Available",
+      currentQuarter: "Not Available"
+    }
   }
 }
 

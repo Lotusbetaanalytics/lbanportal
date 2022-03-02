@@ -66,7 +66,7 @@ const getAllCalibration = async (req, res) => {
       select: "fullname email department manager role isManager"
     });
 
-    if (!calibration) {
+    if (!calibration || calibration.length < 1) {
       return new ErrorResponseJSON(res, "Calibrations not found!", 404)
     }
 

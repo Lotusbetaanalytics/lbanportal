@@ -21,7 +21,7 @@ const createOption = async (req, res) => {
     totalValue += body.value
 
     if (totalValue > 15) {
-      return new ErrorResponseJSON(res, "Total value for all option exceeeds 15!", 400)
+      return new ErrorResponseJSON(res, "Total value for all options exceeeds 15!", 400)
     }
 
     const option = await Option.create(body);
@@ -41,7 +41,7 @@ const getAllOptions = async (req, res) => {
   try {
     const option = await Option.find();
 
-    if (option.length < 1) {
+    if (!option || option.length < 1) {
       return new ErrorResponseJSON(res, "Options not found!", 404)
     }
     res.status(200).json({
@@ -88,7 +88,7 @@ const updateOption = async (req, res) => {
     totalValue += body.value
 
     if (totalValue > 15) {
-      return new ErrorResponseJSON(res, "Total value for all option exceeeds 15!", 400)
+      return new ErrorResponseJSON(res, "Total value for all options exceeeds 15!", 400)
     }
 
     const option = await Option.findByIdAndUpdate(req.params.id, req.body, {

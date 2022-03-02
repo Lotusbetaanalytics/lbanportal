@@ -70,7 +70,7 @@ const getAllResult = async (req, res) => {
       select: "fullname email department manager role isManager"
     });
 
-    if (!result) {
+    if (!result || result.length < 1) {
       return new ErrorResponseJSON(res, "Results not found!", 404)
     }
 

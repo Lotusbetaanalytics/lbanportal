@@ -39,7 +39,7 @@ const createPerspective = async (req, res) => {
 const getAllPerspectives = async (req, res) => {
   try {
     const perspective = await Perspective.find({});
-    if (!perspective) {
+    if (!perspective || perspective.length < 1) {
       return new ErrorResponseJSON(res, "Perspectives not found!", 404)
     }
     

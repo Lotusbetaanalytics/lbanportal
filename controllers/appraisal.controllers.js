@@ -61,7 +61,7 @@ const getCurrentAppraisal = async (req, res) => {
 const getAllAppraisal = async (req, res) => {
   try {
     const appraisal = await Appraisal.find({});
-    if (!appraisal) {
+    if (!appraisal || appraisal.length < 1) {
       return new ErrorResponseJSON(res, "Appraisals not found!", 404)
     }
     

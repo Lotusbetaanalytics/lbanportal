@@ -282,7 +282,7 @@ const getUserDP = async (req, res) => {
       await checkStaff.save();
     }
     return res.status(200).json({
-      photo: photo,
+      photo: avatar,
     });
   } catch (err) {
     return res.status(500).json({

@@ -18,6 +18,7 @@ const resultRoute = require("./routes/result.routes");
 const scoreRoute = require("./routes/score.routes");
 const perspectiveRoute = require("./routes/perspective.routes");
 const calibrationRoute = require("./routes/calibration.routes");
+const optionRoute = require("./routes/option.routes")
 
 // configure express
 const app = express();
@@ -28,6 +29,7 @@ connectDB();
 // set up app
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan("tiny"))
 
 //Sanitize data
 app.use(mongoSanitize());
@@ -59,6 +61,7 @@ app.use("/api/v1/result", resultRoute)
 app.use("/api/v1/score", scoreRoute)
 app.use("/api/v1/perspective", perspectiveRoute)
 app.use("/api/v1/calibration", calibrationRoute)
+app.use("/api/v1/option", optionRoute)
 
 
 app.get("/", (req, res) => {

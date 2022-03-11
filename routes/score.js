@@ -10,8 +10,8 @@ const {
   getScore,
   updateScore,
   deleteScore
-} = require("../controllers/score.controllers")
-const { verifyToken } = require("../middlewares/auth.middleware")
+} = require("../controllers/score")
+const { verifyToken } = require("../middlewares/auth")
 
 router.post("/", verifyToken, createScore); // create a score
 router.get("/", getAllScores); // get all scores

@@ -7,8 +7,8 @@ const {
   getCalibration,
   updateCalibration,
   deleteCalibration
-} = require("../controllers/calibration.controllers")
-const { verifyToken, verifyTokenAdmin, verifyTokenHR } = require("../middlewares/auth.middleware")
+} = require("../controllers/calibration")
+const { verifyToken, verifyTokenAdmin, verifyTokenHR } = require("../middlewares/auth")
 
 router.post("/", verifyTokenHR, createCalibration); // create a calibration
 router.get("/", verifyToken, getAllCalibration); // get all calibrations

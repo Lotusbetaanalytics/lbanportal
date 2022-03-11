@@ -5,8 +5,8 @@ const {
   getAppraisalA,
   updateAppraisalA,
   deleteAppraisalA
-} = require('../controllers/appraisalA.controllers');
-const { verifyToken } = require("../middlewares/auth.middleware");
+} = require('../controllers/appraisalA');
+const { verifyToken } = require("../middlewares/auth");
 
 router.post("/", createAppraisalA); // create an appraisalA
 router.get("/", getAllAppraisalA); // get all appraisalAs

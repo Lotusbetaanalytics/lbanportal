@@ -9,11 +9,11 @@ const {
   deleteStaff,
   uploadDocuments,
   getUserDP,
-} = require("../controllers/auth.controllers");
+} = require("../controllers/auth");
 const {
   verifyToken,
   verifyTokenAdmin,
-} = require("../middlewares/auth.middleware");
+} = require("../middlewares/auth");
 
 router.post("/", postUserDetails); //register a new user
 router.get("/", verifyToken, getUser); //get authenticated user

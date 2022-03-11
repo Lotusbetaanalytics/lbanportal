@@ -5,8 +5,8 @@ const {
   getInitiatives,
   getStaffInitiatives,
   getInitiativeByStaffId,
-} = require("../controllers/initiative.controller");
-const { verifyToken } = require("../middlewares/auth.middleware");
+} = require("../controllers/initiative");
+const { verifyToken } = require("../middlewares/auth");
 
 router.post("/", verifyToken, addInitiative); //staff add initiative
 router.get("/", verifyToken, getInitiatives); //staff initiatives

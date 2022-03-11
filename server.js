@@ -10,15 +10,15 @@ const express = require("express");
 const connectDB = require("./config/db");
 
 // import routes
-const authRoute = require("./routes/auth.routes");
-const appraisalRoute = require("./routes/appraisal.routes");
-const initiativeRoute = require("./routes/initiative.routes");
-const appraisalARoute = require("./routes/appraisalA.routes");
-const resultRoute = require("./routes/result.routes");
-const scoreRoute = require("./routes/score.routes");
-const perspectiveRoute = require("./routes/perspective.routes");
-const calibrationRoute = require("./routes/calibration.routes");
-const optionRoute = require("./routes/option.routes")
+const authRoute = require("./routes/auth");
+const appraisalRoute = require("./routes/appraisal");
+const initiativeRoute = require("./routes/initiative");
+const appraisalARoute = require("./routes/appraisalA");
+const resultRoute = require("./routes/result");
+const scoreRoute = require("./routes/score");
+const perspectiveRoute = require("./routes/perspective");
+const calibrationRoute = require("./routes/calibration");
+const optionRoute = require("./routes/option")
 
 // configure express
 const app = express();

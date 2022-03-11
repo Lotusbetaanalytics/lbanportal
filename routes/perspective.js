@@ -5,8 +5,8 @@ const {
   getPerspective,
   updatePerspective,
   deletePerspective
-} = require("../controllers/perspective.controllers")
-const { verifyToken } = require("../middlewares/auth.middleware")
+} = require("../controllers/perspective")
+const { verifyToken } = require("../middlewares/auth")
 
 router.post("/", verifyToken, createPerspective); // create a perspective
 router.get("/", getAllPerspectives); // get all perspectives

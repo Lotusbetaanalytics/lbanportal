@@ -5,8 +5,8 @@ const {
   getOption,
   updateOption,
   deleteOption
-} = require("../controllers/option.controllers")
-const { verifyToken } = require("../middlewares/auth.middleware")
+} = require("../controllers/option")
+const { verifyToken } = require("../middlewares/auth")
 
 router.post("/", verifyToken, createOption); // create a option
 router.get("/", getAllOptions); // get all options

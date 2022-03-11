@@ -12,8 +12,8 @@ const {
   getResult,
   updateResult,
   deleteResult
-} = require("../controllers/result.controllers")
-const { verifyToken, verifyTokenAdmin } = require("../middlewares/auth.middleware")
+} = require("../controllers/result")
+const { verifyToken, verifyTokenAdmin } = require("../middlewares/auth")
 
 router.post("/", verifyToken, createResult); // create a result
 router.get("/", verifyToken, getAllResult); // get all results

@@ -60,7 +60,7 @@ const StaffSchema = new mongoose.Schema({
   },
   photo: {
     type: mongoose.Schema.ObjectId,
-    ref: "Staff",
+    ref: "Photo",
   },
   emergencyContactName: {
     type: String,

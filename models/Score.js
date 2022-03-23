@@ -24,7 +24,7 @@ const ScoreSchema = new mongoose.Schema({
   managerscore: {
     type: mongoose.Schema.ObjectId,
     ref: "Option",
-    required: true,
+    // required: true,
   },
   section: {
     type: String,

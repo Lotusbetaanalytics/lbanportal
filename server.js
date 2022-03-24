@@ -18,7 +18,7 @@ const resultRoute = require("./routes/result");
 const scoreRoute = require("./routes/score");
 const perspectiveRoute = require("./routes/perspective");
 const calibrationRoute = require("./routes/calibration");
-const optionRoute = require("./routes/option")
+const optionRoute = require("./routes/option");
 
 // configure express
 const app = express();
@@ -29,7 +29,7 @@ connectDB();
 // set up app
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan("tiny"))
+app.use(morgan("tiny"));
 
 //Sanitize data
 app.use(mongoSanitize());
@@ -56,19 +56,18 @@ app.use(cors());
 app.use("/api/v1/staff/auth", authRoute);
 app.use("/api/v1/appraisal", appraisalRoute);
 app.use("/api/v1/initiative", initiativeRoute);
-app.use("/api/v1/section/a", appraisalARoute)
-app.use("/api/v1/result", resultRoute)
-app.use("/api/v1/score", scoreRoute)
-app.use("/api/v1/perspective", perspectiveRoute)
-app.use("/api/v1/calibration", calibrationRoute)
-app.use("/api/v1/option", optionRoute)
-
+app.use("/api/v1/section/a", appraisalARoute);
+app.use("/api/v1/result", resultRoute);
+app.use("/api/v1/score", scoreRoute);
+app.use("/api/v1/perspective", perspectiveRoute);
+app.use("/api/v1/calibration", calibrationRoute);
+app.use("/api/v1/option", optionRoute);
 
 app.get("/", (req, res) => {
   return res.status(200).json({ msg: "This is the api for the lban portal" });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 const server = app.listen(
   PORT,

@@ -1,58 +1,62 @@
-const Result = require("../models/Result")
-const Staff = require("../models/Staff")
-const current = require("../utils/currentAppraisalDetails")
-const resultScore = require("../utils/calculateScore")
-const sendEmail = require("../utils/sendEmail")
+const Result = require("../models/Result");
+const Staff = require("../models/Staff");
+const current = require("../utils/currentAppraisalDetails");
+const resultScore = require("../utils/calculateScore");
+const sendEmail = require("../utils/sendEmail");
 const {
   createResultEmail,
   updateResultEmail,
   rejectedResultEmail,
   acceptedResultEmail,
-} = require("../utils/sendResultEmail")
-const {convertQuarter, hrEmail, firstName} = require("../utils/utils")
-const {ErrorResponseJSON} = require("../utils/errorResponse")
+} = require("../utils/sendResultEmail");
+const { convertQuarter, hrEmail, firstName } = require("../utils/utils");
+const { ErrorResponseJSON } = require("../utils/errorResponse");
 
 // Create a result
 const createResult = async (req, res) => {
-  const {currentSession, currentQuarter} = await current()
+  const { currentSession, currentQuarter } = await current();
 
   try {
     let { user, body } = req;
-    const {session, quarter} = body
+    const { session, quarter } = body;
 
     const existingResult = await Result.findOne({
       user: req.user,
       session: currentSession,
-      quarter: currentQuarter
+      quarter: currentQuarter,
     });
 
-    const score = await resultScore(req)
-    const managerScore = await resultScore(req, scoreType="managerscore")
+    const score = await resultScore(req);
 
     if (!session || !quarter) {
-      body.session = currentSession
-      body.quarter = currentQuarter
+      body.session = currentSession;
+      body.quarter = currentQuarter;
     }
-    body.user = user
-    body.score = score
-    body.managerscore = managerScore
+    body.user = user;
+    body.score = score;
 
-    let result
+    try {
+      const managerScore = await resultScore(req, (scoreType = "managerscore"));
+      body.managerscore = managerScore;
+    } catch (err) {
+      console.log(err.message);
+    }
+
+    let result;
 
     if (existingResult) {
-
       result = await Result.findByIdAndUpdate(existingResult.id, body, {
         new: true,
         runValidators: true,
       });
-  
-      await updateResultEmail(req, existingResult, result, hrEmail)
+
+      await updateResultEmail(req, existingResult, result, hrEmail);
 
       // return new ErrorResponseJSON(res, "Result already exists", 400)
     } else {
       result = await Result.create(body);
-  
-      await createResultEmail(req, existingResult, result, hrEmail)
+
+      await createResultEmail(req, existingResult, result, hrEmail);
     }
 
     return res.status(200).json({
@@ -60,7 +64,7 @@ const createResult = async (req, res) => {
       data: result,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -69,11 +73,11 @@ const getAllResult = async (req, res) => {
   try {
     const result = await Result.find({}).populate({
       path: "user",
-      select: "fullname email department manager role isManager"
+      select: "fullname email department manager role isManager",
     });
 
     if (!result || result.length < 1) {
-      return new ErrorResponseJSON(res, "Results not found!", 404)
+      return new ErrorResponseJSON(res, "Results not found!", 404);
     }
 
     res.status(200).json({
@@ -81,14 +85,14 @@ const getAllResult = async (req, res) => {
       data: result,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
 // Get the current appraisal result for an authenticated staff
 const getCurrentResult = async (req, res) => {
   try {
-    const {currentSession, currentQuarter} = await current()
+    const { currentSession, currentQuarter } = await current();
 
     const result = await Result.findOne({
       user: req.user,
@@ -96,26 +100,26 @@ const getCurrentResult = async (req, res) => {
       quarter: currentQuarter,
     }).populate({
       path: "user",
-      select: "fullname email department manager role isManager"
+      select: "fullname email department manager role isManager",
     });
 
     if (!result) {
-      return new ErrorResponseJSON(res, "Result not found!", 404)
+      return new ErrorResponseJSON(res, "Result not found!", 404);
     }
-    
+
     res.status(200).json({
       success: true,
       data: result,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
 // Upadate the current appraisal result for an authenticated staff
 const updateCurrentResult = async (req, res) => {
   try {
-    const {currentSession, currentQuarter} = await current()
+    const { currentSession, currentQuarter } = await current();
     const { body } = req;
 
     const existingResult = await Result.findOne({
@@ -124,40 +128,40 @@ const updateCurrentResult = async (req, res) => {
       quarter: currentQuarter,
     }).populate({
       path: "user",
-      select: "fullname email department manager role isManager"
+      select: "fullname email department manager role isManager",
     });
 
-    if (!existingResult){
-      return new ErrorResponseJSON(res, "Result not found!", 400)
+    if (!existingResult) {
+      return new ErrorResponseJSON(res, "Result not found!", 400);
     }
-    
-    const score = await resultScore(req)
-    const managerScore = await resultScore(req, scoreType="managerscore")
-    body.score = score
-    body.managerscore = managerScore
+
+    const score = await resultScore(req);
+    const managerScore = await resultScore(req, (scoreType = "managerscore"));
+    body.score = score;
+    body.managerscore = managerScore;
 
     const result = await Result.findByIdAndUpdate(existingResult.id, body, {
       new: true,
       runValidators: true,
     });
 
-    await updateResultEmail(req, existingResult, result, hrEmail)
+    await updateResultEmail(req, existingResult, result, hrEmail);
 
     res.status(200).json({
       success: true,
       data: result,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
 // Get all results by quarter for an authenticated staff
 const getQuarterlyResult = async (req, res) => {
   try {
-    const {currentSession} = await current()
+    const { currentSession } = await current();
 
-    const staff = await Staff.findById(req.user)
+    const staff = await Staff.findById(req.user);
     const firstQuarterResult = await Result.find({
       user: req.user,
       session: currentSession,
@@ -178,10 +182,15 @@ const getQuarterlyResult = async (req, res) => {
       session: currentSession,
       quarter: "Fourth Quarter",
     });
-    if (!firstQuarterResult || !secondQuarterResult || !thirdQuarterResult || !fourthQuarterResult) {
-      return new ErrorResponseJSON(res, "Results not found!", 404)
+    if (
+      !firstQuarterResult ||
+      !secondQuarterResult ||
+      !thirdQuarterResult ||
+      !fourthQuarterResult
+    ) {
+      return new ErrorResponseJSON(res, "Results not found!", 404);
     }
-    
+
     res.status(200).json({
       success: true,
       data: {
@@ -193,16 +202,16 @@ const getQuarterlyResult = async (req, res) => {
       },
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
 // Get the current appraisal result for a staff
 const getCurrentResultByStaffId = async (req, res) => {
   try {
-    const {currentSession, currentQuarter} = await current()
+    const { currentSession, currentQuarter } = await current();
 
-    const staff = await Staff.findById(req.params.id)
+    const staff = await Staff.findById(req.params.id);
     const firstQuarterResult = await Result.find({
       user: req.params.id,
       session: currentSession,
@@ -223,10 +232,15 @@ const getCurrentResultByStaffId = async (req, res) => {
       session: currentSession,
       quarter: "Fourth Quarter",
     });
-    if (!firstQuarterResult || !secondQuarterResult || !thirdQuarterResult || !fourthQuarterResult) {
-      return new ErrorResponseJSON(res, "Results not found!", 404)
+    if (
+      !firstQuarterResult ||
+      !secondQuarterResult ||
+      !thirdQuarterResult ||
+      !fourthQuarterResult
+    ) {
+      return new ErrorResponseJSON(res, "Results not found!", 404);
     }
-    
+
     res.status(200).json({
       success: true,
       data: {
@@ -238,14 +252,14 @@ const getCurrentResultByStaffId = async (req, res) => {
       },
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
 // Update the current appraisal result for a staff using staff id
 const UpdateCurrentResultByStaffId = async (req, res) => {
   try {
-    const {currentSession, currentQuarter} = await current()
+    const { currentSession, currentQuarter } = await current();
     const { user, body } = req;
 
     const existingResult = await Result.findOne({
@@ -254,42 +268,42 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
       quarter: currentQuarter,
     });
     if (!existingResult) {
-      return new ErrorResponseJSON(res, "Result not found!", 404)
+      return new ErrorResponseJSON(res, "Result not found!", 404);
     }
 
-    const staff = await Staff.findById(req.params.id)
-    const manager = await Staff.findById(user)
+    const staff = await Staff.findById(req.params.id);
+    const manager = await Staff.findById(user);
 
     if (staff.manager != user || manager.role != "HR") {
-      return new ErrorResponseJSON(res, "You are not authorized!", 404)
+      return new ErrorResponseJSON(res, "You are not authorized!", 404);
     }
 
-    const score = await resultScore(req)
-    const managerScore = await resultScore(req, scoreType="managerscore")
-    body.score = score
-    body.managerscore = managerScore
+    const score = await resultScore(req);
+    const managerScore = await resultScore(req, (scoreType = "managerscore"));
+    body.score = score;
+    body.managerscore = managerScore;
 
     const result = await Result.findByIdAndUpdate(existingResult.id, req.body, {
       new: true,
       runValidators: true,
     });
 
-    await updateResultEmail(req, existingResult, result, hrEmail)
-    
+    await updateResultEmail(req, existingResult, result, hrEmail);
+
     res.status(200).json({
       success: true,
       data: result,
       staff: staff,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
 // Reject the current appraisal result's manager score for an authenticated user
 const rejectCurrentManagerScore = async (req, res) => {
   try {
-    const {currentSession, currentQuarter} = await current()
+    const { currentSession, currentQuarter } = await current();
     const { user, body } = req;
 
     const existingResult = await Result.findOne({
@@ -298,34 +312,34 @@ const rejectCurrentManagerScore = async (req, res) => {
       quarter: currentQuarter,
     });
     if (!existingResult) {
-      return new ErrorResponseJSON(res, "Result not found!", 404)
+      return new ErrorResponseJSON(res, "Result not found!", 404);
     }
 
-    body.status = "Rejected"
+    body.status = "Rejected";
 
     const result = await Result.findByIdAndUpdate(existingResult.id, req.body, {
       new: true,
       runValidators: true,
     }).populate({
       path: "user",
-      select: "fullname email department manager role isManager"
-    });;
+      select: "fullname email department manager role isManager",
+    });
 
-    await rejectedResultEmail(req, existingResult, result, hrEmail)
-    
+    await rejectedResultEmail(req, existingResult, result, hrEmail);
+
     res.status(200).json({
       success: true,
       data: result,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
 // Accept the current appraisal result's manager score for an authenticated user
 const acceptCurrentManagerScore = async (req, res) => {
   try {
-    const {currentSession, currentQuarter} = await current()
+    const { currentSession, currentQuarter } = await current();
     const { user, body } = req;
 
     const existingResult = await Result.findOne({
@@ -334,27 +348,27 @@ const acceptCurrentManagerScore = async (req, res) => {
       quarter: currentQuarter,
     });
     if (!existingResult) {
-      return new ErrorResponseJSON(res, "Result not found!", 404)
+      return new ErrorResponseJSON(res, "Result not found!", 404);
     }
 
-    body.status = "Accepted"
+    body.status = "Accepted";
 
     const result = await Result.findByIdAndUpdate(existingResult.id, req.body, {
       new: true,
       runValidators: true,
     }).populate({
       path: "user",
-      select: "fullname email department manager role isManager"
-    });;
+      select: "fullname email department manager role isManager",
+    });
 
-    await acceptedResultEmail(req, existingResult, result, hrEmail)
-    
+    await acceptedResultEmail(req, existingResult, result, hrEmail);
+
     res.status(200).json({
       success: true,
       data: result,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -363,19 +377,19 @@ const getResult = async (req, res) => {
   try {
     const result = await Result.findById(req.params.id).populate({
       path: "user",
-      select: "fullname email department manager role isManager"
+      select: "fullname email department manager role isManager",
     });
 
     if (!result) {
-      return new ErrorResponseJSON(res, "Result not found!", 404)
+      return new ErrorResponseJSON(res, "Result not found!", 404);
     }
-    
+
     res.status(200).json({
       success: true,
       data: result,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -386,31 +400,31 @@ const updateResult = async (req, res) => {
 
     const existingResult = await Result.findById(req.params.id).populate({
       path: "user",
-      select: "fullname email department manager role isManager"
+      select: "fullname email department manager role isManager",
     });
 
-    if (!existingResult){
-      return new ErrorResponseJSON(res, "Result not found!", 400)
+    if (!existingResult) {
+      return new ErrorResponseJSON(res, "Result not found!", 400);
     }
-    
-    const score = await resultScore(req)
-    const managerScore = await resultScore(req, scoreType="managerscore")
-    body.score = score
-    body.managerscore = managerScore
+
+    const score = await resultScore(req);
+    const managerScore = await resultScore(req, (scoreType = "managerscore"));
+    body.score = score;
+    body.managerscore = managerScore;
 
     const result = await Result.findByIdAndUpdate(req.params.id, body, {
       new: true,
       runValidators: true,
     });
 
-    await updateResultEmail(req, existingResult, result, hrEmail)
+    await updateResultEmail(req, existingResult, result, hrEmail);
 
     res.status(200).json({
       success: true,
       data: result,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -419,15 +433,15 @@ const deleteResult = async (req, res) => {
   try {
     const result = await Result.findByIdAndDelete(req.params.id);
     if (!result) {
-      return new ErrorResponseJSON(res, "Result not found!", 404)
+      return new ErrorResponseJSON(res, "Result not found!", 404);
     }
-    
+
     res.status(200).json({
       success: true,
       data: result,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -443,5 +457,5 @@ module.exports = {
   acceptCurrentManagerScore,
   getResult,
   updateResult,
-  deleteResult
-}
+  deleteResult,
+};

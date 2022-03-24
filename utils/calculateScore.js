@@ -77,6 +77,8 @@ const ResultScore = async (req, scoreType="score", finalResult=null) => {
         session: currentSession,
       })
       const appraisalA = await AppraisalA.find()
+      // let appraisalAScoreValue = 0
+      appraisalACurrentScore = 0
       // calculate appraisal A score
       for (const [key, score] of Object.entries(appraisalAScores)) {
         appraisalACurrentScore += score[`${scoreType}`].value

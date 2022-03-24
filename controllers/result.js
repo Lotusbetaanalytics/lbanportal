@@ -37,9 +37,11 @@ const createResult = async (req, res) => {
     body.score = score
     body.managerscore = managerScore
 
+    let result
+
     if (existingResult) {
 
-      const result = await Result.findByIdAndUpdate(existingResult.id, body, {
+      result = await Result.findByIdAndUpdate(existingResult.id, body, {
         new: true,
         runValidators: true,
       });
@@ -48,7 +50,7 @@ const createResult = async (req, res) => {
 
       // return new ErrorResponseJSON(res, "Result already exists", 400)
     } else {
-      const result = await Result.create(body);
+      result = await Result.create(body);
   
       await createResultEmail(req, existingResult, result, hrEmail)
     }

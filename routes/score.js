@@ -6,7 +6,8 @@ const {
   getCurrentUserScoresByQuestionId,
   getUserScores,
   getScoresByUserId,
-  geScoreByUserIdAndQuestionId,
+  getScoreByUserIdAndQuestionId,
+  updateScoreByUserIdAndQuestionId,
   getScore,
   updateScore,
   deleteScore
@@ -22,6 +23,7 @@ router.patch("/:id", verifyToken, updateScore); // update score details by id
 router.delete("/:id", verifyToken, deleteScore); // delete score by id
 router.get("/question/:id", verifyToken, getCurrentUserScoresByQuestionId); // get current score for autheticated user
 router.get("/staff/:id", verifyToken, getScoresByUserId); // get scores for a staff by staff id
-router.get("/staff/:id/:q_id", verifyToken, geScoreByUserIdAndQuestionId); // get scores for a staff by staff id and question
+router.get("/staff/:id/:q_id", verifyToken, getScoreByUserIdAndQuestionId); // get a score for a staff by staff id and question
+router.patch("/staff/:id/:q_id", verifyToken, updateScoreByUserIdAndQuestionId); // update a score for a staff by staff id and question
 
 module.exports = router;

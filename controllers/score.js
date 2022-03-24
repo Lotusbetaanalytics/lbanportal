@@ -50,7 +50,7 @@ const createScore = async (req, res) => {
 // Get all scores
 const getAllScores = async (req, res) => {
   try {
-    const score = await Score.find({}).populate("question").populate({
+    const score = await Score.find({}).populate("question score").populate({
       path: "user",
       select: "fullname email department manager role isManager"
     });
@@ -79,7 +79,7 @@ const getCurrentUserScores = async (req, res) => {
       user: req.user,
       session: currentSession,
       quarter: currentQuarter,
-    }).populate("question").populate({
+    }).populate("question score").populate({
       path: "user",
       select: "fullname email department manager role isManager"
     });
@@ -100,7 +100,7 @@ const getCurrentUserScores = async (req, res) => {
 // Get all scores for authenticated user
 const getUserScores = async (req, res) => {
   try {
-    const scores = await Score.find({user: req.user}).populate("question").populate({
+    const scores = await Score.find({user: req.user}).populate("question score").populate({
       path: "user",
       select: "fullname email department manager role isManager"
     });
@@ -124,7 +124,7 @@ const getCurrentUserScoresByQuestionId = async (req, res) => {
       question: req.params.id,
       session: currentSession,
       quarter: currentQuarter,
-    }).populate("question").populate({
+    }).populate("question score").populate({
       path: "user",
       select: "fullname email department manager role isManager"
     });
@@ -152,7 +152,7 @@ const getScoresByUserId = async (req, res) => {
       user: req.params.id,
       session: currentSession,
       quarter: currentQuarter,
-    }).populate("question").populate({
+    }).populate("question score").populate({
       path: "user",
       select: "fullname email department manager role isManager"
     });
@@ -172,17 +172,17 @@ const getScoresByUserId = async (req, res) => {
 };
 
 // Get current score for a question using the question id for an authenticated user
-const geScoreByUserIdAndQuestionId = async (req, res) => {
+const getScoreByUserIdAndQuestionId = async (req, res) => {
   try {
     const {currentQuarter, currentSession} = await current()
 
     const staff = await Staff.findById(req.params.id)
-    const scores = await Score.find({
+    const scores = await Score.findOne({
       user: req.params.id,
       question: req.params.q_id,
       session: currentSession,
       quarter: currentQuarter,
-    }).populate("question").populate({
+    }).populate("question score").populate({
       path: "user",
       select: "fullname email department manager role isManager"
     });
@@ -201,11 +201,46 @@ const geScoreByUserIdAndQuestionId = async (req, res) => {
   }
 };
 
+// update current score for a question using the question id for an authenticated user
+const updateScoreByUserIdAndQuestionId = async (req, res) => {
+  try {
+    const {currentQuarter, currentSession} = await current()
+
+    const staff = await Staff.findById(req.params.id)
+    const existingScore = await Score.findOne({
+      user: req.params.id,
+      question: req.params.q_id,
+      session: currentSession,
+      quarter: currentQuarter,
+    }).populate("question score").populate({
+      path: "user",
+      select: "fullname email department manager role isManager"
+    });
+    
+    if (!existingScore) {
+      return new ErrorResponseJSON(res, "Staff's response not found!", 404)
+    }
+
+    const score = await Score.findByIdAndUpdate(existingScore.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      staff: staff,
+      data: score,
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500)
+  }
+};
+
 // Get a score's details
 const getScore = async (req, res) => {
   try {
     const score = await Score.findById(req.params.id)
-      .populate("question").populate({
+      .populate("question score").populate({
       path: "user",
       select: "fullname email department manager role isManager"
     });
@@ -266,7 +301,8 @@ module.exports = {
   getCurrentUserScoresByQuestionId,
   getUserScores,
   getScoresByUserId,
-  geScoreByUserIdAndQuestionId,
+  getScoreByUserIdAndQuestionId,
+  updateScoreByUserIdAndQuestionId,
   getScore,
   updateScore,
   deleteScore

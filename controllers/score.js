@@ -220,6 +220,22 @@ const updateScoreByUserIdAndQuestionId = async (req, res) => {
     if (!existingScore) {
       return new ErrorResponseJSON(res, "Staff's response not found!", 404)
     }
+    
+    if (Object.keys(req.body).includes(score) && Object.keys(req.body).includes(managerscore)) {
+      // if (req.body.score && req.body.score === req.body.managerscore) {
+      //   delete req.body.score
+      // } else if (req.body.score !== req.body.managerscore) {
+      //   delete req.body.score
+      // }
+      delete req.body.score
+    } else if (Object.keys(req.body).includes(score)) {
+      req.body.managerscore = req.body.score
+      delete req.body.score
+    }
+
+    if (req.user !== staff.manager) {
+      return new ErrorResponseJSON(res, "You are not this staff's manager", 401)
+    }
 
     const score = await Score.findByIdAndUpdate(existingScore.id, req.body, {
       new: true,

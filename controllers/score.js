@@ -206,7 +206,7 @@ const updateScoreByUserIdAndQuestionId = async (req, res) => {
   try {
     const {currentQuarter, currentSession} = await current()
 
-    const staff = await Staff.findById(req.params.id)
+    const staff = await Staff.findById(req.params.id).populate({path: "manager", select: "id fullname email role"})
     const existingScore = await Score.findOne({
       user: req.params.id,
       question: req.params.q_id,
@@ -220,20 +220,20 @@ const updateScoreByUserIdAndQuestionId = async (req, res) => {
     if (!existingScore) {
       return new ErrorResponseJSON(res, "Staff's response not found!", 404)
     }
-    
-    if (Object.keys(req.body).includes(score) && Object.keys(req.body).includes(managerscore)) {
+
+    if (Object.keys(req.body).includes("score") && Object.keys(req.body).includes("managerscore")) {
       // if (req.body.score && req.body.score === req.body.managerscore) {
       //   delete req.body.score
       // } else if (req.body.score !== req.body.managerscore) {
       //   delete req.body.score
       // }
       delete req.body.score
-    } else if (Object.keys(req.body).includes(score)) {
+    } else if (Object.keys(req.body).includes("score")) {
       req.body.managerscore = req.body.score
       delete req.body.score
     }
 
-    if (req.user !== staff.manager) {
+    if (req.user !== staff.manager.id) {
       return new ErrorResponseJSON(res, "You are not this staff's manager", 401)
     }
 

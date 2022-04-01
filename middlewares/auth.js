@@ -43,9 +43,9 @@ const verifyTokenAdmin = async (req, res, next) => {
           .json({ message: "You are not authorized. Token is invalid." });
       }
       const { staff } = decoded;
-      const decodedId = staff._id
-      
-      const findStaff = await Staff.findById(decodedId)
+      const decodedId = staff._id;
+
+      const findStaff = await Staff.findById(decodedId);
 
       if (findStaff.role !== "Admin") {
         return res.status(403).json({
@@ -78,9 +78,9 @@ const verifyTokenHR = async (req, res, next) => {
           .json({ message: "You are not authorized. Token is invalid." });
       }
       const { staff } = decoded;
-      const decodedId = staff._id
-      
-      const findStaff = await Staff.findById(decodedId)
+      const decodedId = staff._id;
+
+      const findStaff = await Staff.findById(decodedId);
 
       if (findStaff.role !== "HR") {
         return res.status(403).json({

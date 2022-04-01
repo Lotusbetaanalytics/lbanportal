@@ -8,13 +8,18 @@ const AppraisalSchema = new mongoose.Schema({
   quarter: {
     type: String,
     required: [true, "Please add  Quarter"],
-    enum: ["First Quarter", "Second Quarter", "Third Quarter", "Fourth Quarter"],
+    enum: [
+      "First Quarter",
+      "Second Quarter",
+      "Third Quarter",
+      "Fourth Quarter",
+    ],
   },
   status: {
     type: String,
     required: [true, "Please add  status"],
     enum: ["Pending", "Started", "Stopped", "Completed"],
-    default: "Pending"
+    default: "Pending",
   },
   createdAt: {
     type: Date,

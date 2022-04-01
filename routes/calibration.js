@@ -1,4 +1,4 @@
-const router = require('express').Router()
+const router = require("express").Router();
 const {
   createCalibration,
   getAllCalibration,
@@ -6,9 +6,13 @@ const {
   getCurrentCalibrationByStaffId,
   getCalibration,
   updateCalibration,
-  deleteCalibration
-} = require("../controllers/calibration")
-const { verifyToken, verifyTokenAdmin, verifyTokenHR } = require("../middlewares/auth")
+  deleteCalibration,
+} = require("../controllers/calibration");
+const {
+  verifyToken,
+  verifyTokenAdmin,
+  verifyTokenHR,
+} = require("../middlewares/auth");
 
 router.post("/", verifyTokenHR, createCalibration); // create a calibration
 router.get("/", verifyToken, getAllCalibration); // get all calibrations

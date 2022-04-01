@@ -1,5 +1,5 @@
-const AppraisalA = require("../models/AppraisalA")
-const {ErrorResponseJSON} = require("../utils/errorResponse")
+const AppraisalA = require("../models/AppraisalA");
+const { ErrorResponseJSON } = require("../utils/errorResponse");
 
 // Create an appraisalA
 const createAppraisalA = async (req, res) => {
@@ -11,7 +11,7 @@ const createAppraisalA = async (req, res) => {
       data: appraisal,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -20,15 +20,15 @@ const getAllAppraisalA = async (req, res) => {
   try {
     const appraisalA = await AppraisalA.find({});
     if (!appraisalA || appraisalA.length < 1) {
-      return new ErrorResponseJSON(res, "AppraisalAs not found!", 404)
+      return new ErrorResponseJSON(res, "AppraisalAs not found!", 404);
     }
-    
+
     res.status(200).json({
       success: true,
       data: appraisalA,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -37,32 +37,36 @@ const getAppraisalA = async (req, res) => {
   try {
     const appraisalA = await AppraisalA.findById(req.params.id);
     if (!appraisalA) {
-      return new ErrorResponseJSON(res, "AppraisalA not found!", 404)
+      return new ErrorResponseJSON(res, "AppraisalA not found!", 404);
     }
-    
+
     res.status(200).json({
       success: true,
       data: appraisalA,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
 // Upadate an appraisalA's details using ID
 const updateAppraisalA = async (req, res) => {
   try {
-    const appraisalA = await AppraisalA.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const appraisalA = await AppraisalA.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     res.status(200).json({
       success: true,
       data: appraisalA,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -71,15 +75,15 @@ const deleteAppraisalA = async (req, res) => {
   try {
     const appraisalA = await AppraisalA.findByIdAndDelete(req.params.id);
     if (!appraisalA) {
-      return new ErrorResponseJSON(res, "AppraisalA not found!", 404)
+      return new ErrorResponseJSON(res, "AppraisalA not found!", 404);
     }
-    
+
     res.status(200).json({
       success: true,
       data: appraisalA,
     });
   } catch (err) {
-    return new ErrorResponseJSON(res, err.message, 500)
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -88,5 +92,5 @@ module.exports = {
   getAllAppraisalA,
   getAppraisalA,
   updateAppraisalA,
-  deleteAppraisalA
-}
+  deleteAppraisalA,
+};

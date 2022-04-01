@@ -1,7 +1,7 @@
 const Staff = require("../models/Staff");
-const Result = require("../models/Result")
-const Photo = require("../models/Photo")
-const Calibration = require("../models/Calibration")
+const Result = require("../models/Result");
+const Photo = require("../models/Photo");
+const Calibration = require("../models/Calibration");
 const cloudinary = require("cloudinary").v2;
 const cloudinarySetup = require("../config/cloudinarysetup");
 const fs = require("fs");
@@ -10,8 +10,8 @@ const generateToken = require("../helpers/generateToken");
 const dotenv = require("dotenv").config();
 const { strToBase64 } = require("../utils/generic");
 const open = require("open");
-const current = require("../utils/currentAppraisalDetails")
-const {ErrorResponseJSON} = require("../utils/errorResponse")
+const current = require("../utils/currentAppraisalDetails");
+const { ErrorResponseJSON } = require("../utils/errorResponse");
 
 //Register new users and send a token
 const postUserDetails = async (req, res) => {
@@ -31,12 +31,12 @@ const postUserDetails = async (req, res) => {
   };
 
   const photoConfig = {
-  method: "get",
-  url: "https://graph.microsoft.com/v1.0/me/photo/$value",
-  headers: {
-  Authorization: `Bearer ${accessToken}`,
-  },
-  responseType: "arraybuffer",
+    method: "get",
+    url: "https://graph.microsoft.com/v1.0/me/photo/$value",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    responseType: "arraybuffer",
   };
 
   const photo = await axios(photoConfig); //get user data from active directory
@@ -57,8 +57,8 @@ const postUserDetails = async (req, res) => {
     const checkStaff = await Staff.findOne({ email: mail }).populate("photo"); //check if there is a staff with the email in the db
     if (checkStaff) {
       if (!checkStaff.photo || checkStaff.photo.image != avatar) {
-        const staffPhoto = new Photo({image: avatar});
-        await staffPhoto.save()
+        const staffPhoto = new Photo({ image: avatar });
+        await staffPhoto.save();
 
         checkStaff.photo = staffPhoto.id;
         await checkStaff.save();
@@ -70,10 +70,14 @@ const postUserDetails = async (req, res) => {
       });
     }
 
-    const staffPhoto = new Photo({image: avatar});
-    await staffPhoto.save()
+    const staffPhoto = new Photo({ image: avatar });
+    await staffPhoto.save();
 
-    const newStaff = new Staff({ email: mail, fullname: displayName, photo: staffPhoto.id });
+    const newStaff = new Staff({
+      email: mail,
+      fullname: displayName,
+      photo: staffPhoto.id,
+    });
     // const newStaff = new Staff({ email: mail, fullname: displayName});
     await newStaff.save(); //add new user to the db
 
@@ -96,7 +100,7 @@ const postUserDetails = async (req, res) => {
 const getUser = async (req, res) => {
   try {
     const { user } = req;
-    const {currentSession} = await current()
+    const { currentSession } = await current();
 
     const staff = await Staff.findById(user).populate("manager");
 
@@ -107,11 +111,11 @@ const getUser = async (req, res) => {
 
     const calibration = await Calibration.findOne({
       staff: user,
-      session: currentSession
+      session: currentSession,
     }).populate({
-        path: "hr",
-        select: "fullname email department manager role isManager"
-      })
+      path: "hr",
+      select: "fullname email department manager role isManager",
+    });
 
     if (!staff) {
       return res.status(404).json({
@@ -261,7 +265,7 @@ const getUserDP = async (req, res) => {
     method: "get",
     url: "https://graph.microsoft.com/v1.0/me/photo/$value",
     headers: {
-    Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${accessToken}`,
     },
     responseType: "arraybuffer",
   };
@@ -271,12 +275,12 @@ const getUserDP = async (req, res) => {
 
     const photo = await axios(photoConfig); //get user data from active directory
     const avatar = new Buffer.from(photo.data, "binary").toString("base64");
-    
+
     const checkStaff = await Staff.findById(req.user).populate("photo");
 
     if (!checkStaff.photo || checkStaff.photo.image != avatar) {
-      const staffPhoto = new Photo({image: avatar});
-      await staffPhoto.save()
+      const staffPhoto = new Photo({ image: avatar });
+      await staffPhoto.save();
 
       checkStaff.photo = staffPhoto.id;
       await checkStaff.save();

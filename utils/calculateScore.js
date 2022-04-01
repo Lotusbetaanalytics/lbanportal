@@ -112,7 +112,7 @@ const ResultScore = async (req, scoreType = "score", finalResult = null) => {
     score: finalScore,
     sectionAScore: finalAppraisalAScore,
     sectionBScore: finalInitiativeScore,
-  }
+  };
 };
 
 module.exports = ResultScore;

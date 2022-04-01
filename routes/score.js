@@ -1,4 +1,4 @@
-const router = require('express').Router()
+const router = require("express").Router();
 const {
   createScore,
   getAllScores,
@@ -10,9 +10,9 @@ const {
   updateScoreByUserIdAndQuestionId,
   getScore,
   updateScore,
-  deleteScore
-} = require("../controllers/score")
-const { verifyToken } = require("../middlewares/auth")
+  deleteScore,
+} = require("../controllers/score");
+const { verifyToken } = require("../middlewares/auth");
 
 router.post("/", verifyToken, createScore); // create a score
 router.get("/", getAllScores); // get all scores

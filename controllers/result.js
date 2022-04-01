@@ -33,11 +33,15 @@ const createResult = async (req, res) => {
       body.quarter = currentQuarter;
     }
     body.user = user;
-    body.score = score;
+    body.score = score.score;
+    body.sectionascore = score.sectionAScore;
+    body.sectionbscore = score.sectionBScore;
 
     try {
       const managerScore = await resultScore(req, (scoreType = "managerscore"));
-      body.managerscore = managerScore;
+      body.managerscore = managerScore.score;
+      body.sectionamanagerscore = managerScore.sectionAScore;
+      body.sectionbmanagerscore = managerScore.sectionBScore;
     } catch (err) {
       console.log(err.message);
     }

@@ -30,7 +30,7 @@ connectDB();
 // set up app
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan("tiny"));
+app.use(morgan("dev"));
 
 //Sanitize data
 app.use(mongoSanitize());

@@ -27,7 +27,7 @@ router.patch(
 ); //upload documents
 
 //Admin routes
-router.get("/allstaff", verifyTokenAdmin, getAllStaff); //get all staff"
+router.get("/allstaff", getAllStaff); //get all staff"
 router.delete("/:id", verifyTokenAdmin, deleteStaff); //delete a user
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const ScoreSchema = new mongoose.Schema({
   user: {
@@ -28,7 +28,7 @@ const ScoreSchema = new mongoose.Schema({
   },
   section: {
     type: String,
-    enum: ["A", "B"]
+    enum: ["A", "B"],
   },
   session: {
     type: String,
@@ -37,8 +37,13 @@ const ScoreSchema = new mongoose.Schema({
   quarter: {
     type: String,
     required: [true, "Please add Quarter"],
-    enum: ["First Quarter", "Second Quarter", "Third Quarter", "Fourth Quarter"],
+    enum: [
+      "First Quarter",
+      "Second Quarter",
+      "Third Quarter",
+      "Fourth Quarter",
+    ],
   },
-})
+});
 
 module.exports = mongoose.model("Score", ScoreSchema);

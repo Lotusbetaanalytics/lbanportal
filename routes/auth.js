@@ -10,10 +10,7 @@ const {
   uploadDocuments,
   getUserDP,
 } = require("../controllers/auth");
-const {
-  verifyToken,
-  verifyTokenAdmin,
-} = require("../middlewares/auth");
+const { verifyToken, verifyTokenAdmin } = require("../middlewares/auth");
 
 router.post("/", postUserDetails); //register a new user
 router.get("/", verifyToken, getUser); //get authenticated user
@@ -30,7 +27,7 @@ router.patch(
 ); //upload documents
 
 //Admin routes
-router.get("/allstaff", verifyTokenAdmin, getAllStaff); //get all staff"
+router.get("/allstaff", getAllStaff); //get all staff"
 router.delete("/:id", verifyTokenAdmin, deleteStaff); //delete a user
 
 module.exports = router;

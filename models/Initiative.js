@@ -37,7 +37,7 @@ const InitiativeSchema = new mongoose.Schema({
   },
   year: {
     type: String,
-    required: true,
+    // required: true,
   },
   section: {
     type: String,

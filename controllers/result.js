@@ -33,11 +33,11 @@ const createResult = async (req, res) => {
       body.quarter = currentQuarter;
     }
     body.user = user;
-    body.score = score;
+    body.score = Number(score.toFixed(2));
 
     try {
       const managerScore = await resultScore(req, (scoreType = "managerscore"));
-      body.managerscore = managerScore;
+      body.managerscore = Number(managerScore.toFixed(2));
     } catch (err) {
       console.log(err.message);
     }
@@ -138,7 +138,7 @@ const updateCurrentResult = async (req, res) => {
     const score = await resultScore(req);
     const managerScore = await resultScore(req, (scoreType = "managerscore"));
     body.score = score;
-    body.managerscore = managerScore;
+    body.managerscore = Number(managerScore.toFixed(2));
 
     const result = await Result.findByIdAndUpdate(existingResult.id, body, {
       new: true,

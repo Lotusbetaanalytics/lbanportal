@@ -30,7 +30,7 @@ const SectionAResultSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please add  status"],
     enum: ["Pending", "Started", "Completed"],
-    default: "Started",
+    default: "Pending",
   },
   createdAt: {
     type: Date,

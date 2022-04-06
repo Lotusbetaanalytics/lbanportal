@@ -9,9 +9,9 @@ class ErrorResponseJSON {
   constructor(res, msg, statusCode) {
     return res.status(statusCode).json({
       success: false,
-      msg: msg
-    })
+      msg: msg,
+    });
   }
 }
 
-module.exports = {ErrorResponse, ErrorResponseJSON};
+module.exports = { ErrorResponse, ErrorResponseJSON };

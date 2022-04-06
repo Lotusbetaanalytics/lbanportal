@@ -1,12 +1,12 @@
-const router = require('express').Router()
+const router = require("express").Router();
 const {
   createOption,
   getAllOptions,
   getOption,
   updateOption,
-  deleteOption
-} = require("../controllers/option")
-const { verifyToken } = require("../middlewares/auth")
+  deleteOption,
+} = require("../controllers/option");
+const { verifyToken } = require("../middlewares/auth");
 
 router.post("/", verifyToken, createOption); // create a option
 router.get("/", getAllOptions); // get all options

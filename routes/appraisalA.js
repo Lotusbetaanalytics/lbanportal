@@ -1,11 +1,11 @@
-const router = require('express').Router();
+const router = require("express").Router();
 const {
   createAppraisalA,
   getAllAppraisalA,
   getAppraisalA,
   updateAppraisalA,
-  deleteAppraisalA
-} = require('../controllers/appraisalA');
+  deleteAppraisalA,
+} = require("../controllers/appraisalA");
 const { verifyToken } = require("../middlewares/auth");
 
 router.post("/", createAppraisalA); // create an appraisalA

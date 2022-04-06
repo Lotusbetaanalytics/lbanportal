@@ -1,12 +1,12 @@
-const router = require('express').Router()
+const router = require("express").Router();
 const {
   createPerspective,
   getAllPerspectives,
   getPerspective,
   updatePerspective,
-  deletePerspective
-} = require("../controllers/perspective")
-const { verifyToken } = require("../middlewares/auth")
+  deletePerspective,
+} = require("../controllers/perspective");
+const { verifyToken } = require("../middlewares/auth");
 
 router.post("/", verifyToken, createPerspective); // create a perspective
 router.get("/", getAllPerspectives); // get all perspectives

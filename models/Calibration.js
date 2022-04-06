@@ -13,11 +13,11 @@ const CalibrationSchema = new mongoose.Schema({
   },
   score: {
     type: Number,
-    required: true
+    required: true,
   },
   session: {
     type: String,
-    required: true
+    required: true,
   },
   createdAt: {
     type: Date,

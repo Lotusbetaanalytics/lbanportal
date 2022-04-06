@@ -107,7 +107,12 @@ const ResultScore = async (req, scoreType = "score", finalResult = null) => {
     finalResult.score = finalScore;
     finalResult.save();
   }
-  return finalScore;
+  // return finalScore;
+  return {
+    score: finalScore,
+    sectionAScore: finalAppraisalAScore,
+    sectionBScore: finalInitiativeScore,
+  };
 };
 
 module.exports = ResultScore;

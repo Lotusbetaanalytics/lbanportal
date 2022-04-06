@@ -5,9 +5,21 @@ const ResultSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Please add a Score"],
   },
+  sectionascore: {
+    type: Number,
+  },
+  sectionbscore: {
+    type: Number,
+  },
   managerscore: {
     type: Number,
     default: 0,
+  },
+  sectionamanagerscore: {
+    type: Number,
+  },
+  sectionbmanagerscore: {
+    type: Number,
   },
   overall: {
     type: Number,
@@ -22,7 +34,12 @@ const ResultSchema = new mongoose.Schema({
   quarter: {
     type: String,
     required: [true, "Please add Quarter"],
-    enum: ["First Quarter", "Second Quarter", "Third Quarter", "Fourth Quarter"],
+    enum: [
+      "First Quarter",
+      "Second Quarter",
+      "Third Quarter",
+      "Fourth Quarter",
+    ],
   },
   status: {
     type: String,

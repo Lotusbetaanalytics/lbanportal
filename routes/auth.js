@@ -6,6 +6,8 @@ const {
   updateUser,
   uploadDp,
   getAllStaff,
+  getStaffByID,
+  updateStaffByID,
   deleteStaff,
   uploadDocuments,
   getUserDP,
@@ -28,6 +30,8 @@ router.patch(
 
 //Admin routes
 router.get("/allstaff", getAllStaff); //get all staff"
+router.get("/:id", verifyTokenAdmin, getStaffByID); //get a user
+router.patch("/:id", verifyTokenAdmin, updateStaffByID); //update a user
 router.delete("/:id", verifyTokenAdmin, deleteStaff); //delete a user
 
 module.exports = router;

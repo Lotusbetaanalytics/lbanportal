@@ -8,11 +8,11 @@ const AppraisalA = require("../models/AppraisalA");
 // Get logs
 const getLogs = async (req, res) => {
   try {
-    const results = await Result.find().sort("createdAt")
-    const staff = await Staff.find().sort("createdAt")
-    const calibration = await Calibration.find().sort("createdAt")
+    const results = await Result.find().sort("-createdAt").populate("user")
+    const staff = await Staff.find().sort("-createdAt").populate("manager")
+    const calibration = await Calibration.find().sort("-createdAt").populate("hr staff")
     const perspectives = await Perspective.find().sort()
-    const appraisalAs = await AppraisalA.find().sort("createdAt")
+    const appraisalAs = await AppraisalA.find().sort("-createdAt")
 
     res.status(200).json({
       success: true,

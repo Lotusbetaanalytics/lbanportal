@@ -354,7 +354,7 @@ const getStaffByID = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: allStaff,
+      data: staff,
     });
   } catch (err) {
     return res.status(500).json({
@@ -385,7 +385,7 @@ const updateStaffByID = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: allStaff,
+      data: staff,
     });
   } catch (err) {
     return res.status(500).json({
@@ -408,12 +408,12 @@ const deleteStaff = async (req, res) => {
       });
     }
 
-    const allStaff = await Staff.find().lean().populate("role");
+    const staff = await Staff.find().lean().populate("role");
 
     return res.status(200).json({
       success: true,
       msg: "Staff deleted",
-      data: allStaff,
+      data: staff,
     });
   } catch (err) {
     return res.status(500).json({

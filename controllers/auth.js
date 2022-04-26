@@ -353,6 +353,57 @@ const getAllStaff = async (req, res) => {
   }
 };
 
+//Get user by id
+const getStaffByID = async (req, res) => {
+  try {
+    const staff = await Staff.findById(req.params.id);
+
+    if (!staff) {
+      return res.status(500).json({
+        success: false,
+        msg: err.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: staff,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
+//Update user by id
+const updateStaffByID = async (req, res) => {
+  try {
+    const staff = await Staff.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!staff) {
+      return res.status(500).json({
+        success: false,
+        msg: err.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: staff,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message,
+    });
+  }
+};
+
 const deleteStaff = async (req, res) => {
   try {
     const { params } = req;
@@ -365,7 +416,6 @@ const deleteStaff = async (req, res) => {
         msg: "Staff member not found",
       });
     }
-
     const allStaff = await Staff.find().lean().populate("manager");
 
     return res.status(200).json({
@@ -443,6 +493,8 @@ module.exports = {
   uploadDocuments,
   uploadDp,
   getAllStaff,
+  getStaffByID,
+  updateStaffByID,
   deleteStaff,
   getUserDP,
   getPhoto,

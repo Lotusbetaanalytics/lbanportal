@@ -6,6 +6,8 @@ const {
   updateUser,
   uploadDp,
   getAllStaff,
+  getStaffByID,
+  updateStaffByID,
   deleteStaff,
   uploadDocuments,
   getUserDP,
@@ -18,6 +20,10 @@ router.get("/", verifyToken, getUser); //get authenticated user
 router.patch("/", verifyToken, updateUser); //update a user
 
 router.patch("/userdp", verifyToken, uploadDp);
+
+router.get("/:id", getStaffByID); //get a user
+router.patch("/:id", updateStaffByID); //update a user
+router.delete("/:id", deleteStaff); //delete a user
 router.get("/photo", verifyToken, getUserDP); //get staff profile picture
 
 router.patch(
@@ -31,6 +37,5 @@ router.patch("/manager/:id", verifyToken, makeManager); //make staff a manager
 
 //Admin routes
 router.get("/allstaff", getAllStaff); //get all staff"
-router.delete("/:id", verifyTokenAdmin, deleteStaff); //delete a user
 
 module.exports = router;

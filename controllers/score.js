@@ -81,7 +81,9 @@ const getCurrentUserScores = async (req, res) => {
       session: currentSession,
       quarter: currentQuarter,
     })
-      .populate("question score managerscore")
+      .populate({ path: "question" })
+      .populate({ path: "managerscore" })
+      .populate({ path: "score" })
       .populate({
         path: "user",
         select: "fullname email department manager role isManager",
@@ -96,6 +98,7 @@ const getCurrentUserScores = async (req, res) => {
       data: score,
     });
   } catch (err) {
+    console.log(err.message);
     return new ErrorResponseJSON(res, err.message, 500);
   }
 };
@@ -216,11 +219,11 @@ const getScoreByUserIdAndQuestionId = async (req, res) => {
 const updateScoreByUserIdAndQuestionId = async (req, res) => {
   try {
     const { currentQuarter, currentSession } = await current();
-
     const staff = await Staff.findById(req.params.id).populate({
       path: "manager",
       select: "id fullname email role",
     });
+
     const existingScore = await Score.findOne({
       user: req.params.id,
       question: req.params.q_id,
@@ -251,7 +254,6 @@ const updateScoreByUserIdAndQuestionId = async (req, res) => {
       req.body.managerscore = req.body.score;
       delete req.body.score;
     }
-
     if (req.user !== staff.manager.id) {
       return new ErrorResponseJSON(
         res,
@@ -265,12 +267,13 @@ const updateScoreByUserIdAndQuestionId = async (req, res) => {
       runValidators: true,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       staff: staff,
       data: score,
     });
   } catch (err) {
+    console.log(err.message);
     return new ErrorResponseJSON(res, err.message, 500);
   }
 };

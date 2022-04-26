@@ -15,10 +15,14 @@ const addInitiative = async (req, res) => {
 
     const initiative = await Initiative.create(body);
 
+    const findInitiative = await Initiative.findById(initiative._id).populate(
+      "perspective"
+    );
+
     return res.status(200).json({
       success: true,
       msg: "Initiative added",
-      data: initiative,
+      data: findInitiative,
     });
   } catch (err) {
     return new ErrorResponseJSON(res, err.message, 500);

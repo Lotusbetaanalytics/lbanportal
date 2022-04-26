@@ -59,8 +59,7 @@ const StaffSchema = new mongoose.Schema({
     type: String,
   },
   photo: {
-    type: mongoose.Schema.ObjectId,
-    ref: "Photo",
+    type: String,
   },
   emergencyContactName: {
     type: String,
@@ -90,7 +89,9 @@ const StaffSchema = new mongoose.Schema({
   accountNumber: { type: String },
   nin: { type: String },
   bvn: { type: String },
-  description: { type: String },
+  bio: { type: String },
+  middleName: { type: String },
+  branch: { type: String },
 
   createdAt: {
     type: Date,

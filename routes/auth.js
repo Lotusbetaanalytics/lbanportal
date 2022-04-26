@@ -9,6 +9,7 @@ const {
   deleteStaff,
   uploadDocuments,
   getUserDP,
+  makeManager,
 } = require("../controllers/auth");
 const { verifyToken, verifyTokenAdmin } = require("../middlewares/auth");
 
@@ -16,7 +17,7 @@ router.post("/", postUserDetails); //register a new user
 router.get("/", verifyToken, getUser); //get authenticated user
 router.patch("/", verifyToken, updateUser); //update a user
 
-router.patch("/userdp", verifyToken, upload.single("profilePic"), uploadDp);
+router.patch("/userdp", verifyToken, uploadDp);
 router.get("/photo", verifyToken, getUserDP); //get staff profile picture
 
 router.patch(
@@ -25,6 +26,8 @@ router.patch(
   upload.array("documents", 5),
   uploadDocuments
 ); //upload documents
+
+router.patch("/manager/:id", verifyToken, makeManager); //make staff a manager
 
 //Admin routes
 router.get("/allstaff", getAllStaff); //get all staff"

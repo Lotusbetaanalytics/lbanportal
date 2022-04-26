@@ -28,8 +28,8 @@ const app = express();
 connectDB();
 
 // set up app
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(morgan("dev"));
 
 //Sanitize data
@@ -63,7 +63,7 @@ app.use("/api/v1/score", scoreRoute);
 app.use("/api/v1/perspective", perspectiveRoute);
 app.use("/api/v1/calibration", calibrationRoute);
 app.use("/api/v1/option", optionRoute);
-app.use("/api/v1/section/a/result", sectionAResultRoute);
+app.use("/api/v1/check/section/a/result", sectionAResultRoute);
 
 app.get("/", (req, res) => {
   return res.status(200).json({ msg: "This is the api for the lban portal" });

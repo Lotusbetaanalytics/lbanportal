@@ -63,6 +63,8 @@ const createResult = async (req, res) => {
       await createResultEmail(req, existingResult, result, hrEmail);
     }
 
+    console.log(existingResult);
+
     return res.status(200).json({
       success: true,
       data: result,

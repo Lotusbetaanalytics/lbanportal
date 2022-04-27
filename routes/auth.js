@@ -36,6 +36,6 @@ router.patch(
 router.patch("/manager/:id", verifyToken, makeManager); //make staff a manager
 
 //Admin routes
-router.get("/allstaff", getAllStaff); //get all staff"
+router.get("/employees/all", getAllStaff); //get all staff"
 
 module.exports = router;

@@ -18,7 +18,7 @@ const createLog = async (req, res) => {
 // Get all logs
 const getAllLogs = async (req, res) => {
   try {
-    const log = await Log.find({});
+    const log = await Log.find({}).sort("-createdAt");
     if (!log || log.length < 1) {
       return new ErrorResponseJSON(res, "Logs not found!", 404);
     }

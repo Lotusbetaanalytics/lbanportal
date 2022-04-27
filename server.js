@@ -20,7 +20,7 @@ const perspectiveRoute = require("./routes/perspective");
 const calibrationRoute = require("./routes/calibration");
 const optionRoute = require("./routes/option");
 const sectionAResultRoute = require("./routes/sectionAResult");
-const logsRoute = require("./routes/logs");
+const logsRoute = require("./routes/log");
 
 // configure express
 const app = express();

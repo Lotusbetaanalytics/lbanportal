@@ -1,4 +1,5 @@
 const Calibration = require("../models/Calibration");
+const Log = require("../models/Log");
 const Result = require("../models/Result");
 const Staff = require("../models/Staff");
 const current = require("../utils/currentAppraisalDetails");
@@ -6,7 +7,7 @@ const { ErrorResponseJSON } = require("../utils/errorResponse");
 
 // Create a calibration
 const createCalibration = async (req, res) => {
-  const { currentSession } = await current();
+  const { currentSession, currentQuarter } = await current();
 
   try {
     let { user, body } = req;
@@ -45,6 +46,10 @@ const createCalibration = async (req, res) => {
     } catch (err) {
       console.log(err);
     }
+    await Log.create({
+      title: "Calibration created",
+      descrtption: `Calibration has been created for ${staff.fullname} for the ${currentSession} session`
+    })
 
     res.status(200).json({
       success: true,
@@ -205,6 +210,7 @@ const getCalibration = async (req, res) => {
 // Upadate a calibration's details
 const updateCalibration = async (req, res) => {
   try {
+    const { currentSession, currentQuarter } = await current();
     const calibration = await Calibration.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -232,6 +238,10 @@ const updateCalibration = async (req, res) => {
     } catch (err) {
       console.log(err);
     }
+    await Log.create({
+      title: "Calibration updated",
+      descrtption: `Calibration has been updated for ${staff.fullname} for the ${currentSession} session`
+    })
 
     res.status(200).json({
       success: true,

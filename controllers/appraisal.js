@@ -1,4 +1,5 @@
 const Appraisal = require("../models/Appraisal");
+const Log = require("../models/Log");
 const { ErrorResponseJSON } = require("../utils/errorResponse");
 
 // Create an appraisal
@@ -19,6 +20,10 @@ const createAppraisal = async (req, res) => {
     }
 
     const appraisal = await Appraisal.create(req.body);
+    await Log.create({
+      title: "Appraisal Session created",
+      descrtption: `An Appraisal Session has been created for the ${appraisal.quarter} of the ${appraisal.session} session`,
+    });
 
     res.status(200).json({
       success: true,
@@ -48,6 +53,10 @@ const startAppraisal = async (req, res) => {
         runValidators: true,
       }
     );
+    await Log.create({
+      title: "Appraisal Session started",
+      descrtption: `An Appraisal Session has been started for the ${appraisal.quarter} of the ${appraisal.session} session`,
+    });
 
     res.status(200).json({
       success: true,
@@ -120,6 +129,10 @@ const updateAppraisal = async (req, res) => {
         runValidators: true,
       }
     );
+    await Log.create({
+      title: "Appraisal Session updated",
+      descrtption: `An Appraisal Session has been updated for the ${appraisal.quarter} of the ${appraisal.session} session`,
+    });
 
     res.status(200).json({
       success: true,

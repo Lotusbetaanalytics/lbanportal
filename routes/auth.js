@@ -19,11 +19,11 @@ router.post("/", postUserDetails); //register a new user
 router.get("/", verifyToken, getUser); //get authenticated user
 router.patch("/", verifyToken, updateUser); //update a user
 
-router.patch("/userdp", verifyToken, uploadDp);
+router.get("/:id", verifyTokenAdmin, getStaffByID); //get a user
+router.patch("/:id", verifyTokenAdmin, updateStaffByID); //update a user
+router.delete("/:id", verifyTokenAdmin, deleteStaff); //delete a user
 
-router.get("/:id", getStaffByID); //get a user
-router.patch("/:id", updateStaffByID); //update a user
-router.delete("/:id", deleteStaff); //delete a user
+router.patch("/userdp", verifyToken, upload.single("profilePic"), uploadDp);
 router.get("/photo", verifyToken, getUserDP); //get staff profile picture
 
 router.patch(

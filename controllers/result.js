@@ -11,6 +11,7 @@ const {
 } = require("../utils/sendResultEmail");
 const { convertQuarter, hrEmail, firstName } = require("../utils/utils");
 const { ErrorResponseJSON } = require("../utils/errorResponse");
+const Log = require("../models/Log");
 
 // Create a result
 const createResult = async (req, res) => {
@@ -62,6 +63,11 @@ const createResult = async (req, res) => {
 
       await createResultEmail(req, existingResult, result, hrEmail);
     }
+    const staff = await Staff.findById(result.user)
+    await Log.create({
+      title: "Appraisal completed",
+      descrtption: `Appraisal has been completed for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`
+    })
 
     console.log(existingResult);
 
@@ -332,6 +338,11 @@ const rejectCurrentManagerScore = async (req, res) => {
     });
 
     await rejectedResultEmail(req, existingResult, result, hrEmail);
+    const staff = await Staff.findById(result.user)
+    await Log.create({
+      title: "Manager score rejected",
+      descrtption: `Manager score has been rejected for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`
+    })
 
     res.status(200).json({
       success: true,
@@ -368,6 +379,11 @@ const acceptCurrentManagerScore = async (req, res) => {
     });
 
     await acceptedResultEmail(req, existingResult, result, hrEmail);
+    const staff = await Staff.findById(result.user)
+    await Log.create({
+      title: "Manager score accepted",
+      descrtption: `Manager score has been accepted for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`
+    })
 
     res.status(200).json({
       success: true,

@@ -68,7 +68,9 @@ app.use("/api/v1/check/section/a/result", sectionAResultRoute);
 app.use("/api/v1/logs", logsRoute);
 
 app.get("/", (req, res) => {
-  return res.status(200).json({ msg: "This is the api for the lban portal" });
+  return res
+    .status(200)
+    .json({ msg: "This is the api for the lban portal 2022" });
 });
 
 const PORT = process.env.PORT || 8000;

@@ -12,7 +12,6 @@ const { strToBase64 } = require("../utils/generic");
 const open = require("open");
 const current = require("../utils/currentAppraisalDetails");
 const { ErrorResponseJSON } = require("../utils/errorResponse");
-const bufferImage = require("buffer-image");
 
 //Register new users and send a token
 const postUserDetails = async (req, res) => {

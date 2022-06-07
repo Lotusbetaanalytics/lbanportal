@@ -158,6 +158,14 @@ const updateUser = async (req, res) => {
         isManager: true,
       }).populate("manager");
 
+      if (!findManager) {
+        return new ErrorResponseJSON(
+          res,
+          `No manager assigned for ${body.department}`,
+          400
+        );
+      }
+
       body.manager = findManager._id;
 
       const staff = await Staff.findByIdAndUpdate(
@@ -171,10 +179,7 @@ const updateUser = async (req, res) => {
       );
 
       if (!staff) {
-        return res.status(400).json({
-          success: false,
-          msg: "Staff not found",
-        });
+        return new ErrorResponseJSON(res, "staff not found", 400);
       }
 
       return res.status(200).json({
@@ -193,10 +198,7 @@ const updateUser = async (req, res) => {
       );
 
       if (!staff) {
-        return res.status(400).json({
-          success: false,
-          msg: "Staff not found",
-        });
+        return new ErrorResponseJSON(res, "staff not found", 400);
       }
 
       return res.status(200).json({
@@ -205,10 +207,7 @@ const updateUser = async (req, res) => {
       });
     }
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
@@ -456,7 +455,6 @@ const getPhoto = async (req, res) => {
 const makeManager = async (req, res) => {
   try {
     const { params, body } = req;
-    console.log(params.id);
 
     const foundStaff = await Staff.findById(params.id);
 

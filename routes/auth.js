@@ -19,7 +19,7 @@ router.post("/", postUserDetails); //register a new user
 router.get("/", verifyToken, getUser); //get authenticated user
 router.patch("/", verifyToken, updateUser); //update a user
 
-router.get("/:id", verifyTokenAdmin, getStaffByID); //get a user
+router.get("/:id", getStaffByID); //get a user
 router.patch("/:id", verifyTokenAdmin, updateStaffByID); //update a user
 router.delete("/:id", verifyTokenAdmin, deleteStaff); //delete a user
 

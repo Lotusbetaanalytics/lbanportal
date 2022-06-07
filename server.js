@@ -29,8 +29,8 @@ const app = express();
 connectDB();
 
 // set up app
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 //Sanitize data
@@ -46,12 +46,12 @@ app.use(
 // Prevent XSS attacks
 app.use(xss());
 
-//Rate limiting
-const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 mins
-  max: 100,
-});
-app.use(limiter);
+// //Rate limiting
+// const limiter = rateLimit({
+//   windowMs: 10 * 60 * 1000, // 10 mins
+//   max: 100,
+// });
+// app.use(limiter);
 app.use(cors());
 
 // configure routes

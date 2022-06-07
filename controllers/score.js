@@ -163,7 +163,7 @@ const getScoresByUserId = async (req, res) => {
       session: currentSession,
       quarter: currentQuarter,
     })
-      .populate("question score")
+      .populate("question score managerscore")
       .populate({
         path: "user",
         select: "fullname email department manager role isManager",

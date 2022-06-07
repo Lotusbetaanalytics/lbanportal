@@ -19,9 +19,9 @@ const createLog = async (req, res) => {
 const getAllLogs = async (req, res) => {
   try {
     const log = await Log.find({}).sort("-createdAt");
-    if (!log || log.length < 1) {
-      return new ErrorResponseJSON(res, "Logs not found!", 404);
-    }
+    // if (!log || log.length < 1) {
+    //   return new ErrorResponseJSON(res, "Logs not found!", 404);
+    // }
 
     res.status(200).json({
       success: true,
@@ -52,14 +52,10 @@ const getLog = async (req, res) => {
 // Upadate an log's details using ID
 const updateLog = async (req, res) => {
   try {
-    const log = await Log.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const log = await Log.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     res.status(200).json({
       success: true,

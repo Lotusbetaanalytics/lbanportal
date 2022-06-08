@@ -61,15 +61,22 @@ const createResult = async (req, res) => {
     } else {
       result = await Result.create(body);
 
-      await createResultEmail(req, existingResult, result, hrEmail);
+      try {
+        await createResultEmail(req, existingResult, result, hrEmail);
+      } catch (err) {
+        return new ErrorResponseJSON(res, err.message, 500);
+      }
     }
-    const staff = await Staff.findById(result.user)
-    await Log.create({
-      title: "Appraisal completed",
-      descrtption: `Appraisal has been completed for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`
-    })
+    const staff = await Staff.findById(result.user);
 
-    console.log(existingResult);
+    try {
+      await Log.create({
+        title: "Appraisal completed",
+        description: `Appraisal has been completed for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`,
+      });
+    } catch (err) {
+      return new ErrorResponseJSON(res, err.message, 500);
+    }
 
     return res.status(200).json({
       success: true,
@@ -338,11 +345,11 @@ const rejectCurrentManagerScore = async (req, res) => {
     });
 
     await rejectedResultEmail(req, existingResult, result, hrEmail);
-    const staff = await Staff.findById(result.user)
+    const staff = await Staff.findById(result.user);
     await Log.create({
       title: "Manager score rejected",
-      descrtption: `Manager score has been rejected for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`
-    })
+      descrtption: `Manager score has been rejected for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`,
+    });
 
     res.status(200).json({
       success: true,
@@ -379,11 +386,11 @@ const acceptCurrentManagerScore = async (req, res) => {
     });
 
     await acceptedResultEmail(req, existingResult, result, hrEmail);
-    const staff = await Staff.findById(result.user)
+    const staff = await Staff.findById(result.user);
     await Log.create({
       title: "Manager score accepted",
-      descrtption: `Manager score has been accepted for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`
-    })
+      descrtption: `Manager score has been accepted for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`,
+    });
 
     res.status(200).json({
       success: true,

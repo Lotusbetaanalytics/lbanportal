@@ -218,35 +218,23 @@ const uploadDp = async (req, res) => {
 
     const imageSizeLimit = 5 * 1024 * 1024; // 5Mb
 
-    console.log(body.img.mimetype);
+    await cloudinarySetup();
+    const { secure_url } = await cloudinary.uploader.upload(file.path);
 
-    //check if the file is an image
-    // if (!body.img.mimetype.startsWith("image")) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     msg: "Uploaded file is not an image",
-    //   });
-    // }
-    // if (!body.img.mimetype.startsWith("image")) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     msg: "Uploaded file is not an image",
-    //   });
-    // }
-
-    await Staff.findByIdAndUpdate(
+    const data = await Staff.findByIdAndUpdate(
       user,
       {
-        photo: body.img,
+        photo: secure_url,
       },
       {
         new: true,
         runValidators: true,
       }
     );
+
     return res.status(200).json({
       success: true,
-      photo: body.img,
+      photo: data.photo,
     });
   } catch (err) {
     console.log(err.message);

@@ -348,7 +348,7 @@ const rejectCurrentManagerScore = async (req, res) => {
     const staff = await Staff.findById(result.user);
     await Log.create({
       title: "Manager score rejected",
-      descrtption: `Manager score has been rejected for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`,
+      description: `Manager score has been rejected by ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`,
     });
 
     res.status(200).json({
@@ -389,7 +389,7 @@ const acceptCurrentManagerScore = async (req, res) => {
     const staff = await Staff.findById(result.user);
     await Log.create({
       title: "Manager score accepted",
-      descrtption: `Manager score has been accepted for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`,
+      description: `Manager score has been accepted by ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`,
     });
 
     res.status(200).json({

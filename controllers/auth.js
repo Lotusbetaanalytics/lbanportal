@@ -146,66 +146,63 @@ const updateUser = async (req, res) => {
     const { user, body } = req;
 
     if (!body) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "No data was provided!" });
+      return new ErrorResponseJSON(res, `No data provided!`, 400);
     }
 
-    if (body.department && !body.manager) {
-      const findManager = await Staff.findOne({
-        department: body.department,
-        role: "Manager",
-        isManager: true,
-      }).populate("manager");
+    // if (body.department && !body.manager) {
+    //   const findManager = await Staff.findOne({
+    //     department: body.department,
+    //     role: "Manager",
+    //     isManager: true,
+    //   }).populate("manager");
 
-      if (!findManager) {
-        return new ErrorResponseJSON(
-          res,
-          `No manager assigned for ${body.department}`,
-          400
-        );
+    //   if (!findManager) {
+    //     return new ErrorResponseJSON(
+    //       res,
+    //       `No manager assigned for ${body.department}`,
+    //       400
+    //     );
+    //   }
+
+    //   body.manager = findManager._id;
+
+    //   const staff = await Staff.findByIdAndUpdate(
+    //     user,
+    //     body,
+
+    //     {
+    //       new: true,
+    //       runValidators: true,
+    //     }
+    //   );
+
+    //   if (!staff) {
+    //     return new ErrorResponseJSON(res, "staff not found", 400);
+    //   }
+
+    //   return res.status(200).json({
+    //     success: true,
+    //     data: staff,
+    //   });
+    // } else {
+    const staff = await Staff.findByIdAndUpdate(
+      user,
+      body,
+
+      {
+        new: true,
+        runValidators: true,
       }
+    );
 
-      body.manager = findManager._id;
-
-      const staff = await Staff.findByIdAndUpdate(
-        user,
-        body,
-
-        {
-          new: true,
-          runValidators: true,
-        }
-      );
-
-      if (!staff) {
-        return new ErrorResponseJSON(res, "staff not found", 400);
-      }
-
-      return res.status(200).json({
-        success: true,
-        data: staff,
-      });
-    } else {
-      const staff = await Staff.findByIdAndUpdate(
-        user,
-        body,
-
-        {
-          new: true,
-          runValidators: true,
-        }
-      );
-
-      if (!staff) {
-        return new ErrorResponseJSON(res, "staff not found", 400);
-      }
-
-      return res.status(200).json({
-        success: true,
-        data: staff,
-      });
+    if (!staff) {
+      return new ErrorResponseJSON(res, "staff not found", 400);
     }
+
+    return res.status(200).json({
+      success: true,
+      data: staff,
+    });
   } catch (err) {
     return new ErrorResponseJSON(res, err.message, 500);
   }

@@ -92,12 +92,8 @@ const getAllResult = async (req, res) => {
   try {
     const result = await Result.find({}).populate({
       path: "user",
-      select: "fullname email department manager role isManager",
+      select: "fullname email department manager role isManager photo",
     });
-
-    if (!result || result.length < 1) {
-      return new ErrorResponseJSON(res, "Results not found!", 404);
-    }
 
     res.status(200).json({
       success: true,
@@ -251,6 +247,7 @@ const getCurrentResultByStaffId = async (req, res) => {
       session: currentSession,
       quarter: "Fourth Quarter",
     });
+
     if (
       !firstQuarterResult ||
       !secondQuarterResult ||
@@ -406,7 +403,7 @@ const getResult = async (req, res) => {
   try {
     const result = await Result.findById(req.params.id).populate({
       path: "user",
-      select: "fullname email department manager role isManager",
+      select: "fullname email department manager role isManager photo",
     });
 
     if (!result) {

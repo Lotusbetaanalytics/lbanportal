@@ -8,7 +8,7 @@ const {
 } = require("../controllers/appraisalA");
 const { verifyToken } = require("../middlewares/auth");
 
-router.post("/", createAppraisalA); // create an appraisalA
+router.post("/", verifyToken, createAppraisalA); // create an appraisalA
 router.get("/", getAllAppraisalA); // get all appraisalAs
 // router.get("/:id", getAppraisalA); // get appraisalA details by id
 router.patch("/:id", verifyToken, updateAppraisalA); // update appraisalA by id

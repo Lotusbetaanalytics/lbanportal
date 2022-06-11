@@ -22,7 +22,7 @@ const createAppraisal = async (req, res) => {
     const appraisal = await Appraisal.create(req.body);
     await Log.create({
       title: "Appraisal Session created",
-      descrtption: `An Appraisal Session has been created for the ${appraisal.quarter} of the ${appraisal.session} session`,
+      description: `An Appraisal Session has been created for the ${appraisal.quarter} of the ${appraisal.session} session`,
     });
 
     res.status(200).json({
@@ -55,7 +55,7 @@ const startAppraisal = async (req, res) => {
     );
     await Log.create({
       title: "Appraisal Session started",
-      descrtption: `An Appraisal Session has been started for the ${appraisal.quarter} of the ${appraisal.session} session`,
+      description: `An Appraisal Session has been started for the ${appraisal.quarter} of the ${appraisal.session} session`,
     });
 
     res.status(200).json({
@@ -131,7 +131,7 @@ const updateAppraisal = async (req, res) => {
     );
     await Log.create({
       title: "Appraisal Session updated",
-      descrtption: `An Appraisal Session has been updated for the ${appraisal.quarter} of the ${appraisal.session} session`,
+      description: `An Appraisal Session has been updated for the ${appraisal.quarter} of the ${appraisal.session} session`,
     });
 
     res.status(200).json({
@@ -150,6 +150,11 @@ const deleteAppraisal = async (req, res) => {
     if (!appraisal) {
       return new ErrorResponseJSON(res, "Appraisal not found!", 404);
     }
+
+    await Log.create({
+      title: "Appraisal Session Deleted",
+      description: `An Appraisal Session has been deleted for the ${appraisal.quarter} of the ${appraisal.session} session`,
+    });
 
     res.status(200).json({
       success: true,

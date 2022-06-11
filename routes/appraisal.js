@@ -10,7 +10,7 @@ const {
 } = require("../controllers/appraisal");
 const { verifyToken } = require("../middlewares/auth");
 
-router.post("/", createAppraisal); // create an appraisal
+router.post("/", verifyToken, createAppraisal); // create an appraisal
 router.get("/", getAllAppraisal); // get all appraisal
 router.get("/current", getCurrentAppraisal); // get currently started appraisal
 router.get("/:id", getAppraisal); // get appraisal by id

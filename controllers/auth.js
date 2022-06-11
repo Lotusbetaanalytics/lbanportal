@@ -12,6 +12,7 @@ const { strToBase64 } = require("../utils/generic");
 const open = require("open");
 const current = require("../utils/currentAppraisalDetails");
 const { ErrorResponseJSON } = require("../utils/errorResponse");
+const Log = require("../models/Log");
 
 //Register new users and send a token
 const postUserDetails = async (req, res) => {
@@ -452,6 +453,13 @@ const makeManager = async (req, res) => {
         msg: "Staff member not found!",
       });
     }
+
+    const staff = await Staff.findById(req.user);
+
+    await Log.create({
+      title: "Staff role configured!",
+      description: `${foundStaff.fullname} has been assigned the role of ${body.role} by ${staff.fullname}.`,
+    });
 
     return res.status(200).json({
       success: true,

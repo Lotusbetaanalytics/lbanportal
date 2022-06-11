@@ -12,6 +12,7 @@ const {
 const { convertQuarter, hrEmail, firstName } = require("../utils/utils");
 const { ErrorResponseJSON } = require("../utils/errorResponse");
 const Log = require("../models/Log");
+const Report = require("../models/Report");
 
 // Create a result
 const createResult = async (req, res) => {
@@ -68,6 +69,32 @@ const createResult = async (req, res) => {
       }
     }
     const staff = await Staff.findById(result.user);
+
+    const findReport = await Report.find({ staff: result.user });
+
+    if (!findReport.length) {
+      await Report.create({
+        staffName: staff.fullname,
+        staff: result.user,
+        session: result.session,
+        [currentQuarter]: result.managerscore,
+        overall: result.overall,
+        department: staff.department,
+      });
+    } else {
+      await Report.findByIdAndUpdate(
+        findReport[0]._id,
+        {
+          staffName: staff.fullname,
+          staff: result.user,
+          session: result.session,
+          [currentQuarter]: result.managerscore,
+          overall: result.overall,
+          department: staff.department,
+        },
+        { new: true }
+      );
+    }
 
     try {
       await Log.create({
@@ -291,7 +318,7 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
     const manager = await Staff.findById(user);
 
     if (staff.manager != user || manager.role != "HR") {
-      return new ErrorResponseJSON(res, "You are not authorized!", 404);
+      return new ErrorResponseJSON(res, "You are not authorized!", 400);
     }
 
     const score = await resultScore(req);

@@ -46,6 +46,9 @@ const StaffSchema = new mongoose.Schema({
     enum: ["HR", "Admin", "Manager", "Staff", "Team Lead"],
     default: "Staff",
   },
+  roles: {
+    type: [String],
+  },
   isManager: {
     type: Boolean,
     default: false,

@@ -66,6 +66,7 @@ app.use("/api/v1/calibration", calibrationRoute);
 app.use("/api/v1/option", optionRoute);
 app.use("/api/v1/check/section/a/result", sectionAResultRoute);
 app.use("/api/v1/logs", logsRoute);
+app.use("/api/v1/report", require("./routes/report"));
 
 app.get("/", (req, res) => {
   return res

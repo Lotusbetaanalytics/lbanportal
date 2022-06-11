@@ -193,7 +193,7 @@ const updateUser = async (req, res) => {
         new: true,
         runValidators: true,
       }
-    );
+    ).populate("manager");
 
     if (!staff) {
       return new ErrorResponseJSON(res, "staff not found", 400);
@@ -441,23 +441,21 @@ const makeManager = async (req, res) => {
   try {
     const { params, body } = req;
 
-    const foundStaff = await Staff.findById(params.id);
+    const foundStaff = await Staff.findByIdAndUpdate(params.id, body, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!foundStaff) {
       return res.status(404).json({
         success: false,
-        msg: "Staff member not found",
+        msg: "Staff member not found!",
       });
     }
 
-    foundStaff.isManager = true; // set staff member as manager
-    foundStaff.department = body.department; // set staff member as manager
-    foundStaff.role = "Manager"; // set staff member as manager
-    await foundStaff.save();
-
     return res.status(200).json({
       success: true,
-      msg: "Staff member is now a manager",
+      msg: "Success",
     });
   } catch (err) {
     console.log(err.message);

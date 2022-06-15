@@ -17,7 +17,6 @@ const AppraisalSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    required: [true, "Please add  status"],
     enum: ["Pending", "Started", "Stopped", "Completed"],
     default: "Pending",
   },

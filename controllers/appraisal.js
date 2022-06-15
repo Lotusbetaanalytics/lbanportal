@@ -6,7 +6,7 @@ const { ErrorResponseJSON } = require("../utils/errorResponse");
 const createAppraisal = async (req, res) => {
   try {
     const findAppraisal = await Appraisal.findOne({
-      status: "Started",
+      // status: "Started",
       quarter: req.body.quarter,
       session: req.body.session,
     });
@@ -14,7 +14,7 @@ const createAppraisal = async (req, res) => {
     if (findAppraisal) {
       return new ErrorResponseJSON(
         res,
-        "Appraisal already started for this quarter",
+        "Appraisal already running for this quarter",
         400
       );
     }

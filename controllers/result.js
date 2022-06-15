@@ -82,8 +82,8 @@ const createResult = async (req, res) => {
         department: staff.department,
       });
     } else {
-      await Report.findByIdAndUpdate(
-        findReport[0]._id,
+      await Report.updateOne(
+        { _id: findReport[0]._id },
         {
           staffName: staff.fullname,
           staff: result.user,
@@ -117,6 +117,7 @@ const createResult = async (req, res) => {
 // Get all results
 const getAllResult = async (req, res) => {
   try {
+    const { currentSession, currentQuarter } = await current();
     const result = await Result.find({}).populate({
       path: "user",
       select: "fullname email department manager role isManager photo",
@@ -124,7 +125,10 @@ const getAllResult = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: result,
+      data: result.filter(
+        (item) =>
+          item.session === currentSession && item.quarter === currentQuarter
+      ),
     });
   } catch (err) {
     return new ErrorResponseJSON(res, err.message, 500);
@@ -145,9 +149,9 @@ const getCurrentResult = async (req, res) => {
       select: "fullname email department manager role isManager",
     });
 
-    if (!result) {
-      return new ErrorResponseJSON(res, "Result not found!", 404);
-    }
+    // if (!result) {
+    //   return new ErrorResponseJSON(res, "Result not found!", 404);
+    // }
 
     res.status(200).json({
       success: true,

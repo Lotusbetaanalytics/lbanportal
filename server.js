@@ -67,6 +67,7 @@ app.use("/api/v1/option", optionRoute);
 app.use("/api/v1/check/section/a/result", sectionAResultRoute);
 app.use("/api/v1/logs", logsRoute);
 app.use("/api/v1/report", require("./routes/report"));
+app.use("/api/v1/departments", require("./routes/department"));
 
 app.get("/", (req, res) => {
   return res

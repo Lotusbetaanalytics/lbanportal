@@ -134,6 +134,22 @@ const getAllResult = async (req, res) => {
     return new ErrorResponseJSON(res, err.message, 500);
   }
 };
+// Get all results
+const getResults = async (req, res) => {
+  try {
+    const result = await Result.find({}).populate({
+      path: "user",
+      select: "fullname email department manager role isManager photo",
+    });
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500);
+  }
+};
 
 // Get the current appraisal result for an authenticated staff
 const getCurrentResult = async (req, res) => {
@@ -515,4 +531,5 @@ module.exports = {
   getResult,
   updateResult,
   deleteResult,
+  getResults
 };

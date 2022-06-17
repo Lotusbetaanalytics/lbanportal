@@ -12,11 +12,13 @@ const {
   getResult,
   updateResult,
   deleteResult,
+  getResults,
 } = require("../controllers/result");
 const { verifyToken, verifyTokenAdmin } = require("../middlewares/auth");
 
 router.post("/", verifyToken, createResult); // create a result
 router.get("/", verifyToken, getAllResult); // get all results
+router.get("/hr", verifyToken, getResults); // get all results for HR
 router.get("/current", verifyToken, getCurrentResult); // get current result for autheticated user
 router.patch("/current", verifyToken, updateCurrentResult); // update current result for autheticated user
 router.get("/quarterly", verifyToken, getQuarterlyResult); // get quarterly result for authenticated user

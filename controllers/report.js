@@ -9,6 +9,7 @@ const asyncHandler = require("../middlewares/asyncHandler");
 const getReports = async (req, res) => {
   try {
     const reports = await Report.find({});
+
     return res.status(200).json({
       success: true,
       data: reports,

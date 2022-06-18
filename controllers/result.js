@@ -318,6 +318,41 @@ const getCurrentResultByStaffId = async (req, res) => {
     return new ErrorResponseJSON(res, err.message, 500);
   }
 };
+const getResultByStaffId = async (req, res) => {
+  try {
+    const { currentSession, currentQuarter } = await current();
+
+    const staff = await Staff.findById(req.params.id);
+
+    if (!staff) {
+      return new ErrorResponseJSON(res, `Staff not found!`, 404);
+    }
+
+    const staffResult = await Result.find({
+      user: req.params.id,
+      session: currentSession,
+      quarter: currentQuarter,
+    });
+
+    if (!staffResult) {
+      return new ErrorResponseJSON(
+        res,
+        `Result for ${staff.fullname} not found!`,
+        404
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        staff: staff,
+        result: staffResult,
+      },
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500);
+  }
+};
 
 // Update the current appraisal result for a staff using staff id
 const UpdateCurrentResultByStaffId = async (req, res) => {
@@ -531,5 +566,6 @@ module.exports = {
   getResult,
   updateResult,
   deleteResult,
-  getResults
+  getResults,
+  getResultByStaffId,
 };

@@ -12,6 +12,8 @@ const {
 const { convertQuarter, hrEmail, firstName } = require("../utils/utils");
 const { ErrorResponseJSON } = require("../utils/errorResponse");
 const Log = require("../models/Log");
+const Report = require("../models/Report");
+const mongoose = require("mongoose");
 
 // Create a result
 const createResult = async (req, res) => {
@@ -61,13 +63,35 @@ const createResult = async (req, res) => {
     } else {
       result = await Result.create(body);
 
-      await createResultEmail(req, existingResult, result, hrEmail);
+      try {
+        await createResultEmail(req, existingResult, result, hrEmail);
+      } catch (err) {
+        return new ErrorResponseJSON(res, err.message, 500);
+      }
     }
-    const staff = await Staff.findById(result.user)
-    await Log.create({
-      title: "Appraisal completed",
-      descrtption: `Appraisal has been completed for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`
-    })
+    const staff = await Staff.findById(result.user);
+
+    const findReport = await Report.find({ staff: req.params.id });
+
+    if (!findReport.length) {
+      await Report.create({
+        staffName: staff.fullname,
+        staff: result.user,
+        session: result.session,
+        [currentQuarter]: result.managerscore,
+        overall: result.overall,
+        department: staff.department,
+      });
+    }
+
+    try {
+      await Log.create({
+        title: "Appraisal completed",
+        description: `Appraisal has been completed for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`,
+      });
+    } catch (err) {
+      return new ErrorResponseJSON(res, err.message, 500);
+    }
 
     return res.status(200).json({
       success: true,
@@ -81,14 +105,30 @@ const createResult = async (req, res) => {
 // Get all results
 const getAllResult = async (req, res) => {
   try {
+    const { currentSession, currentQuarter } = await current();
     const result = await Result.find({}).populate({
       path: "user",
-      select: "fullname email department manager role isManager",
+      select: "fullname email department manager role isManager photo",
     });
 
-    if (!result || result.length < 1) {
-      return new ErrorResponseJSON(res, "Results not found!", 404);
-    }
+    res.status(200).json({
+      success: true,
+      data: result.filter(
+        (item) =>
+          item.session === currentSession && item.quarter === currentQuarter
+      ),
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500);
+  }
+};
+// Get all results
+const getResults = async (req, res) => {
+  try {
+    const result = await Result.find({}).populate({
+      path: "user",
+      select: "fullname email department manager role isManager photo",
+    });
 
     res.status(200).json({
       success: true,
@@ -113,9 +153,9 @@ const getCurrentResult = async (req, res) => {
       select: "fullname email department manager role isManager",
     });
 
-    if (!result) {
-      return new ErrorResponseJSON(res, "Result not found!", 404);
-    }
+    // if (!result) {
+    //   return new ErrorResponseJSON(res, "Result not found!", 404);
+    // }
 
     res.status(200).json({
       success: true,
@@ -242,6 +282,7 @@ const getCurrentResultByStaffId = async (req, res) => {
       session: currentSession,
       quarter: "Fourth Quarter",
     });
+
     if (
       !firstQuarterResult ||
       !secondQuarterResult ||
@@ -259,6 +300,41 @@ const getCurrentResultByStaffId = async (req, res) => {
         secondQuarter: secondQuarterResult,
         thirdQuarter: thirdQuarterResult,
         fourthQuarter: fourthQuarterResult,
+      },
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500);
+  }
+};
+const getResultByStaffId = async (req, res) => {
+  try {
+    const { currentSession, currentQuarter } = await current();
+
+    const staff = await Staff.findById(req.params.id);
+
+    if (!staff) {
+      return new ErrorResponseJSON(res, `Staff not found!`, 404);
+    }
+
+    const staffResult = await Result.find({
+      user: req.params.id,
+      session: currentSession,
+      quarter: currentQuarter,
+    });
+
+    if (!staffResult) {
+      return new ErrorResponseJSON(
+        res,
+        `Result for ${staff.fullname} not found!`,
+        404
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        staff: staff,
+        result: staffResult,
       },
     });
   } catch (err) {
@@ -284,19 +360,202 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
     const staff = await Staff.findById(req.params.id);
     const manager = await Staff.findById(user);
 
-    if (staff.manager != user || manager.role != "HR") {
-      return new ErrorResponseJSON(res, "You are not authorized!", 404);
+    if (
+      JSON.stringify(mongoose.Types.ObjectId(user)) !=
+      JSON.stringify(mongoose.Types.ObjectId(staff.manager))
+    ) {
+      return new ErrorResponseJSON(res, "You are not authorized!", 400);
     }
 
     const score = await resultScore(req);
-    const managerScore = await resultScore(req, (scoreType = "managerscore"));
-    body.score = score;
-    body.managerscore = managerScore;
+    // const managerScore = await resultScore(req, (scoreType = "managerscore"));
+    body.score = Number(score.score.toFixed(2));
+    // body.managerscore = managerScore;
+
+    try {
+      const managerScore = await resultScore(req, (scoreType = "managerscore"));
+      body.managerscore = Number(managerScore.score.toFixed(2));
+      body.sectionamanagerscore = Number(managerScore.sectionAScore.toFixed(2));
+      body.sectionbmanagerscore = Number(managerScore.sectionBScore.toFixed(2));
+    } catch (err) {
+      console.log(err.message);
+    }
 
     const result = await Result.findByIdAndUpdate(existingResult.id, req.body, {
       new: true,
       runValidators: true,
     });
+
+    const findReport = await Report.find({ staff: req.params.id });
+
+    if (!findReport.length) {
+      await Report.create({
+        staffName: staff.fullname,
+        staff: result.user,
+        session: result.session,
+        [currentQuarter]: result.managerscore,
+        overall: result.overall,
+        department: staff.department,
+      });
+    } else {
+      const found = await Report.findById(findReport[0]._id);
+
+      found.staffName = staff.fullname;
+      found.staff = result.user;
+      found.session = result.session;
+      found[currentQuarter] = result.managerscore;
+      found.department = staff.department;
+
+      await found.save();
+
+      let foundOverall = 0;
+
+      if (
+        found["First Quarter"] &&
+        found["Second Quarter"] &&
+        found["Third Quarter"] &&
+        found["Fourth Quarter"]
+      ) {
+        foundOverall = Math.ceil(
+          (found["First Quarter"] +
+            found["Second Quarter"] +
+            found["Third Quarter"] +
+            found["Fourth Quarter"]) /
+            4
+        );
+      } else if (
+        !found["First Quarter"] &&
+        found["Third Quarter"] &&
+        found["Fourth Quarter"] &&
+        found["Second Quarter"]
+      ) {
+        foundOverall = Math.ceil(
+          (found["Second Quarter"] +
+            found["Third Quarter"] +
+            found["Fourth Quarter"]) /
+            3
+        );
+      } else if (
+        !found["Second Quarter"] &&
+        found["Third Quarter"] &&
+        found["Fourth Quarter"] &&
+        found["First Quarter"]
+      ) {
+        foundOverall = Math.ceil(
+          (found["First Quarter"] +
+            found["Third Quarter"] +
+            found["Fourth Quarter"]) /
+            3
+        );
+      } else if (
+        !found["Third Quarter"] &&
+        found["Fourth Quarter"] &&
+        found["Second Quarter"] &&
+        found["First Quarter"]
+      ) {
+        foundOverall = Math.ceil(
+          (found["Second Quarter"] +
+            found["First Quarter"] +
+            found["Fourth Quarter"]) /
+            3
+        );
+      } else if (
+        !found["Fouth Quarter"] &&
+        found["Third Quarter"] &&
+        found["Second Quarter"] &&
+        found["First Quarter"]
+      ) {
+        foundOverall = Math.ceil(
+          (found["Second Quarter"] +
+            found["Third Quarter"] +
+            found["First Quarter"]) /
+            3
+        );
+      } else if (
+        !found["First Quarter"] &&
+        !found["Second Quarter"] &&
+        found["Third Quarter"] &&
+        found["Fourth Quarter"]
+      ) {
+        foundOverall = Math.ceil(
+          (found["Third Quarter"] + found["Fourth Quarter"]) / 2
+        );
+      } else if (
+        !found["First Quarter"] &&
+        !found["Third Quarter"] &&
+        found["Second Quarter"] &&
+        found["Fourth Quarter"]
+      ) {
+        foundOverall = Math.ceil(
+          (found["Second Quarter"] + found["Fourth Quarter"]) / 2
+        );
+      } else if (
+        !found["First Quarter"] &&
+        !found["Fourth Quarter"] &&
+        found["Third Quarter"] &&
+        found["Second Quarter"]
+      ) {
+        foundOverall = Math.ceil(
+          (found["Third Quarter"] + found["Second Quarter"]) / 2
+        );
+      } else if (
+        found["First Quarter"] &&
+        !found["Fourth Quarter"] &&
+        !found["Third Quarter"] &&
+        found["Second Quarter"]
+      ) {
+        foundOverall = Math.ceil(
+          (found["First Quarter"] + found["Second Quarter"]) / 2
+        );
+      } else if (
+        found["First Quarter"] &&
+        !found["Second Quarter"] &&
+        !found["Third Quarter"] &&
+        !found["Fourth Quarter"]
+      ) {
+        foundOverall = Math.ceil(found["First Quarter"]);
+      } else if (
+        !found["First Quarter"] &&
+        found["Second Quarter"] &&
+        !found["Third Quarter"] &&
+        !found["Fourth Quarter"]
+      ) {
+        foundOverall = Math.ceil(found["Second Quarter"]);
+      } else if (
+        !found["First Quarter"] &&
+        !found["Second Quarter"] &&
+        found["Third Quarter"] &&
+        !found["Fourth Quarter"]
+      ) {
+        foundOverall = Math.ceil(found["Third Quarter"]);
+      } else if (
+        !found["First Quarter"] &&
+        !found["Second Quarter"] &&
+        !found["Third Quarter"] &&
+        found["Fourth Quarter"]
+      ) {
+        foundOverall = Math.ceil(found["Fourth Quarter"]);
+      }
+
+      await Report.findByIdAndUpdate(
+        found._id,
+        {
+          overall: foundOverall,
+        },
+        {
+          new: true,
+        }
+      );
+    }
+
+    try {
+      await Log.create({
+        title: "Manager Appraisal",
+        description: `${staff.fullname} has been appraised by ${manager.fullname} for the ${currentQuarter} of the ${currentSession} session`,
+      });
+    } catch (err) {
+      return new ErrorResponseJSON(res, err.message, 500);
+    }
 
     await updateResultEmail(req, existingResult, result, hrEmail);
 
@@ -336,11 +595,11 @@ const rejectCurrentManagerScore = async (req, res) => {
     });
 
     await rejectedResultEmail(req, existingResult, result, hrEmail);
-    const staff = await Staff.findById(result.user)
+    const staff = await Staff.findById(result.user);
     await Log.create({
       title: "Manager score rejected",
-      descrtption: `Manager score has been rejected for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`
-    })
+      description: `Manager score has been rejected by ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`,
+    });
 
     res.status(200).json({
       success: true,
@@ -377,11 +636,11 @@ const acceptCurrentManagerScore = async (req, res) => {
     });
 
     await acceptedResultEmail(req, existingResult, result, hrEmail);
-    const staff = await Staff.findById(result.user)
+    const staff = await Staff.findById(result.user);
     await Log.create({
       title: "Manager score accepted",
-      descrtption: `Manager score has been accepted for ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`
-    })
+      description: `Manager score has been accepted by ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`,
+    });
 
     res.status(200).json({
       success: true,
@@ -397,7 +656,7 @@ const getResult = async (req, res) => {
   try {
     const result = await Result.findById(req.params.id).populate({
       path: "user",
-      select: "fullname email department manager role isManager",
+      select: "fullname email department manager role isManager photo",
     });
 
     if (!result) {
@@ -478,4 +737,6 @@ module.exports = {
   getResult,
   updateResult,
   deleteResult,
+  getResults,
+  getResultByStaffId,
 };

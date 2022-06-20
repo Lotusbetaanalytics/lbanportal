@@ -46,12 +46,12 @@ app.use(
 // Prevent XSS attacks
 app.use(xss());
 
-//Rate limiting
-const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 mins
-  max: 100,
-});
-app.use(limiter);
+// //Rate limiting
+// const limiter = rateLimit({
+//   windowMs: 10 * 60 * 1000, // 10 mins
+//   max: 100,
+// });
+// app.use(limiter);
 app.use(cors());
 
 // configure routes
@@ -64,11 +64,15 @@ app.use("/api/v1/score", scoreRoute);
 app.use("/api/v1/perspective", perspectiveRoute);
 app.use("/api/v1/calibration", calibrationRoute);
 app.use("/api/v1/option", optionRoute);
-app.use("/api/v1/section/a/result", sectionAResultRoute);
+app.use("/api/v1/check/section/a/result", sectionAResultRoute);
 app.use("/api/v1/logs", logsRoute);
+app.use("/api/v1/report", require("./routes/report"));
+app.use("/api/v1/departments", require("./routes/department"));
 
 app.get("/", (req, res) => {
-  return res.status(200).json({ msg: "This is the api for the lban portal" });
+  return res
+    .status(200)
+    .json({ msg: "This is the api for the lban portal 2022" });
 });
 
 const PORT = process.env.PORT || 8000;

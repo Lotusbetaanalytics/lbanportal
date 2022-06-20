@@ -7,6 +7,7 @@ class ErrorResponse extends Error {
 
 class ErrorResponseJSON {
   constructor(res, msg, statusCode) {
+    console.log(msg, "error message");
     return res.status(statusCode).json({
       success: false,
       msg: msg,

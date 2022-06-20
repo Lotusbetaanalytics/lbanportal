@@ -1,10 +1,22 @@
 const AppraisalA = require("../models/AppraisalA");
+const Log = require("../models/Log");
+const Staff = require("../models/Staff");
+const current = require("../utils/currentAppraisalDetails");
 const { ErrorResponseJSON } = require("../utils/errorResponse");
 
 // Create an appraisalA
 const createAppraisalA = async (req, res) => {
   try {
     const appraisal = await AppraisalA.create(req.body);
+
+    const { currentSession, currentQuarter } = await current();
+
+    const staff = await Staff.findById(req.user);
+
+    await Log.create({
+      title: "Appraisal Section A Criteria created",
+      description: `Appraisal Section A Criteria  has been created by ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`,
+    });
 
     res.status(200).json({
       success: true,

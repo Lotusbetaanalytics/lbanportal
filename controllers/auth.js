@@ -12,6 +12,7 @@ const { strToBase64 } = require("../utils/generic");
 const open = require("open");
 const current = require("../utils/currentAppraisalDetails");
 const { ErrorResponseJSON } = require("../utils/errorResponse");
+const Log = require("../models/Log");
 
 //Register new users and send a token
 const postUserDetails = async (req, res) => {
@@ -146,99 +147,95 @@ const updateUser = async (req, res) => {
     const { user, body } = req;
 
     if (!body) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "No data was provided!" });
+      return new ErrorResponseJSON(res, `No data provided!`, 400);
     }
-    const staff = await Staff.findByIdAndUpdate(user, body, {
-      new: true,
-      runValidators: true,
-    });
+
+    // if (body.department && !body.manager) {
+    //   const findManager = await Staff.findOne({
+    //     department: body.department,
+    //     role: "Manager",
+    //     isManager: true,
+    //   }).populate("manager");
+
+    //   if (!findManager) {
+    //     return new ErrorResponseJSON(
+    //       res,
+    //       `No manager assigned for ${body.department}`,
+    //       400
+    //     );
+    //   }
+
+    //   body.manager = findManager._id;
+
+    //   const staff = await Staff.findByIdAndUpdate(
+    //     user,
+    //     body,
+
+    //     {
+    //       new: true,
+    //       runValidators: true,
+    //     }
+    //   );
+
+    //   if (!staff) {
+    //     return new ErrorResponseJSON(res, "staff not found", 400);
+    //   }
+
+    //   return res.status(200).json({
+    //     success: true,
+    //     data: staff,
+    //   });
+    // } else {
+    const staff = await Staff.findByIdAndUpdate(
+      user,
+      body,
+
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).populate("manager");
 
     if (!staff) {
-      return res.status(400).json({
-        success: false,
-        msg: "Staff not found",
-      });
+      return new ErrorResponseJSON(res, "staff not found", 400);
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: staff,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message,
-    });
+    return new ErrorResponseJSON(res, err.message, 500);
   }
 };
 
 // upload profile picture
 const uploadDp = async (req, res) => {
   try {
-    const { file, user } = req;
+    const { file, user, body } = req;
 
     const imageSizeLimit = 5 * 1024 * 1024; // 5Mb
 
-    if (!file || file.size <= 0) {
-      return res.status(400).json({
-        success: false,
-        msg: "Avatar field is required",
-      });
-    }
-
-    if (file.size >= imageSizeLimit) {
-      return res.status(400).json({
-        success: false,
-        msg: `Uploaded image size limit is ${imageSizeLimit / 1024 / 1024}Mb`,
-      });
-    }
-
-    //check if the file is an image
-    if (!file.mimetype.startsWith("image")) {
-      fs.unlinkSync(file.path); //delete the file from memory if it's not an image
-
-      return res.status(400).json({
-        success: false,
-        msg: "Uploaded file is not an image",
-      });
-    }
-
-    // upload file to cloud storage
     await cloudinarySetup();
-    const uploadedImage = await cloudinary.uploader.upload(file.path, {
-      eager: [
-        { height: 100, width: 100, crop: "fill" },
-        { height: 150, width: 150, crop: "fill" },
-      ],
-    });
+    const { secure_url } = await cloudinary.uploader.upload(file.path);
 
-    if (!uploadedImage) {
-      return res.status(500).json({
-        success: false,
-        msg: "Something went wrong",
-      });
-    }
-
-    //convert the image to base64
-    const base64Image = strToBase64(uploadedImage.eager[0].url);
-
-    await Staff.findByIdAndUpdate(
+    const data = await Staff.findByIdAndUpdate(
       user,
       {
-        photo: base64Image,
+        photo: secure_url,
       },
       {
         new: true,
         runValidators: true,
       }
     );
+
     return res.status(200).json({
       success: true,
-      photo: base64Image,
+      photo: data.photo,
     });
   } catch (err) {
+    console.log(err.message);
     return res.status(500).json({
       success: false,
       msg: err.message,
@@ -326,7 +323,7 @@ const uploadDocuments = async (req, res) => {
 //Get all user details
 const getAllStaff = async (req, res) => {
   try {
-    const allStaff = await Staff.find().lean().populate("role");
+    const allStaff = await Staff.find().lean().populate("manager");
 
     return res.status(200).json({
       success: true,
@@ -343,14 +340,14 @@ const getAllStaff = async (req, res) => {
 //Get user by id
 const getStaffByID = async (req, res) => {
   try {
-    const staff = await Staff.findById(req.params.id)
+    const staff = await Staff.findById(req.params.id);
 
     if (!staff) {
       return res.status(500).json({
         success: false,
         msg: err.message,
       });
-    };
+    }
 
     return res.status(200).json({
       success: true,
@@ -367,21 +364,17 @@ const getStaffByID = async (req, res) => {
 //Update user by id
 const updateStaffByID = async (req, res) => {
   try {
-    const staff = await Staff.findByIdAndUpdate(
-      req.params.id, 
-      req.body, 
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const staff = await Staff.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!staff) {
       return res.status(500).json({
         success: false,
         msg: err.message,
       });
-    };
+    }
 
     return res.status(200).json({
       success: true,
@@ -407,13 +400,12 @@ const deleteStaff = async (req, res) => {
         msg: "Staff member not found",
       });
     }
-
-    const staff = await Staff.find().lean().populate("role");
+    const allStaff = await Staff.find().lean().populate("manager");
 
     return res.status(200).json({
       success: true,
       msg: "Staff deleted",
-      data: staff,
+      data: allStaff,
     });
   } catch (err) {
     return res.status(500).json({
@@ -446,6 +438,42 @@ const getPhoto = async (req, res) => {
   }
 };
 
+const makeManager = async (req, res) => {
+  try {
+    const { params, body } = req;
+
+    const foundStaff = await Staff.findByIdAndUpdate(params.id, body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!foundStaff) {
+      return res.status(404).json({
+        success: false,
+        msg: "Staff member not found!",
+      });
+    }
+
+    const staff = await Staff.findById(req.user);
+
+    await Log.create({
+      title: "Staff role configured!",
+      description: `${foundStaff.fullname} has been assigned the role of ${body.role} by ${staff.fullname}.`,
+    });
+
+    return res.status(200).json({
+      success: true,
+      msg: "Success",
+    });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   postUserDetails,
   getUser,
@@ -458,4 +486,5 @@ module.exports = {
   deleteStaff,
   getUserDP,
   getPhoto,
+  makeManager,
 };

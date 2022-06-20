@@ -189,6 +189,7 @@ const getScoreByUserIdAndQuestionId = async (req, res) => {
     const { currentQuarter, currentSession } = await current();
 
     const staff = await Staff.findById(req.params.id);
+
     const scores = await Score.findOne({
       user: req.params.id,
       question: req.params.q_id,

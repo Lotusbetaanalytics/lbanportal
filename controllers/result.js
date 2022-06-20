@@ -71,6 +71,19 @@ const createResult = async (req, res) => {
     }
     const staff = await Staff.findById(result.user);
 
+    const findReport = await Report.find({ staff: req.params.id });
+
+    if (!findReport.length) {
+      await Report.create({
+        staffName: staff.fullname,
+        staff: result.user,
+        session: result.session,
+        [currentQuarter]: result.managerscore,
+        overall: result.overall,
+        department: staff.department,
+      });
+    }
+
     try {
       await Log.create({
         title: "Appraisal completed",

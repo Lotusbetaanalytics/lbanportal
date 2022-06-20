@@ -13,6 +13,7 @@ const { convertQuarter, hrEmail, firstName } = require("../utils/utils");
 const { ErrorResponseJSON } = require("../utils/errorResponse");
 const Log = require("../models/Log");
 const Report = require("../models/Report");
+const mongoose = require("mongoose");
 
 // Create a result
 const createResult = async (req, res) => {
@@ -372,19 +373,66 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
     const staff = await Staff.findById(req.params.id);
     const manager = await Staff.findById(user);
 
-    if (staff.manager != user || manager.role != "HR") {
+    if (
+      JSON.stringify(mongoose.Types.ObjectId(user)) !=
+      JSON.stringify(mongoose.Types.ObjectId(staff.manager))
+    ) {
       return new ErrorResponseJSON(res, "You are not authorized!", 400);
     }
 
     const score = await resultScore(req);
-    const managerScore = await resultScore(req, (scoreType = "managerscore"));
-    body.score = score;
-    body.managerscore = managerScore;
+    // const managerScore = await resultScore(req, (scoreType = "managerscore"));
+    body.score = score.score;
+    // body.managerscore = managerScore;
+
+    try {
+      const managerScore = await resultScore(req, (scoreType = "managerscore"));
+      body.managerscore = Number(managerScore.score.toFixed(2));
+      body.sectionamanagerscore = Number(managerScore.sectionAScore.toFixed(2));
+      body.sectionbmanagerscore = Number(managerScore.sectionBScore.toFixed(2));
+    } catch (err) {
+      console.log(err.message);
+    }
 
     const result = await Result.findByIdAndUpdate(existingResult.id, req.body, {
       new: true,
       runValidators: true,
     });
+
+    const findReport = await Report.find({ staff: req.params.id });
+
+    if (!findReport.length) {
+      await Report.create({
+        staffName: staff.fullname,
+        staff: result.user,
+        session: result.session,
+        [currentQuarter]: result.managerscore,
+        overall: result.overall,
+        department: staff.department,
+      });
+    } else {
+      await Report.updateOne(
+        { _id: findReport[0]._id },
+        {
+          staffName: staff.fullname,
+          staff: result.user,
+          session: result.session,
+          [currentQuarter]: result.managerscore,
+          overall: result.overall,
+          department: staff.department,
+        },
+        { new: true }
+      );
+    }
+
+    try {
+      await Log.create({
+        title: "Manager Appraisal",
+        description: `${staff.fullname} has been appraised by ${manager.fullname} for the ${currentQuarter} of the ${currentSession} session`,
+      });
+    } catch (err) {
+      return new ErrorResponseJSON(res, err.message, 500);
+    }
 
     await updateResultEmail(req, existingResult, result, hrEmail);
 

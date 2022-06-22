@@ -32,7 +32,7 @@ const updateReport = async (req, res) => {
     const { currentSession, currentQuarter } = await current();
     const hr = await Staff.findById(user);
 
-    const staff = await Staff.findById(req.user);
+    const staff = await Staff.findById(req.user).populate("manager");
 
     // Send email to staff, manager and hr
     try {

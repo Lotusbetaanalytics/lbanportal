@@ -241,7 +241,7 @@ const assignedRoleEmail = async (req, hrEmail) => {
   try {
     let salutation = ``;
     let content = `
-    Kindly be aware that you have been assigned the role of a Manager of ${userDetails.department}.
+    Kindly be aware that you have been assigned the role of a Manager.
     `;
     await sendEmail({
       email: userDetails.email,

@@ -14,6 +14,7 @@ const current = require("../utils/currentAppraisalDetails");
 const { ErrorResponseJSON } = require("../utils/errorResponse");
 const Log = require("../models/Log");
 const { assignedRoleEmail } = require("../utils/sendResultEmail");
+const { hrEmail } = require("../utils/utils");
 
 //Register new users and send a token
 const postUserDetails = async (req, res) => {

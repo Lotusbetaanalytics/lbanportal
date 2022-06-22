@@ -19,7 +19,7 @@ const getReports = async (req, res) => {
   }
 };
 
-const updateReport = async (req, res) => {
+const updateReport = async (req, res, next) => {
   try {
     const report = await Report.findById(req.params.id);
     if (!report) {

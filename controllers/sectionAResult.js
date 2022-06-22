@@ -17,7 +17,7 @@ const createSectionAResult = async (req, res) => {
       quarter: currentQuarter,
     });
 
-    const score = await resultScore(req);
+    const score = await resultScore.ResultScore(req);
 
     if (!session || !quarter) {
       body.session = currentSession;
@@ -27,7 +27,10 @@ const createSectionAResult = async (req, res) => {
     body.score = Number(score.sectionAScore.toFixed(2));
 
     try {
-      const managerScore = await resultScore(req, (scoreType = "managerscore"));
+      const managerScore = await resultScore.ResultScore(
+        req,
+        (scoreType = "managerscore")
+      );
       body.managerscore = Number(managerScore.sectionAScore.toFixed(2));
     } catch (err) {
       console.log(err.message);

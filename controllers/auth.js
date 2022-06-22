@@ -13,6 +13,7 @@ const open = require("open");
 const current = require("../utils/currentAppraisalDetails");
 const { ErrorResponseJSON } = require("../utils/errorResponse");
 const Log = require("../models/Log");
+const { assignedRoleEmail } = require("../utils/sendResultEmail");
 
 //Register new users and send a token
 const postUserDetails = async (req, res) => {
@@ -455,6 +456,10 @@ const makeManager = async (req, res) => {
     }
 
     const staff = await Staff.findById(req.user);
+
+    if (body.role == "Manager") {
+      await assignedRoleEmail(req, hrEmail);
+    }
 
     await Log.create({
       title: "Staff role configured!",

@@ -535,6 +535,8 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
       );
     }
 
+    await updateResultEmail(req, existingResult, result, hrEmail);
+
     try {
       await Log.create({
         title: "Manager Appraisal",

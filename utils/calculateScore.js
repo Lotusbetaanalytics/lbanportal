@@ -9,7 +9,7 @@ const ResultScore = async (req, scoreType = "score", finalResult = null) => {
   // scoreType options are "score" or "managerscore"
   const { currentSession, currentQuarter } = await current();
   const userScores = await Score.find({
-    user: req.user,
+    user: req.param.id,
     quarter: currentQuarter,
     session: currentSession,
   }).populate("user question score managerscore");

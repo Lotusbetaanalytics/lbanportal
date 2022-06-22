@@ -30,8 +30,26 @@ const updateReport = async (req, res) => {
     });
 
     const { currentSession, currentQuarter } = await current();
+    const hr = await Staff.findById(user);
 
     const staff = await Staff.findById(req.user);
+
+    // Send email to staff, manager and hr
+    try {
+      let salutation = ``;
+      let content = `
+      Kindly be aware that the calibration for ${staff.fullname}, for the ${currentSession} session,  has been updated. The calibrated score is ${newReport.calibration}.
+      `;
+      await sendEmail({
+        email: staff.email,
+        cc: [hr.email, staff.manager.email],
+        subject: "Updated Appraisal Calibration",
+        salutation,
+        content,
+      });
+    } catch (err) {
+      console.log(err);
+    }
 
     await Log.create({
       title: "Staff score calibrated!",

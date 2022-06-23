@@ -37,7 +37,7 @@ const createResultEmail = async (req, existingResult, result, hrEmail) => {
     }  has completed the self-appraisal section of the ${convertQuarter(
       existingResult.quarter
     )} performance appraisal with an overall score of ${result.score}.
-    Kindly log on to the <a href="https://lbanstaffportal.herokuapp.com/dashboard">Portal</a> for your final rating.
+    Kindly log on to the <a href="https://performance-portal.vercel.app/">Portal</a> for your final rating.
     `;
     await sendEmail({
       email: managerEmail,
@@ -86,7 +86,7 @@ const updateResultEmail = async (req, existingResult, result, hrEmail) => {
       }  has updated the self-appraisal section of the ${convertQuarter(
         existingResult.quarter
       )} performance appraisal with an overall score of ${result.score}.,
-      Kindly log on to the <a href="https://lbanstaffportal.herokuapp.com/dashboard">Portal</a> for your final rating.
+      Kindly log on to the <a href="https://performance-portal.vercel.app/">Portal</a> for your final rating.
       `;
       await sendEmail({
         email: userDetails.manager.email,
@@ -110,7 +110,7 @@ const updateResultEmail = async (req, existingResult, result, hrEmail) => {
       )} performance appraisal and your manager's score is ${
         result.managerscore
       }.
-      Please <a href="https://lbanstaffportal.herokuapp.com/dashboard">Accept</a> or <a href="https://lbanstaffportal.herokuapp.com/dashboard">Reject</a> your manager's score
+      <a href="https://performance-portal.vercel.app/report">View Result to accept or reject</a>
 
       Thank you
       `;
@@ -241,7 +241,7 @@ const assignedRoleEmail = async (req, hrEmail) => {
   try {
     let salutation = ``;
     let content = `
-    Kindly be aware that you have been assigned the role of a Manager.
+    Hello ${userDetails.fullname}, kindly be aware that you have been assigned the role of a Manager.
     `;
     await sendEmail({
       email: userDetails.email,

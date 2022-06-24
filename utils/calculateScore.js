@@ -101,7 +101,8 @@ const ResultScore = async (req, scoreType = "score", finalResult = null) => {
   for (const [key, result] of Object.entries(resultDict)) {
     finalInitiativeScore += result.percentage;
   }
-  const finalScore = (finalInitiativeScore + finalAppraisalAScore) / 2;
+  // const finalScore = (finalInitiativeScore + finalAppraisalAScore) / 2;
+  const finalScore = finalInitiativeScore * 0.8 + finalAppraisalAScore * 0.2;
 
   if (finalResult) {
     finalResult.score = finalScore;
@@ -215,7 +216,8 @@ const ResultScoreUpdate = async (
   for (const [key, result] of Object.entries(resultDict)) {
     finalInitiativeScore += result.percentage;
   }
-  const finalScore = (finalInitiativeScore + finalAppraisalAScore) / 2;
+  // const finalScore = (finalInitiativeScore + finalAppraisalAScore) / 2;
+  const finalScore = finalInitiativeScore * 0.8 + finalAppraisalAScore * 0.2;
 
   if (finalResult) {
     finalResult.score = finalScore;

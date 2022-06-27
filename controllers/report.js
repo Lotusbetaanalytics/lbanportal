@@ -1,11 +1,11 @@
 const Result = require("../models/Result");
 const Report = require("../models/Report");
 const { ErrorResponseJSON, ErrorResponse } = require("../utils/errorResponse");
+const sendEmail = require("../utils/sendEmail");
 const Log = require("../models/Log");
 const current = require("../utils/currentAppraisalDetails");
 const Staff = require("../models/Staff");
 const asyncHandler = require("../middlewares/asyncHandler");
-
 const {hrEmail} = require("../utils/utils")
 
 

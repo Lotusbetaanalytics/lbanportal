@@ -42,10 +42,11 @@ const postUserDetails = async (req, res) => {
     responseType: "arraybuffer",
   };
 
-  const photo = await axios(photoConfig); //get user data from active directory
-  const avatar = new Buffer.from(photo.data, "binary").toString("base64");
+  // const avatar = new Buffer.from(photo.data, "binary").toString("base64");
 
   try {
+    const photo = await axios(photoConfig); //get user data from active directory
+
     const { data } = await axios(config); //get user data from active directory
 
     const checkEmail = data.mail.split("@"); //split the email address
@@ -57,15 +58,15 @@ const postUserDetails = async (req, res) => {
     }
     const { mail, displayName } = data;
 
-    const checkStaff = await Staff.findOne({ email: mail }).populate("photo"); //check if there is a staff with the email in the db
+    const checkStaff = await Staff.findOne({ email: mail }); //check if there is a staff with the email in the db
     if (checkStaff) {
-      if (!checkStaff.photo || checkStaff.photo.image != avatar) {
-        const staffPhoto = new Photo({ image: avatar });
-        await staffPhoto.save();
+      // if (!checkStaff.photo || checkStaff.photo.image != avatar) {
+      //   const staffPhoto = new Photo({ image: avatar });
+      //   await staffPhoto.save();
 
-        checkStaff.photo = staffPhoto.id;
-        await checkStaff.save();
-      }
+      //   checkStaff.photo = staffPhoto.id;
+      //   await checkStaff.save();
+      // }
       const token = generateToken({ staff: checkStaff }); //generate token
       return res.status(201).cookie("token", token).json({
         success: true,
@@ -73,13 +74,13 @@ const postUserDetails = async (req, res) => {
       });
     }
 
-    const staffPhoto = new Photo({ image: avatar });
-    await staffPhoto.save();
+    // const staffPhoto = new Photo({ image: avatar });
+    // await staffPhoto.save();
 
     const newStaff = new Staff({
       email: mail,
       fullname: displayName,
-      photo: staffPhoto.id,
+      // photo: staffPhoto.id,
     });
     // const newStaff = new Staff({ email: mail, fullname: displayName});
     await newStaff.save(); //add new user to the db

@@ -13,6 +13,7 @@ const firstName = (words) => {
   return n[n.length - 1];
 };
 
-const hrEmail = "akinwalejude@gmail.com";
+// const hrEmail = "akinwalejude@gmail.com";
+const hrEmail = "testuser1@lotusbetaanalytics.com";
 
 module.exports = { convertQuarter, hrEmail, firstName };

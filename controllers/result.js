@@ -392,7 +392,6 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
       });
     } else {
       const found = await Report.findById(findReport[0]._id);
-
       found.staffName = staff.fullname;
       found.staff = result.user;
       found.session = result.session;
@@ -540,7 +539,7 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
       // }
 
       await Report.findByIdAndUpdate(
-        found._id,
+        findReport[0]._id,
         {
           overall: foundOverall,
         },

@@ -6,6 +6,9 @@ const current = require("../utils/currentAppraisalDetails");
 const Staff = require("../models/Staff");
 const asyncHandler = require("../middlewares/asyncHandler");
 
+const {hrEmail} = require("../utils/utils")
+
+
 const getReports = async (req, res) => {
   try {
     const reports = await Report.find({});
@@ -35,25 +38,23 @@ const updateReport = async (req, res, next) => {
     const staff = await Staff.findById(newReport.staff).populate("manager");
 
     // Send email to staff, manager and hr
-    try {
+
       let salutation = ``;
       let content = `
       Kindly be aware that the calibration for ${staff.fullname}, for the ${currentSession} session,  has been updated. The calibrated score is ${newReport.calibration}.
       `;
       await sendEmail({
         email: staff.email,
-        cc: [hr.email, staff.manager.email],
+        cc: [hrEmail, staff.manager.email],
         subject: "Updated Appraisal Calibration",
         salutation,
         content,
       });
-    } catch (err) {
-      console.log(err);
-    }
+
 
     await Log.create({
       title: "Staff score calibrated!",
-      description: `Staff score has been calibrated by ${staff.fullname} for the ${currentQuarter} of the ${currentSession} session`,
+      description: `Staff score has been calibrated by ${hr.fullname} for the ${currentQuarter} of the ${currentSession} session`,
     });
 
     return res.status(200).json({

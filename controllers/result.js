@@ -395,153 +395,24 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
 
       await found.save();
 
-      let foundOverall = 0;
 
-      if (found["Second Quarter"] && found["Fourth Quarter"]) {
-        foundOverall = Math.ceil(
-          (found["Second Quarter"] + found["Fourth Quarter"]) / 2
+      const updatedReport = await Report.findById(found._id)
+
+      if (updatedReport["Second Quarter"] && updatedReport["Fourth Quarter"]) {
+       updatedReport["overall"] = Math.ceil(
+          (updatedReport["Second Quarter"] + updatedReport["Fourth Quarter"]) / 2
         );
-      } else if (!found["Second Quarter"] && found["Fourth Quarter"]) {
-        foundOverall = found["Fourth Quarter"];
-      } else if (found["Second Quarter"] && !found["Fourth Quarter"]) {
-        foundOverall = found["Second Quarter"];
+      } else if (!updatedReport["Second Quarter"] && updatedReport["Fourth Quarter"]) {
+       updatedReport["overall"] = Math.ceil(updatedReport["Fourth Quarter"]);
+      } else if (updatedReport["Second Quarter"] && !updatedReport["Fourth Quarter"]) {
+       updatedReport["overall"] = Math.ceil(updatedReport["Second Quarter"]);
+      }else if (!updatedReport["Second Quarter"] && !updatedReport["Fourth Quarter"]){
+       updatedReport["overall"] = 0;
+      }else{
+        updatedReport["overall"]=0;
       }
-      // if (
-      //   found["First Quarter"] &&
-      //   found["Second Quarter"] &&
-      //   found["Third Quarter"] &&
-      //   found["Fourth Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(
-      //     (found["First Quarter"] +
-      //       found["Second Quarter"] +
-      //       found["Third Quarter"] +
-      //       found["Fourth Quarter"]) /
-      //       4
-      //   );
-      // } else if (
-      //   !found["First Quarter"] &&
-      //   found["Third Quarter"] &&
-      //   found["Fourth Quarter"] &&
-      //   found["Second Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(
-      //     (found["Second Quarter"] +
-      //       found["Third Quarter"] +
-      //       found["Fourth Quarter"]) /
-      //       3
-      //   );
-      // } else if (
-      //   !found["Second Quarter"] &&
-      //   found["Third Quarter"] &&
-      //   found["Fourth Quarter"] &&
-      //   found["First Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(
-      //     (found["First Quarter"] +
-      //       found["Third Quarter"] +
-      //       found["Fourth Quarter"]) /
-      //       3
-      //   );
-      // } else if (
-      //   !found["Third Quarter"] &&
-      //   found["Fourth Quarter"] &&
-      //   found["Second Quarter"] &&
-      //   found["First Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(
-      //     (found["Second Quarter"] +
-      //       found["First Quarter"] +
-      //       found["Fourth Quarter"]) /
-      //       3
-      //   );
-      // } else if (
-      //   !found["Fouth Quarter"] &&
-      //   found["Third Quarter"] &&
-      //   found["Second Quarter"] &&
-      //   found["First Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(
-      //     (found["Second Quarter"] +
-      //       found["Third Quarter"] +
-      //       found["First Quarter"]) /
-      //       3
-      //   );
-      // } else if (
-      //   !found["First Quarter"] &&
-      //   !found["Second Quarter"] &&
-      //   found["Third Quarter"] &&
-      //   found["Fourth Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(
-      //     (found["Third Quarter"] + found["Fourth Quarter"]) / 2
-      //   );
-      // } else if (
-      //   !found["First Quarter"] &&
-      //   !found["Third Quarter"] &&
-      //   found["Second Quarter"] &&
-      //   found["Fourth Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(
-      //     (found["Second Quarter"] + found["Fourth Quarter"]) / 2
-      //   );
-      // } else if (
-      //   !found["First Quarter"] &&
-      //   !found["Fourth Quarter"] &&
-      //   found["Third Quarter"] &&
-      //   found["Second Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(
-      //     (found["Third Quarter"] + found["Second Quarter"]) / 2
-      //   );
-      // } else if (
-      //   found["First Quarter"] &&
-      //   !found["Fourth Quarter"] &&
-      //   !found["Third Quarter"] &&
-      //   found["Second Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(
-      //     (found["First Quarter"] + found["Second Quarter"]) / 2
-      //   );
-      // } else if (
-      //   found["First Quarter"] &&
-      //   !found["Second Quarter"] &&
-      //   !found["Third Quarter"] &&
-      //   !found["Fourth Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(found["First Quarter"]);
-      // } else if (
-      //   !found["First Quarter"] &&
-      //   found["Second Quarter"] &&
-      //   !found["Third Quarter"] &&
-      //   !found["Fourth Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(found["Second Quarter"]);
-      // } else if (
-      //   !found["First Quarter"] &&
-      //   !found["Second Quarter"] &&
-      //   found["Third Quarter"] &&
-      //   !found["Fourth Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(found["Third Quarter"]);
-      // } else if (
-      //   !found["First Quarter"] &&
-      //   !found["Second Quarter"] &&
-      //   !found["Third Quarter"] &&
-      //   found["Fourth Quarter"]
-      // ) {
-      //   foundOverall = Math.ceil(found["Fourth Quarter"]);
-      // }
 
-      await Report.findByIdAndUpdate(
-        findReport[0]._id,
-        {
-          overall: foundOverall,
-        },
-        {
-          new: true,
-        }
-      );
+     await updatedReport.save()
     }
 
     try {

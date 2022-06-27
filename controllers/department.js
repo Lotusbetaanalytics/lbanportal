@@ -15,7 +15,7 @@ const createDepartment = async (req, res, next) => {
 
       let salutation = ``;
       let content = `
-      Hello ${departmentManager?.fullname??"Guest"}! This is to notify you that you have been assigned the manager of ${department.name} department.
+      Hello ${departmentManager?.manager?.fullname??"Manager"}! This is to notify you that you have been assigned the manager of ${department.name} department.
       `;
       await sendEmail({
         email: departmentManager?.manager?.email,

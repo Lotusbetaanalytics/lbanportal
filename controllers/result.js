@@ -29,7 +29,7 @@ const createResult = async (req, res) => {
       quarter: currentQuarter,
     });
 
-    const score = await resultScore(req);
+    const score = await resultScore.ResultScore(req);
 
     if (!session || !quarter) {
       body.session = currentSession;
@@ -41,7 +41,10 @@ const createResult = async (req, res) => {
     body.sectionbscore = Number(score.sectionBScore.toFixed(2));
 
     try {
-      const managerScore = await resultScore(req, (scoreType = "managerscore"));
+      const managerScore = await resultScore.ResultScore(
+        req,
+        (scoreType = "managerscore")
+      );
       body.managerscore = Number(managerScore.score.toFixed(2));
       body.sectionamanagerscore = Number(managerScore.sectionAScore.toFixed(2));
       body.sectionbmanagerscore = Number(managerScore.sectionBScore.toFixed(2));
@@ -62,27 +65,9 @@ const createResult = async (req, res) => {
       // return new ErrorResponseJSON(res, "Result already exists", 400)
     } else {
       result = await Result.create(body);
-
-      try {
         await createResultEmail(req, existingResult, result, hrEmail);
-      } catch (err) {
-        return new ErrorResponseJSON(res, err.message, 500);
-      }
     }
     const staff = await Staff.findById(result.user);
-
-    const findReport = await Report.find({ staff: req.params.id });
-
-    if (!findReport.length) {
-      await Report.create({
-        staffName: staff.fullname,
-        staff: result.user,
-        session: result.session,
-        [currentQuarter]: result.managerscore,
-        overall: result.overall,
-        department: staff.department,
-      });
-    }
 
     try {
       await Log.create({
@@ -367,13 +352,16 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
       return new ErrorResponseJSON(res, "You are not authorized!", 400);
     }
 
-    const score = await resultScore(req);
+    const score = await resultScore.ResultScoreUpdate(req);
     // const managerScore = await resultScore(req, (scoreType = "managerscore"));
     body.score = Number(score.score.toFixed(2));
     // body.managerscore = managerScore;
 
     try {
-      const managerScore = await resultScore(req, (scoreType = "managerscore"));
+      const managerScore = await resultScore.ResultScoreUpdate(
+        req,
+        (scoreType = "managerscore")
+      );
       body.managerscore = Number(managerScore.score.toFixed(2));
       body.sectionamanagerscore = Number(managerScore.sectionAScore.toFixed(2));
       body.sectionbmanagerscore = Number(managerScore.sectionBScore.toFixed(2));
@@ -399,7 +387,6 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
       });
     } else {
       const found = await Report.findById(findReport[0]._id);
-
       found.staffName = staff.fullname;
       found.staff = result.user;
       found.session = result.session;
@@ -408,144 +395,24 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
 
       await found.save();
 
-      let foundOverall = 0;
 
-      if (
-        found["First Quarter"] &&
-        found["Second Quarter"] &&
-        found["Third Quarter"] &&
-        found["Fourth Quarter"]
-      ) {
-        foundOverall = Math.ceil(
-          (found["First Quarter"] +
-            found["Second Quarter"] +
-            found["Third Quarter"] +
-            found["Fourth Quarter"]) /
-            4
+      const updatedReport = await Report.findById(found._id)
+
+      if (updatedReport["Second Quarter"] && updatedReport["Fourth Quarter"]) {
+       updatedReport["overall"] = Math.ceil(
+          (updatedReport["Second Quarter"] + updatedReport["Fourth Quarter"]) / 2
         );
-      } else if (
-        !found["First Quarter"] &&
-        found["Third Quarter"] &&
-        found["Fourth Quarter"] &&
-        found["Second Quarter"]
-      ) {
-        foundOverall = Math.ceil(
-          (found["Second Quarter"] +
-            found["Third Quarter"] +
-            found["Fourth Quarter"]) /
-            3
-        );
-      } else if (
-        !found["Second Quarter"] &&
-        found["Third Quarter"] &&
-        found["Fourth Quarter"] &&
-        found["First Quarter"]
-      ) {
-        foundOverall = Math.ceil(
-          (found["First Quarter"] +
-            found["Third Quarter"] +
-            found["Fourth Quarter"]) /
-            3
-        );
-      } else if (
-        !found["Third Quarter"] &&
-        found["Fourth Quarter"] &&
-        found["Second Quarter"] &&
-        found["First Quarter"]
-      ) {
-        foundOverall = Math.ceil(
-          (found["Second Quarter"] +
-            found["First Quarter"] +
-            found["Fourth Quarter"]) /
-            3
-        );
-      } else if (
-        !found["Fouth Quarter"] &&
-        found["Third Quarter"] &&
-        found["Second Quarter"] &&
-        found["First Quarter"]
-      ) {
-        foundOverall = Math.ceil(
-          (found["Second Quarter"] +
-            found["Third Quarter"] +
-            found["First Quarter"]) /
-            3
-        );
-      } else if (
-        !found["First Quarter"] &&
-        !found["Second Quarter"] &&
-        found["Third Quarter"] &&
-        found["Fourth Quarter"]
-      ) {
-        foundOverall = Math.ceil(
-          (found["Third Quarter"] + found["Fourth Quarter"]) / 2
-        );
-      } else if (
-        !found["First Quarter"] &&
-        !found["Third Quarter"] &&
-        found["Second Quarter"] &&
-        found["Fourth Quarter"]
-      ) {
-        foundOverall = Math.ceil(
-          (found["Second Quarter"] + found["Fourth Quarter"]) / 2
-        );
-      } else if (
-        !found["First Quarter"] &&
-        !found["Fourth Quarter"] &&
-        found["Third Quarter"] &&
-        found["Second Quarter"]
-      ) {
-        foundOverall = Math.ceil(
-          (found["Third Quarter"] + found["Second Quarter"]) / 2
-        );
-      } else if (
-        found["First Quarter"] &&
-        !found["Fourth Quarter"] &&
-        !found["Third Quarter"] &&
-        found["Second Quarter"]
-      ) {
-        foundOverall = Math.ceil(
-          (found["First Quarter"] + found["Second Quarter"]) / 2
-        );
-      } else if (
-        found["First Quarter"] &&
-        !found["Second Quarter"] &&
-        !found["Third Quarter"] &&
-        !found["Fourth Quarter"]
-      ) {
-        foundOverall = Math.ceil(found["First Quarter"]);
-      } else if (
-        !found["First Quarter"] &&
-        found["Second Quarter"] &&
-        !found["Third Quarter"] &&
-        !found["Fourth Quarter"]
-      ) {
-        foundOverall = Math.ceil(found["Second Quarter"]);
-      } else if (
-        !found["First Quarter"] &&
-        !found["Second Quarter"] &&
-        found["Third Quarter"] &&
-        !found["Fourth Quarter"]
-      ) {
-        foundOverall = Math.ceil(found["Third Quarter"]);
-      } else if (
-        !found["First Quarter"] &&
-        !found["Second Quarter"] &&
-        !found["Third Quarter"] &&
-        found["Fourth Quarter"]
-      ) {
-        foundOverall = Math.ceil(found["Fourth Quarter"]);
+      } else if (!updatedReport["Second Quarter"] && updatedReport["Fourth Quarter"]) {
+       updatedReport["overall"] = Math.ceil(updatedReport["Fourth Quarter"]);
+      } else if (updatedReport["Second Quarter"] && !updatedReport["Fourth Quarter"]) {
+       updatedReport["overall"] = Math.ceil(updatedReport["Second Quarter"]);
+      }else if (!updatedReport["Second Quarter"] && !updatedReport["Fourth Quarter"]){
+       updatedReport["overall"] = 0;
+      }else{
+        updatedReport["overall"]=0;
       }
 
-      await Report.findByIdAndUpdate(
-        found._id,
-        {
-          overall: foundOverall,
-        },
-        {
-          new: true,
-        }
-      );
+     await updatedReport.save()
     }
 
     try {

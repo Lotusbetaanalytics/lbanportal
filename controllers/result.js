@@ -65,7 +65,7 @@ const createResult = async (req, res) => {
       // return new ErrorResponseJSON(res, "Result already exists", 400)
     } else {
       result = await Result.create(body);
-        await createResultEmail(req, result, hrEmail);
+      await createResultEmail(req, result, hrEmail);
     }
     const staff = await Staff.findById(result.user);
 

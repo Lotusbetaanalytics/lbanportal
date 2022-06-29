@@ -65,7 +65,7 @@ const createResult = async (req, res) => {
       // return new ErrorResponseJSON(res, "Result already exists", 400)
     } else {
       result = await Result.create(body);
-        await createResultEmail(req, existingResult, result, hrEmail);
+        await createResultEmail(req, result, hrEmail);
     }
     const staff = await Staff.findById(result.user);
 
@@ -461,7 +461,7 @@ const rejectCurrentManagerScore = async (req, res) => {
       select: "fullname email department manager role isManager",
     });
 
-    await rejectedResultEmail(req, existingResult, result, hrEmail);
+    await rejectedResultEmail(req, result, hrEmail);
     const staff = await Staff.findById(result.user);
     await Log.create({
       title: "Manager score rejected",
@@ -502,7 +502,7 @@ const acceptCurrentManagerScore = async (req, res) => {
       select: "fullname email department manager role isManager",
     });
 
-    await acceptedResultEmail(req, existingResult, result, hrEmail);
+    await acceptedResultEmail(req, result, hrEmail);
     const staff = await Staff.findById(result.user);
     await Log.create({
       title: "Manager score accepted",

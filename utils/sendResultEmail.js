@@ -2,7 +2,7 @@ const Staff = require("../models/Staff");
 const sendEmail = require("./sendEmail");
 const { convertQuarter, firstName, hrEmail } = require("./utils");
 
-const createResultEmail = async (req, existingResult, result, hrEmail) => {
+const createResultEmail = async (req, result, hrEmail) => {
 
   // Send email to staff
   try {
@@ -10,7 +10,7 @@ const createResultEmail = async (req, existingResult, result, hrEmail) => {
     let salutation = ``;
     let content = `
     Kudos, you have completed your ${convertQuarter(
-      existingResult.quarter
+      result.quarter
     )} performance appraisal and you score is ${result.score}.
     Your manager will be informed to proceed with the manager rating.<br>
 
@@ -35,12 +35,13 @@ const createResultEmail = async (req, existingResult, result, hrEmail) => {
     Kindly be aware that ${
       userDetails.fullname
     }  has completed the self-appraisal section of the ${convertQuarter(
-      existingResult.quarter
+      result.quarter
     )} performance appraisal with an overall score of ${result.score}.
     Kindly log on to the <a href="https://performance-portal.vercel.app/">Portal</a> for your final rating.
     `;
     await sendEmail({
       email: managerEmail,
+      cc: [hrEmail],
       subject: "Quarterly Appraisal for Team Member",
       salutation,
       content,
@@ -59,7 +60,7 @@ const updateResultEmail = async (req, existingResult, result, hrEmail) => {
       let salutation = ``;
       let content = `
       Kudos, you have updated your ${convertQuarter(
-        existingResult.quarter
+        result.quarter
       )} performance appraisal and you score is ${result.score}.,
       Your manager will be informed to proceed with the manager rating
 
@@ -84,7 +85,7 @@ const updateResultEmail = async (req, existingResult, result, hrEmail) => {
       Kindly be aware that ${
         userDetails.fullname
       }  has updated the self-appraisal section of the ${convertQuarter(
-        existingResult.quarter
+        result.quarter
       )} performance appraisal with an overall score of ${result.score}.,
       Kindly log on to the <a href="https://performance-portal.vercel.app/">Portal</a> for your final rating.
       `;
@@ -106,7 +107,7 @@ const updateResultEmail = async (req, existingResult, result, hrEmail) => {
       let salutation = ``;
       let content = `
       Kindly be aware that your manager has rated your ${convertQuarter(
-        existingResult.quarter
+        result.quarter
       )} performance appraisal and your manager's score is ${
         result.managerscore
       }.
@@ -133,7 +134,7 @@ const updateResultEmail = async (req, existingResult, result, hrEmail) => {
       Kindly be aware that the updated manager's rating score for ${
         userDetails.fullname
       } for the ${convertQuarter(
-        existingResult.quarter
+        result.quarter
       )} performance appraisal is ${result.managerscore},
 
       Thank you
@@ -151,7 +152,7 @@ const updateResultEmail = async (req, existingResult, result, hrEmail) => {
   }
 };
 
-const rejectedResultEmail = async (req, existingResult, result, hrEmail) => {
+const rejectedResultEmail = async (req, result, hrEmail) => {
   const userDetails = await Staff.findById(result.user).populate("manager");
 
   // Send email to staff
@@ -159,7 +160,7 @@ const rejectedResultEmail = async (req, existingResult, result, hrEmail) => {
     let salutation = ``;
     let content = `
     You have rejected your manager's score for the ${convertQuarter(
-      existingResult.quarter
+      result.quarter
     )} performance appraisal.
     Your self appraisal score is ${result.score} and your manager's score is ${
       result.managerscore
@@ -187,7 +188,7 @@ const rejectedResultEmail = async (req, existingResult, result, hrEmail) => {
     Kindly be aware that ${
       userDetails.fullname
     }  has rejected the manager score section of the ${convertQuarter(
-      existingResult.quarter
+      result.quarter
     )} performance appraisal.
     The manager score is ${result.managerscore}.
     The staff's self appraisal score is ${result.score}.
@@ -206,7 +207,7 @@ const rejectedResultEmail = async (req, existingResult, result, hrEmail) => {
   }
 };
 
-const acceptedResultEmail = async (req, existingResult, result, hrEmail) => {
+const acceptedResultEmail = async (req, result, hrEmail) => {
   const userDetails = await Staff.findById(result.user).populate("manager");
 
   // Send email to staff, manager and hr
@@ -217,7 +218,7 @@ const acceptedResultEmail = async (req, existingResult, result, hrEmail) => {
     Kindly be aware that ${
       userDetails.fullname
     } has accepted the manager score of the ${convertQuarter(
-      existingResult.quarter
+      result.quarter
     )} performance appraisal.
     The overall score is ${result.overall}
     The manager score is ${result.managerscore}.

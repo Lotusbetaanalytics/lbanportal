@@ -3,10 +3,10 @@ const sendEmail = require("./sendEmail");
 const { convertQuarter, firstName, hrEmail } = require("./utils");
 
 const createResultEmail = async (req, result, hrEmail) => {
+  const userDetails = await Staff.findById(req.user).populate("manager");
 
   // Send email to staff
   try {
-    const userDetails = await Staff.findById(req.user).populate("manager");
     let salutation = ``;
     let content = `
     Kudos, you have completed your ${convertQuarter(

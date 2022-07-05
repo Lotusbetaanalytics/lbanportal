@@ -18,6 +18,7 @@
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^14.2.0",
+    "ejs": "^3.1.8",
     "express": "^4.17.2",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^6.1.0",

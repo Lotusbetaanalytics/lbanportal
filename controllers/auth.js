@@ -67,6 +67,11 @@ const postUserDetails = async (req, res) => {
       //   checkStaff.photo = staffPhoto.id;
       //   await checkStaff.save();
       // }
+      if (!checkStaff.fullname) {
+        checkStaff.fullname = displayName
+        await checkStaff.save()
+      }
+
       const token = generateToken({ staff: checkStaff }); //generate token
       return res.status(201).cookie("token", token).json({
         success: true,

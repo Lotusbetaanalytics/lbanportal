@@ -3,9 +3,8 @@ const sendEmail = require("./sendEmail");
 const { convertQuarter, firstName, hrEmail } = require("./utils");
 
 const createResultEmail = async (req, result, hrEmail) => {
-  const userDetails = await Staff.findById(req.user).populate("manager");
-
   // Send email to staff
+  const userDetails = await Staff.findById(req.user).populate("manager");
   try {
     let salutation = ``;
     let content = `
@@ -133,9 +132,9 @@ const updateResultEmail = async (req, existingResult, result, hrEmail) => {
       content = `
       Kindly be aware that the updated manager's rating score for ${
         userDetails.fullname
-      } for the ${convertQuarter(
-        result.quarter
-      )} performance appraisal is ${result.managerscore},
+      } for the ${convertQuarter(result.quarter)} performance appraisal is ${
+        result.managerscore
+      },
 
       Thank you
       `;

@@ -45,7 +45,7 @@ const postUserDetails = async (req, res) => {
   // const avatar = new Buffer.from(photo.data, "binary").toString("base64");
 
   try {
-    const photo = await axios(photoConfig); //get user data from active directory
+    // const photo = await axios(photoConfig); //get user data from active directory
 
     const { data } = await axios(config); //get user data from active directory
 

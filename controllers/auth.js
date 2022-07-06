@@ -56,7 +56,9 @@ const postUserDetails = async (req, res) => {
     ) {
       return res.status(400).json({ success: false, msg: "Invalid email" });
     }
-    const { mail, displayName } = data;
+    let { mail, displayName } = data;
+
+    mail = mail.toLowerCase(); //convert email to lowercase
 
     const checkStaff = await Staff.findOne({ email: mail }); //check if there is a staff with the email in the db
     if (checkStaff) {

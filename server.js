@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const colors = require("colors");
 const dotenv = require("dotenv").config();
 const cors = require("cors");
+const path = require("path");
 const rateLimit = require("express-rate-limit");
 const express = require("express");
 const connectDB = require("./config/db");
@@ -46,13 +47,17 @@ app.use(
 // Prevent XSS attacks
 app.use(xss());
 
-// //Rate limiting
-// const limiter = rateLimit({
-//   windowMs: 10 * 60 * 1000, // 10 mins
-//   max: 100,
-// });
-// app.use(limiter);
+//Rate limiting
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 mins
+  max: 10000,
+});
+app.use(limiter);
+
 app.use(cors());
+
+//Set static folder
+app.use(express.static(path.join(__dirname, "public")));
 
 // configure routes
 app.use("/api/v1/staff/auth", authRoute);
@@ -69,10 +74,24 @@ app.use("/api/v1/logs", logsRoute);
 app.use("/api/v1/report", require("./routes/report"));
 app.use("/api/v1/departments", require("./routes/department"));
 
-app.get("/", (req, res) => {
-  return res
-    .status(200)
-    .json({ msg: "This is the api for the lban portal 2022" });
+
+app.use(function (req, res, next) {
+  console.log("%s %s", req.method, req.url);
+  next();
+});
+
+app.engine(".html", require("ejs").__express);
+app.set("view engine", "html");
+app.set("views", __dirname + "/public");
+app.set("view engine", "html");
+
+app.get("/*", function (req, res) {
+  if (req.xhr) {
+    var pathname = url.parse(req.url).pathname;
+    res.sendfile("index.html", {root: __dirname + "/public" + pathname});
+  } else {
+    res.render("index");
+  }
 });
 
 const PORT = process.env.PORT || 8000;

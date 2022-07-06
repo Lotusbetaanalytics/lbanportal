@@ -57,8 +57,7 @@ const postUserDetails = async (req, res) => {
       return res.status(400).json({ success: false, msg: "Invalid email" });
     }
     let { mail, displayName } = data;
-
-    mail = mail.toLowerCase(); //convert email to lowercase
+    mail = mail.toLowerCase();
 
     const checkStaff = await Staff.findOne({ email: mail }); //check if there is a staff with the email in the db
     if (checkStaff) {
@@ -69,6 +68,11 @@ const postUserDetails = async (req, res) => {
       //   checkStaff.photo = staffPhoto.id;
       //   await checkStaff.save();
       // }
+      if (!checkStaff.fullname) {
+        checkStaff.fullname = displayName;
+        await checkStaff.save();
+      }
+
       const token = generateToken({ staff: checkStaff }); //generate token
       return res.status(201).cookie("token", token).json({
         success: true,

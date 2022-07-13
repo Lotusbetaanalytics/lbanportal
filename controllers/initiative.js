@@ -48,6 +48,31 @@ const removeInitiative = async (req, res) => {
     return new ErrorResponseJSON(res, err.message, 500);
   }
 };
+// Edit an initiative
+const editInitiative = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    let foundInitiative = await UserInitiative.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+
+    if (!foundInitiative) {
+      return new ErrorResponseJSON(res, "Initiative not found!", 404);
+    }
+
+    foundInitiative = await Initiative.findById(foundInitiative._id).populate(
+      "perspective"
+    );
+
+    res.status(200).json({
+      success: true,
+      data: foundInitiative,
+    });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500);
+  }
+};
 
 // Get Initiative for authenticated user
 const getInitiatives = async (req, res) => {
@@ -81,7 +106,6 @@ const getStaffInitiatives = async (req, res) => {
     const { id } = req.params;
 
     const initiative = await UserInitiative.findById(id)
-      .sort({ _id: -1 })
       .populate({
         path: "user",
         select: "fullname email manager role isManager",
@@ -140,4 +164,5 @@ module.exports = {
   getInitiatives,
   getStaffInitiatives,
   getInitiativeByStaffId,
+  editInitiative,
 };

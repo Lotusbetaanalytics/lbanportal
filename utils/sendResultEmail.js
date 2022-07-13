@@ -36,7 +36,7 @@ const createResultEmail = async (req, result, hrEmail) => {
     }  has completed the self-appraisal section of the ${convertQuarter(
       result.quarter
     )} performance appraisal with an overall score of ${result.score}.
-    Kindly log on to the <a href="https://performance-portal.vercel.app/">Portal</a> for your final rating.
+    Kindly log on to the <a href="https://www.portal.lotusbetaanalytics.com/">Portal</a> for your final rating.
     `;
     await sendEmail({
       email: managerEmail,
@@ -86,7 +86,7 @@ const updateResultEmail = async (req, existingResult, result, hrEmail) => {
       }  has updated the self-appraisal section of the ${convertQuarter(
         result.quarter
       )} performance appraisal with an overall score of ${result.score}.,
-      Kindly log on to the <a href="https://performance-portal.vercel.app/">Portal</a> for your final rating.
+      Kindly log on to the <a href="https://www.portal.lotusbetaanalytics.com/">Portal</a> for your final rating.
       `;
       await sendEmail({
         email: userDetails.manager.email,
@@ -110,7 +110,7 @@ const updateResultEmail = async (req, existingResult, result, hrEmail) => {
       )} performance appraisal and your manager's score is ${
         result.managerscore
       }.
-      <a href="https://performance-portal.vercel.app/report">View Result to accept or reject</a>
+      <a href="https://www.portal.lotusbetaanalytics.com/report">View Result to accept or reject</a>
 
       Thank you
       `;

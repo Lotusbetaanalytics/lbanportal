@@ -28,9 +28,16 @@ const StaffSchema = new mongoose.Schema({
     unique: true,
   },
 
+  // this will be changed to a list of strings or ObjectId later
   department: {
     type: String,
   },
+  // this will be the department manager
+  departmentManager: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Staff",
+  },
+  // this is used as the "line manager" so i don't have to modify the logic 
   manager: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Staff",
@@ -43,7 +50,7 @@ const StaffSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["HR", "Admin", "Manager", "Staff", "Team Lead"],
+    enum: ["HR", "Admin", "Manager", "Staff", "Team Lead", "Line Manager"],
     default: "Staff",
   },
   roles: {

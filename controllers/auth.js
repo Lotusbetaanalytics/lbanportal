@@ -112,7 +112,9 @@ const getUser = async (req, res) => {
     const { user } = req;
     const { currentSession } = await current();
 
-    const staff = await Staff.findById(user).populate("manager");
+    const staff = await Staff.findById(user).populate(
+      "manager departmentManager"
+    );
 
     const currentResult = await Result.find({
       user: user,
@@ -332,7 +334,9 @@ const uploadDocuments = async (req, res) => {
 //Get all user details
 const getAllStaff = async (req, res) => {
   try {
-    const allStaff = await Staff.find().lean().populate("manager");
+    const allStaff = await Staff.find()
+      .lean()
+      .populate("manager departmentManager");
 
     return res.status(200).json({
       success: true,

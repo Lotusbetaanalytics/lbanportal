@@ -81,7 +81,6 @@ const getStaffInitiatives = async (req, res) => {
     const { id } = req.params;
 
     const initiative = await UserInitiative.findById(id)
-      .sort({ _id: -1 })
       .populate({
         path: "user",
         select: "fullname email manager role isManager",

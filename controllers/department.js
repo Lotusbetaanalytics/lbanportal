@@ -1,32 +1,41 @@
 const Department = require("../models/Department");
 const { ErrorResponse } = require("../utils/errorResponse");
-const sendEmail = require("../utils/sendEmail")
-const {hrEmail} = require("../utils/utils")
+const sendEmail = require("../utils/sendEmail");
+const { hrEmail } = require("../utils/utils");
+const Staff = require("../models/Staff");
 
 const createDepartment = async (req, res, next) => {
   try {
+    const findStaff = await Staff.findById(req.body.manager);
+
+    if (findStaff && findStaff.role !== "Manager") {
+      findStaff.role = "Manager";
+      await findStaff.save();
+    }
+
     const department = await Department.create(req.body);
 
+    const departmentManager = await Department.findById(
+      department._id
+    ).populate("manager");
 
-    const departmentManager = await Department.findById(department._id).populate("manager")
+    // Send email to staff, manager and hr
 
-
-  // Send email to staff, manager and hr
-
-      let salutation = ``;
-      let content = `
-      Hello ${departmentManager?.manager?.fullname??"Manager"}! This is to notify you that you have been assigned as the manager of ${department.name} department.
+    let salutation = ``;
+    let content = `
+      Hello ${
+        departmentManager?.manager?.fullname ?? "Manager"
+      }! This is to notify you that you have been assigned as the manager of ${
+      department.name
+    } department.
       `;
-      await sendEmail({
-        email: departmentManager?.manager?.email,
-        cc: [hrEmail],
-        subject: "Department Update",
-        salutation,
-        content,
-      });
-
-
-
+    await sendEmail({
+      email: departmentManager?.manager?.email,
+      cc: [hrEmail],
+      subject: "Department Update",
+      salutation,
+      content,
+    });
 
     return res.status(201).json({
       success: true,
@@ -47,12 +56,18 @@ const updateDepartment = async (req, res, next) => {
       }
     ).populate("manager");
 
-    if(req.body.manager){
-const departmentManager = await Department.findById(department._id).populate("manager")
-  // Send email to staff, manager and hr
+    if (req.body.manager) {
+      const departmentManager = await Department.findById(
+        department._id
+      ).populate("manager");
+      // Send email to staff, manager and hr
       let salutation = ``;
       let content = `
-      Hello ${departmentManager?.manager?.fullname??"Manager"}! This is to notify you that you have been assigned as the manager of ${department.name} department.
+      Hello ${
+        departmentManager?.manager?.fullname ?? "Manager"
+      }! This is to notify you that you have been assigned as the manager of ${
+        department.name
+      } department.
       `;
       await sendEmail({
         email: departmentManager?.manager?.email,
@@ -61,7 +76,6 @@ const departmentManager = await Department.findById(department._id).populate("ma
         salutation,
         content,
       });
-
     }
 
     return res.status(200).json({

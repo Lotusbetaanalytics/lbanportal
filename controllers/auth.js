@@ -15,6 +15,7 @@ const { ErrorResponseJSON } = require("../utils/errorResponse");
 const Log = require("../models/Log");
 const { assignedRoleEmail } = require("../utils/sendResultEmail");
 const { hrEmail } = require("../utils/utils");
+const { staffRegistrationEmail } = require("../utils/staffEmail");
 
 //Register new users and send a token
 const postUserDetails = async (req, res) => {
@@ -90,6 +91,9 @@ const postUserDetails = async (req, res) => {
     });
     // const newStaff = new Staff({ email: mail, fullname: displayName});
     await newStaff.save(); //add new user to the db
+
+    // send email to hr
+    await staffRegistrationEmail(newStaff)
 
     const token = generateToken({ staff: newStaff }); //generate token
     return res.status(200).cookie("token", token).json({

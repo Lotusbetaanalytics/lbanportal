@@ -26,16 +26,16 @@ const ResultScore = async (req, scoreType = "score", finalResult = null) => {
 
   // create a list of perspective titles
   for (const [key, perspective] of Object.entries(allPerspectives)) {
-    perspectiveTitles.push(perspective.title);
+    perspectiveTitles.push(perspective?.title);
   }
 
   for (const [key, score] of Object.entries(userScores)) {
     // check if question is an initiative
-    if (score.question.perspective || score._qid == "Initiative") {
-      const question = await Initiative.findById(score.question).populate(
+    if (score?.question?.perspective || score._qid == "Initiative") {
+      const question = await Initiative.findById(score?.question).populate(
         "perspective"
       );
-      let scorePerspectiveTitle = question.perspective.title;
+      let scorePerspectiveTitle = question?.perspective?.title;
 
       for (let i = 0; i < perspectiveTitles.length; i++) {
         if (scorePerspectiveTitle == perspectiveTitles[i]) {
@@ -141,7 +141,7 @@ const ResultScoreUpdate = async (
 
   // create a list of perspective titles
   for (const [key, perspective] of Object.entries(allPerspectives)) {
-    perspectiveTitles.push(perspective.title);
+    perspectiveTitles.push(perspective?.title);
   }
 
   for (const [key, score] of Object.entries(userScores)) {
@@ -150,7 +150,7 @@ const ResultScoreUpdate = async (
       const question = await Initiative.findById(score.question).populate(
         "perspective"
       );
-      let scorePerspectiveTitle = question.perspective.title;
+      let scorePerspectiveTitle = question?.perspective?.title;
 
       for (let i = 0; i < perspectiveTitles.length; i++) {
         if (scorePerspectiveTitle == perspectiveTitles[i]) {

@@ -469,14 +469,14 @@ const makeManager = async (req, res) => {
 
     const staff = await Staff.findById(req.user);
 
-    if (body.role == "Manager") {
-      await assignedRoleEmail(req, hrEmail);
-    }
+    // if (body.role == "Manager" || "Line Manager") {
+    //   await assignedRoleEmail(req, hrEmail);
+    // }
 
-    await Log.create({
-      title: "Staff role configured!",
-      description: `${foundStaff.fullname} has been assigned the role of ${body.role} by ${staff.fullname}.`,
-    });
+    // await Log.create({
+    //   title: "Staff role configured!",
+    //   description: `${foundStaff.fullname} has been assigned the role of ${body.role} by ${staff.fullname}.`,
+    // });
 
     return res.status(200).json({
       success: true,

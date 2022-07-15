@@ -75,7 +75,7 @@ const ResultScore = async (req, scoreType = "score", finalResult = null) => {
       scoreValue = 0;
     }
     // check if question is an appraisal A
-    if (score.question.description || score._qid == "AppraisalA") {
+    if (score?.question?.description || score._qid == "AppraisalA") {
       const appraisalAScores = await Score.find({
         user: req.user,
         _qid: "AppraisalA",
@@ -88,7 +88,7 @@ const ResultScore = async (req, scoreType = "score", finalResult = null) => {
       appraisalACurrentScore = 0;
       // calculate appraisal A score
       for (const [key, score] of Object.entries(appraisalAScores)) {
-        appraisalACurrentScore += score[`${scoreType}`].value;
+        appraisalACurrentScore += score[`${scoreType}`]?.value;
         console.log("appraisalACurrentScore: " + appraisalACurrentScore);
         let appraisalAMaxScore = appraisalA.length * answerOptions.length;
         console.log("appraisalAMaxScore: ", appraisalAMaxScore);
@@ -99,7 +99,7 @@ const ResultScore = async (req, scoreType = "score", finalResult = null) => {
   }
 
   for (const [key, result] of Object.entries(resultDict)) {
-    finalInitiativeScore += result.percentage;
+    finalInitiativeScore += result?.percentage;
   }
   // const finalScore = (finalInitiativeScore + finalAppraisalAScore) / 2;
   const finalScore = finalInitiativeScore * 0.8 + finalAppraisalAScore * 0.2;
@@ -146,8 +146,8 @@ const ResultScoreUpdate = async (
 
   for (const [key, score] of Object.entries(userScores)) {
     // check if question is an initiative
-    if (score.question.perspective || score._qid == "Initiative") {
-      const question = await Initiative.findById(score.question).populate(
+    if (score?.question?.perspective || score._qid == "Initiative") {
+      const question = await Initiative.findById(score?.question).populate(
         "perspective"
       );
       let scorePerspectiveTitle = question?.perspective?.title;
@@ -190,7 +190,7 @@ const ResultScoreUpdate = async (
       scoreValue = 0;
     }
     // check if question is an appraisal A
-    if (score.question.description || score._qid == "AppraisalA") {
+    if (score?.question?.description || score._qid == "AppraisalA") {
       const appraisalAScores = await Score.find({
         user: req.params.id,
         _qid: "AppraisalA",

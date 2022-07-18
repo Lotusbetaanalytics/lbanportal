@@ -395,24 +395,31 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
 
       await found.save();
 
-
-      const updatedReport = await Report.findById(found._id)
+      const updatedReport = await Report.findById(found._id);
 
       if (updatedReport["Second Quarter"] && updatedReport["Fourth Quarter"]) {
-       updatedReport["overall"] = Math.ceil(
-          (updatedReport["Second Quarter"] + updatedReport["Fourth Quarter"]) / 2
+        updatedReport["overall"] = Math.ceil(
+          (updatedReport["Second Quarter"] + updatedReport["Fourth Quarter"]) /
+            2
         );
-      } else if (!updatedReport["Second Quarter"] && updatedReport["Fourth Quarter"]) {
-       updatedReport["overall"] = Math.ceil(updatedReport["Fourth Quarter"]);
-      } else if (updatedReport["Second Quarter"] && !updatedReport["Fourth Quarter"]) {
-       updatedReport["overall"] = Math.ceil(updatedReport["Second Quarter"]);
-      }else if (!updatedReport["Second Quarter"] && !updatedReport["Fourth Quarter"]){
-       updatedReport["overall"] = 0;
-      }else{
-        updatedReport["overall"]=0;
+      } else if (
+        !updatedReport["Second Quarter"] ||
+        updatedReport["Fourth Quarter"]
+      ) {
+        updatedReport["overall"] = Math.ceil(updatedReport["Fourth Quarter"]);
+      } else if (
+        updatedReport["Second Quarter"] ||
+        !updatedReport["Fourth Quarter"]
+      ) {
+        updatedReport["overall"] = Math.ceil(updatedReport["Second Quarter"]);
+      } else if (
+        !updatedReport["Second Quarter"] &&
+        !updatedReport["Fourth Quarter"]
+      ) {
+        updatedReport["overall"] = 0;
       }
 
-     await updatedReport.save()
+      await updatedReport.save();
     }
 
     try {

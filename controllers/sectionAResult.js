@@ -24,14 +24,14 @@ const createSectionAResult = async (req, res) => {
       body.quarter = currentQuarter;
     }
     body.user = user;
-    body.score = Number(score.sectionAScore.toFixed(2));
+    body.score = Number(score?.sectionAScore?.toFixed(2) ?? 0);
 
     try {
-      const managerScore = await resultScore.ResultScore(
+      const managerScore = await resultScore.ResultScoreUpdate(
         req,
         (scoreType = "managerscore")
       );
-      body.managerscore = Number(managerScore.sectionAScore.toFixed(2));
+      body.managerscore = Number(managerScore?.sectionAScore?.toFixed(2) ?? 0);
     } catch (err) {
       console.log(err.message);
     }

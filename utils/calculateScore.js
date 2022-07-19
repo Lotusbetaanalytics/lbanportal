@@ -118,7 +118,7 @@ const ResultScore = async (req, scoreType = "score", finalResult = null) => {
 
 const ResultScoreUpdate = async (
   req,
-  scoreType = "score",
+  scoreType = "managerscore",
   finalResult = null
 ) => {
   // scoreType options are "score" or "managerscore"
@@ -203,7 +203,7 @@ const ResultScoreUpdate = async (
       appraisalACurrentScore = 0;
       // calculate appraisal A score
       for (const [key, score] of Object.entries(appraisalAScores)) {
-        appraisalACurrentScore += score[`${scoreType}`].value;
+        appraisalACurrentScore += score[`${scoreType}`]?.value;
         console.log("appraisalACurrentScore: " + appraisalACurrentScore);
         let appraisalAMaxScore = appraisalA.length * answerOptions.length;
         console.log("appraisalAMaxScore: ", appraisalAMaxScore);
@@ -214,7 +214,7 @@ const ResultScoreUpdate = async (
   }
 
   for (const [key, result] of Object.entries(resultDict)) {
-    finalInitiativeScore += result.percentage;
+    finalInitiativeScore += result?.percentage;
   }
   // const finalScore = (finalInitiativeScore + finalAppraisalAScore) / 2;
   const finalScore = finalInitiativeScore * 0.8 + finalAppraisalAScore * 0.2;

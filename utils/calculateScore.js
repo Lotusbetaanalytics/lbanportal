@@ -4,6 +4,7 @@ const AppraisalA = require("../models/AppraisalA");
 const Perspective = require("../models/Perspective");
 const Option = require("../models/Option");
 const current = require("./currentAppraisalDetails");
+const { ErrorResponse } = require("./errorResponse");
 
 const ResultScore = async (req, scoreType = "score", finalResult = null) => {
   // scoreType options are "score" or "managerscore"
@@ -130,6 +131,13 @@ const ResultScoreUpdate = async (
   }).populate("user question score managerscore");
   const answerOptions = await Option.find({});
   console.log(`answerOptions length: ${answerOptions.length}`);
+  // check if there are any scores
+  if (!userScores.length) {
+    throw new ErrorResponse(
+      "No scores found for this user in this quarter and session",
+      404
+    );
+  }
 
   const allPerspectives = await Perspective.find();
   let perspectiveTitles = [];
@@ -198,12 +206,30 @@ const ResultScoreUpdate = async (
         session: currentSession,
       }).populate("user question score managerscore");
       console.log(`appraisalAScores length: ${appraisalAScores.length}`);
+      // check if there are any appraisal A scores
+      if (!appraisalAScores.length) {
+        throw new ErrorResponse(
+          "No Section A scores found for this user in this quarter and session",
+          404
+        );
+      }
+
       const appraisalA = await AppraisalA.find();
       // let appraisalAScoreValue = 0
       appraisalACurrentScore = 0;
+      console.log(
+        "appraisalACurrentScore, before updating: " + appraisalACurrentScore
+      );
       // calculate appraisal A score
       for (const [key, score] of Object.entries(appraisalAScores)) {
+        // check if score is valid
+        if (!score[`${scoreType}`]) {
+          throw new ErrorResponse(`${scoretype} not valid!`, 404);
+        }
+
         appraisalACurrentScore += score[`${scoreType}`]?.value;
+        console.log(`Appraisal A Score`, score);
+        console.log(`Appraisal A ${scoreType}`, score[`${scoreType}`]);
         console.log("appraisalACurrentScore: " + appraisalACurrentScore);
         let appraisalAMaxScore = appraisalA.length * answerOptions.length;
         console.log("appraisalAMaxScore: ", appraisalAMaxScore);

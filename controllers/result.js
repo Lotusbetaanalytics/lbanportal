@@ -41,7 +41,7 @@ const createResult = async (req, res) => {
     body.sectionbscore = Number(score.sectionBScore.toFixed(2));
 
     try {
-      const managerScore = await resultScore.ResultScore(
+      const managerScore = await resultScore.ResultScoreUpdate(
         req,
         (scoreType = "managerscore")
       );
@@ -170,8 +170,11 @@ const updateCurrentResult = async (req, res) => {
       return new ErrorResponseJSON(res, "Result not found!", 400);
     }
 
-    const score = await resultScore(req);
-    const managerScore = await resultScore(req, (scoreType = "managerscore"));
+    const score = await resultScore.ResultScore(req);
+    const managerScore = await resultScore.ResultScoreUpdate(
+      req,
+      (scoreType = "managerscore")
+    );
     body.score = score;
     body.managerscore = Number(managerScore.toFixed(2));
 
@@ -352,7 +355,7 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
       return new ErrorResponseJSON(res, "You are not authorized!", 400);
     }
 
-    const score = await resultScore.ResultScoreUpdate(req);
+    const score = await resultScore.ResultScore(req);
     // const managerScore = await resultScore(req, (scoreType = "managerscore"));
     body.score = Number(score.score.toFixed(2));
     // body.managerscore = managerScore;
@@ -560,8 +563,11 @@ const updateResult = async (req, res) => {
       return new ErrorResponseJSON(res, "Result not found!", 400);
     }
 
-    const score = await resultScore(req);
-    const managerScore = await resultScore(req, (scoreType = "managerscore"));
+    const score = await resultScore.ResultScore(req);
+    const managerScore = await resultScore.ResultScoreUpdate(
+      req,
+      (scoreType = "managerscore")
+    );
     body.score = score;
     body.managerscore = managerScore;
 

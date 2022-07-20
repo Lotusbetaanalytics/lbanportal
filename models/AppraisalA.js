@@ -19,4 +19,12 @@ const AppraisalASchema = new mongoose.Schema({
   },
 });
 
+AppraisalASchema.pre("remove", async function (next) {
+  console.log("Deleting Section A Scores ...".brightblue);
+  await this.model("Score").deleteMany({question: this._id});
+  console.log("Section A Scores Deleted".bgRed);
+  next();
+});
+
+
 module.exports = mongoose.model("AppraisalA", AppraisalASchema);

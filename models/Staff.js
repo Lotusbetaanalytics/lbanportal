@@ -109,4 +109,19 @@ const StaffSchema = new mongoose.Schema({
   },
 });
 
+StaffSchema.pre("remove", async function (next) {
+  console.log("Deleting Initiatives ...".brightblue);
+  await this.model("Initiative").deleteMany({user: this._id});
+  console.log("Initiatives Deleted".bgRed);
+
+  console.log("Deleting Section A Results ...".brightblue);
+  await this.model("SectionAResult").deleteMany({user: this._id});
+  console.log("Section A Results Deleted".bgRed);
+
+  console.log("Deleting Test Results ...".brightblue);
+  await this.model("Result").deleteMany({user: this._id});
+  console.log("Test Results Deleted".bgRed);
+  next();
+});
+
 module.exports = mongoose.model("Staff", StaffSchema);

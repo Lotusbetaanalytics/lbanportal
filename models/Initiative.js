@@ -49,4 +49,11 @@ const InitiativeSchema = new mongoose.Schema({
   },
 });
 
+InitiativeSchema.pre("remove", async function (next) {
+  console.log("Deleting Section B Scores ...".brightblue);
+  await this.model("Score").deleteMany({question: this._id});
+  console.log("Section B Scores Deleted".bgRed);
+  next();
+});
+
 module.exports = mongoose.model("Initiative", InitiativeSchema);

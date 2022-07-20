@@ -20,7 +20,7 @@ router.get("/current", verifyToken, getCurrentUserScores); // get current score 
 router.get("/all", verifyToken, getUserScores); // get quarterly score for authenticated user
 router.get("/:id", verifyToken, getScore); // get score details by id
 router.patch("/:id", verifyToken, updateScore); // update score details by id
-router.delete("/:id", verifyToken, deleteScore); // delete score by id
+router.delete("/:id", deleteScore); // delete score by id
 router.get("/question/:id", verifyToken, getCurrentUserScoresByQuestionId); // get current score for autheticated user
 router.get("/staff/:id", verifyToken, getScoresByUserId); // get scores for a staff by staff id
 router.get("/staff/:id/:q_id", verifyToken, getScoreByUserIdAndQuestionId); // get a score for a staff by staff id and question

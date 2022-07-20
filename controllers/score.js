@@ -331,8 +331,20 @@ const deleteScore = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: score,
     });
+  } catch (err) {
+    return new ErrorResponseJSON(res, err.message, 500);
+  }
+};
+
+const deleteAScoreRecord = async (id) => {
+  try {
+    const score = await Score.findByIdAndDelete(id);
+    if (!score) {
+      return new ErrorResponseJSON(res, "Score not found!", 404);
+    }
+
+    return true;
   } catch (err) {
     return new ErrorResponseJSON(res, err.message, 500);
   }
@@ -350,4 +362,5 @@ module.exports = {
   getScore,
   updateScore,
   deleteScore,
+  deleteAScoreRecord,
 };

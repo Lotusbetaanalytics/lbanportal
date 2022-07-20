@@ -2,9 +2,12 @@ const Initiative = require("../models/Initiative");
 const UserInitiative = require("../models/Initiative");
 const Perspective = require("../models/Perspective");
 const Result = require("../models/Result");
+const Score = require("../models/Score");
 const Staff = require("../models/Staff");
 const current = require("../utils/currentAppraisalDetails");
 const { ErrorResponseJSON } = require("../utils/errorResponse");
+const { deleteAScoreRecord } = require("./score");
+const axios = require("axios");
 
 // Create an initiative
 const addInitiative = async (req, res) => {
@@ -35,6 +38,23 @@ const removeInitiative = async (req, res) => {
     const { id } = req.params;
 
     const foundInitiative = await UserInitiative.findByIdAndDelete(id);
+
+    //find score with the same initiative id
+    const foundScore = await Score.findOne({ question: id });
+
+    if (foundScore) {
+      console.log("deleting....");
+      await axios
+        .delete(
+          `https://lotusportalapi.herokuapp.com/api/v1/score/${foundScore._id}`
+        )
+        .then((response) => {
+          console.log("response deleted");
+        })
+        .catch((error) => {
+          console.log("error deleting score", error);
+        });
+    }
 
     if (!foundInitiative) {
       return new ErrorResponseJSON(res, "Initiative not found!", 404);

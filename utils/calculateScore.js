@@ -224,7 +224,7 @@ const ResultScoreUpdate = async (
       for (const [key, score] of Object.entries(appraisalAScores)) {
         // check if score is valid
         if (!score[`${scoreType}`]) {
-          throw new ErrorResponse(`${scoretype} not valid!`, 404);
+          throw new ErrorResponse(`${scoreType} not valid!`, 404);
         }
 
         appraisalACurrentScore += score[`${scoreType}`]?.value;

@@ -17,7 +17,16 @@ const createSectionAResult = async (req, res) => {
       quarter: currentQuarter,
     });
 
-    const score = await resultScore.ResultScore(req);
+    // const score = await resultScore.ResultScore(req);
+
+    // if req.params.id exists, get staff using req.params.id, else, use req.user
+    // calculate manager score
+    let score;
+    if (req.params.id) {
+      score = await resultScore.ResultScoreUpdate(req, "score");
+    } else {
+      score = await resultScore.ResultScore(req);
+    }    
 
     if (!session || !quarter) {
       body.session = currentSession;
@@ -27,10 +36,26 @@ const createSectionAResult = async (req, res) => {
     body.score = Number(score?.sectionAScore?.toFixed(2) ?? 0);
 
     try {
-      const managerScore = await resultScore.ResultScoreUpdate(
-        req,
-        (scoreType = "managerscore")
-      );
+      // const managerScore = await resultScore.ResultScoreUpdate(
+      //   req,
+      //   (scoreType = "managerscore")
+      // );
+
+      // if req.params.id exists, get staff using req.params.id, else, use req.user
+      // calculate manager score
+      let managerScore;
+      if (req.params.id) {
+        managerScore = await resultScore.ResultScoreUpdate(
+          req,
+          (scoreType = "managerscore")
+        );
+      } else {
+        managerScore = await resultScore.ResultScore(
+          req,
+          (scoreType = "managerscore")
+        );
+      }
+
       body.managerscore = Number(managerScore?.sectionAScore?.toFixed(2) ?? 0);
     } catch (err) {
       console.log(err.message);

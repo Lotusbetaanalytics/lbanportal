@@ -29,7 +29,16 @@ const createResult = async (req, res) => {
       quarter: currentQuarter,
     });
 
-    const score = await resultScore.ResultScore(req);
+    // score = await resultScore.ResultScore(req);
+
+    // if req.params.id exists, get staff using req.params.id, else, use req.user
+    // calculate manager score
+    let score;
+    if (req.params.id) {
+      score = await resultScore.ResultScoreUpdate(req, "score");
+    } else {
+      score = await resultScore.ResultScore(req);
+    }
 
     if (!session || !quarter) {
       body.session = currentSession;
@@ -41,10 +50,25 @@ const createResult = async (req, res) => {
     body.sectionbscore = Number(score.sectionBScore.toFixed(2));
 
     try {
-      const managerScore = await resultScore.ResultScoreUpdate(
-        req,
-        (scoreType = "managerscore")
-      );
+      // managerScore = await resultScore.ResultScoreUpdate(
+      //   req,
+      //   (scoreType = "managerscore")
+      // );
+
+      // if req.params.id exists, get staff using req.params.id, else, use req.user
+      // calculate manager score
+      let managerScore;
+      if (req.params.id) {
+        managerScore = await resultScore.ResultScoreUpdate(
+          req,
+          (scoreType = "managerscore")
+        );
+      } else {
+        managerScore = await resultScore.ResultScore(
+          req,
+          (scoreType = "managerscore")
+        );
+      }
       body.managerscore = Number(managerScore.score.toFixed(2));
       body.sectionamanagerscore = Number(managerScore.sectionAScore.toFixed(2));
       body.sectionbmanagerscore = Number(managerScore.sectionBScore.toFixed(2));
@@ -170,11 +194,38 @@ const updateCurrentResult = async (req, res) => {
       return new ErrorResponseJSON(res, "Result not found!", 400);
     }
 
-    const score = await resultScore.ResultScore(req);
-    const managerScore = await resultScore.ResultScoreUpdate(
-      req,
-      (scoreType = "managerscore")
-    );
+    // const score = await resultScore.ResultScore(req);
+
+    // if req.params.id exists, get staff using req.params.id, else, use req.user
+    // calculate manager score
+    let score;
+    if (req.params.id) {
+      score = await resultScore.ResultScoreUpdate(req, "score");
+    } else {
+      score = await resultScore.ResultScore(req);
+    }
+
+
+    // const managerScore = await resultScore.ResultScoreUpdate(
+    //   req,
+    //   (scoreType = "managerscore")
+    // );
+
+    // if req.params.id exists, get staff using req.params.id, else, use req.user
+    // calculate manager score
+    let managerScore;
+    if (req.params.id) {
+      managerScore = await resultScore.ResultScoreUpdate(
+        req,
+        (scoreType = "managerscore")
+      );
+    } else {
+      managerScore = await resultScore.ResultScore(
+        req,
+        (scoreType = "managerscore")
+      );
+    }
+
     body.score = score;
     body.managerscore = Number(managerScore.toFixed(2));
 
@@ -355,16 +406,42 @@ const UpdateCurrentResultByStaffId = async (req, res) => {
       return new ErrorResponseJSON(res, "You are not authorized!", 400);
     }
 
-    const score = await resultScore.ResultScore(req);
+    // const score = await resultScore.ResultScore(req);
+
+    // if req.params.id exists, get staff using req.params.id, else, use req.user
+    // calculate manager score
+    let score;
+    if (req.params.id) {
+      score = await resultScore.ResultScoreUpdate(req, "score");
+    } else {
+      score = await resultScore.ResultScore(req);
+    }
+
     // const managerScore = await resultScore(req, (scoreType = "managerscore"));
     body.score = Number(score.score.toFixed(2));
     // body.managerscore = managerScore;
 
     try {
-      const managerScore = await resultScore.ResultScoreUpdate(
-        req,
-        (scoreType = "managerscore")
-      );
+      // const managerScore = await resultScore.ResultScoreUpdate(
+      //   req,
+      //   (scoreType = "managerscore")
+      // );
+
+      // if req.params.id exists, get staff using req.params.id, else, use req.user
+      // calculate manager score
+      let managerScore;
+      if (req.params.id) {
+        managerScore = await resultScore.ResultScoreUpdate(
+          req,
+          (scoreType = "managerscore")
+        );
+      } else {
+        managerScore = await resultScore.ResultScore(
+          req,
+          (scoreType = "managerscore")
+        );
+      }
+
       body.managerscore = Number(managerScore.score.toFixed(2));
       body.sectionamanagerscore = Number(managerScore.sectionAScore.toFixed(2));
       body.sectionbmanagerscore = Number(managerScore.sectionBScore.toFixed(2));
@@ -563,11 +640,37 @@ const updateResult = async (req, res) => {
       return new ErrorResponseJSON(res, "Result not found!", 400);
     }
 
-    const score = await resultScore.ResultScore(req);
-    const managerScore = await resultScore.ResultScoreUpdate(
-      req,
-      (scoreType = "managerscore")
-    );
+    // const score = await resultScore.ResultScore(req);
+
+    // if req.params.id exists, get staff using req.params.id, else, use req.user
+    // calculate manager score
+    let score;
+    if (req.params.id) {
+      score = await resultScore.ResultScoreUpdate(req, "score");
+    } else {
+      score = await resultScore.ResultScore(req);
+    }
+
+    // const managerScore = await resultScore.ResultScoreUpdate(
+    //   req,
+    //   (scoreType = "managerscore")
+    // );
+
+    // if req.params.id exists, get staff using req.params.id, else, use req.user
+    // calculate manager score
+    let managerScore;
+    if (req.params.id) {
+      managerScore = await resultScore.ResultScoreUpdate(
+        req,
+        (scoreType = "managerscore")
+      );
+    } else {
+      managerScore = await resultScore.ResultScore(
+        req,
+        (scoreType = "managerscore")
+      );
+    }
+    
     body.score = score;
     body.managerscore = managerScore;
 

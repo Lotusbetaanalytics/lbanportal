@@ -46,7 +46,17 @@ const calculateSectionAScore = async (userId, session, quarter, scoreType) => {
     }
 
     // get the first response (score) for a section a question
-    let instanceScoreValue = await instanceScores[0][`${scoreType}`].value || 0
+    let instanceScoreValue;
+    if (instanceScores.length < 1 || instanceScores[0][`${scoreType}`] == undefined) {
+      // throw new ErrorResponse(`There are multiple responses for Section A with id: ${instance._id}`)
+      console.log(`There are no responses for Section A with id: ${instance._id}`.bgBlue)
+      instanceScoreValue = 0
+      // continue  // this does not break the calculation
+    } else {
+      console.log(instanceScores)
+      instanceScoreValue = await instanceScores[0][`${scoreType}`].value || 0
+    }
+    // let instanceScoreValue = await instanceScores[0][`${scoreType}`].value || 0
     console.log("instanceScoreValue", instanceScoreValue)
 
     // add the score value for the first response to a list
@@ -59,7 +69,7 @@ const calculateSectionAScore = async (userId, session, quarter, scoreType) => {
 
   console.log("sectionAScore", sectionAScore)
 
-  // calculate the final score for section a
+  // calculate the final score for section a as a percentage
   const sectionAFinalScore = (sectionAScore / sectionAMaxScore) * 100;
   console.log("sectionAFinalScore", sectionAFinalScore)
 
@@ -76,9 +86,9 @@ const calculateSectionBScore = async (userId, session, quarter, scoreType, detai
   }).populate("perspective result");
   const largestAnswerOption = await Option.findOne().sort("-value")
 
-  const sectionBLength = sectionB.length;  // get length of all section a questions
-  const largestAnswerOptionValue = largestAnswerOption.value;  // get max value for section a options
-  let sectionBMaxScore = sectionBLength * largestAnswerOptionValue;  // calculate section a max score
+  const sectionBLength = sectionB.length;  // get length of all section b questions
+  const largestAnswerOptionValue = largestAnswerOption.value;  // get max value for section b options
+  let sectionBMaxScore = sectionBLength * largestAnswerOptionValue;  // calculate section b max score
 
   console.log("scoreType", scoreType)
   console.log("largestAnswerOption value, sectionBLength, sectionBMaxScore: ", largestAnswerOptionValue, sectionBLength, sectionBMaxScore)
@@ -98,22 +108,7 @@ const calculateSectionBScore = async (userId, session, quarter, scoreType, detai
 
   console.log("results, before calculation: ", results)
 
-  // // create a list of perspective titles
-  // const perspectiveTitles = []
-  // for (const [key, perspective] of Object.entries(allPerspectives)) {
-  //   perspectiveTitles.push(perspective?.title);
-  // }
-  
-  // const results = {}
-
-  // for (const title in perspectiveTitles) resultsDict[`${title}`] = {
-  //   score: 0,
-  //   percentage: 0,
-  //   len: 0,
-  //   maxScore: 0,
-  //   maxPercentage: scorePerspective.percentage,
-  // }
-  let sectionBScore = 0  // the section a score value
+  let sectionBScore = 0  // the section b score value
 
   for (const [index, instance] of Object.entries(sectionB)) {
     console.log("index: ", index)
@@ -130,15 +125,15 @@ const calculateSectionBScore = async (userId, session, quarter, scoreType, detai
       session: session,
     }).populate("user question score managerscore");
 
-    // check if there are multiple responses (scores) for the same section a question
+    // check if there are multiple responses (scores) for the same section b question
     if (instanceScores.length > 1) {
       // throw new ErrorResponse(`There are multiple responses for Initiative with id: ${instance._id}`)
       console.log(`There are multiple responses for Initiative with id: ${instance._id}`.red)
     }
 
-    // get the first response (score) for a section a question
+    // get the first response (score) for a section b question
     let instanceScoreValue;
-    if (instanceScores.length < 1) {
+    if (instanceScores.length < 1 || instanceScores[0][`${scoreType}`] == undefined) {
       // throw new ErrorResponse(`There are multiple responses for Initiative with id: ${instance._id}`)
       console.log(`There are no responses for Initiative with id: ${instance._id}`.bgBlue)
       instanceScoreValue = 0
@@ -147,14 +142,6 @@ const calculateSectionBScore = async (userId, session, quarter, scoreType, detai
       instanceScoreValue = await instanceScores[0][`${scoreType}`].value || 0
     }
     console.log("instanceScoreValue", instanceScoreValue)
-    
-    
-    // results[`${title}`].score += instanceScoreValue;
-    // results[`${title}`].len += 1;
-    // results[`${title}`].maxScore =
-    //   results[`${title}`].len * answerOptions.length;
-    // // calculate score as a percentage out of 25%
-    // results[`${title}`].percentage = (results[`${title}`].score / results[`${title}`].maxScore) * results[`${title}`].maxPercentage;
     
     // update the result object with this instance's details
     item.score += instanceScoreValue;
@@ -171,6 +158,7 @@ const calculateSectionBScore = async (userId, session, quarter, scoreType, detai
   
   if (detailed) return results
 
+  // calculate section b score as a percentage
   for (const [key, result] of Object.entries(results)) {
     sectionBScore += result.percentage;
   }
@@ -180,11 +168,11 @@ const calculateSectionBScore = async (userId, session, quarter, scoreType, detai
 }
 
 
-
 const calculateScore = async (req, scoreType = "score", finalResult = undefined) => {
   /**
    * @summary
    *  Calculate total appraisal score for a user
+   * 
    * @param scoreType - Type of score being calculated. Options are "score" or "managerscore"
    */
 
@@ -219,115 +207,6 @@ const calculateScore = async (req, scoreType = "score", finalResult = undefined)
     sectionBScore: finalInitiativeScore,
   };
 };
-
-
-// const calculateScoreDepreciated = async (req, scoreType = "score", isLineManager = false, finalResult = null) => {
-//   /**
-//    * @param scoreType - Type of score being calculated. Options are "score" or "managerscore"
-//    * @param isLineManager - Specify if authenticated staff is a line manager
-//    */
-
-//   const userId = getUserId(req)
-//   console.log("userId: ", userId)
-
-//   // get current quarter and session
-//   const { currentSession, currentQuarter } = await current();
-
-//   const userScores = await Score.find({
-//     user: userId,
-//     quarter: currentQuarter,
-//     session: currentSession,
-//   }).populate("user question score managerscore");
-//   console.log(`userScores length: ${userScores.length}`);
-//   const answerOptions = await Option.find({});
-//   console.log(`answerOptions length: ${answerOptions.length}`);
-
-//   const allPerspectives = await Perspective.find();
-//   let perspectiveTitles = [];
-//   let scoreValue = 0;
-//   let resultDict = {};
-//   let finalInitiativeScore = 0;
-//   let finalAppraisalAScore = 0;
-//   let appraisalACurrentScore = 0;
-
-//   // create a list of perspective titles
-//   for (const [key, perspective] of Object.entries(allPerspectives)) {
-//     perspectiveTitles.push(perspective?.title);
-//   }
-
-//   const sectionAFinalScore = await calculateSectionAScore(userId, currentSession, currentQuarter, scoreType)
-//   console.log("section a final score in calculate score function: ", sectionAFinalScore)
-
-
-//   for (const [key, score] of Object.entries(userScores)) {
-//     // // check if question is an initiative
-//     if (score?.question?.perspective || score._qid == "Initiative") {
-//       const question = await Initiative.findById(score?.question).populate(
-//         "perspective"
-//       );
-//       let scorePerspectiveTitle = question?.perspective?.title;
-
-//       for (let i = 0; i < perspectiveTitles.length; i++) {
-//         if (scorePerspectiveTitle == perspectiveTitles[i]) {
-//           const scorePerspective = await Perspective.findOne({
-//             title: scorePerspectiveTitle,
-//           });
-//           let title = perspectiveTitles[i];
-//           let oldValue = 0;
-//           let oldLength = 0;
-//           // store old resultDict[`${title}`] values if they exist
-//           if (resultDict[`${title}`]) {
-//             oldValue = resultDict[`${title}`].score;
-//             oldLength = resultDict[`${title}`].len;
-//           }
-//           // increment old score by new score
-//           scoreValue = oldValue + score[`${scoreType}`].value;
-//           // initialize resultDict[`${title}`]
-//           resultDict[`${title}`] = {
-//             score: 0,
-//             percentage: 0,
-//             len: 0,
-//             maxScore: 0,
-//             maxPercentage: scorePerspective.percentage,
-//           };
-
-//           resultDict[`${title}`].score += scoreValue;
-//           resultDict[`${title}`].len = oldLength + 1;
-//           resultDict[`${title}`].maxScore =
-//             resultDict[`${title}`].len * answerOptions.length;
-//           // calculate score as a percentage out of 25%
-//           resultDict[`${title}`].percentage =
-//             (resultDict[`${title}`].score / resultDict[`${title}`].maxScore) *
-//             resultDict[`${title}`].maxPercentage;
-//         }
-//       }
-//       // reset scoreValue to 0
-//       scoreValue = 0;
-//     }
-//   }
-
-//   for (const [key, result] of Object.entries(resultDict)) {
-//     finalInitiativeScore += result?.percentage;
-//   }
-
-//   finalAppraisalAScore = sectionAFinalScore
-//   // const finalScore = (finalInitiativeScore + finalAppraisalAScore) / 2;
-//   const finalScore = finalInitiativeScore * 0.8 + finalAppraisalAScore * 0.2;
-
-//   if (finalResult) {
-//     finalResult.score = finalScore;
-//     finalResult.save();
-//   }
-//   // return finalScore;
-//   console.log("final score: ", finalScore)
-//   console.log(SomeBullShitToBreakTheCode)
-
-//   return {
-//     score: finalScore,
-//     sectionAScore: finalAppraisalAScore,
-//     sectionBScore: finalInitiativeScore,
-//   };
-// };
 
 
 const ResultScore = async (req, scoreType = "score", finalResult = null) => {

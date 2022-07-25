@@ -1,5 +1,7 @@
 /node_modules
 store.js
+test.js
+db_backup/
 .env
 t Timer",
 todo.md

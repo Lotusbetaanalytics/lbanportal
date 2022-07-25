@@ -16,4 +16,10 @@ const firstName = (words) => {
 // const hrEmail = "akinwalejude@gmail.com";
 const hrEmail = "oluwayemisi@lotusbetaanalytics.com";
 
+// const fixPerspectives = (initiatives) => {
+//   for (const [key, initiative] of Object.entries(initiatives)) {
+//     console.log(initiative.perspective)
+//   }
+// }
+
 module.exports = { convertQuarter, hrEmail, firstName };

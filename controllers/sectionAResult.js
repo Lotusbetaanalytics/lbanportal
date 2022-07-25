@@ -1,4 +1,5 @@
 const SectionAResult = require("../models/SectionAResult");
+const Initiative = require("../models/Initiative");
 const current = require("../utils/currentAppraisalDetails");
 const resultScore = require("../utils/calculateScore");
 const { calculateScore } = require("../utils/calculateScore")
@@ -18,21 +19,23 @@ const createSectionAResult = async (req, res) => {
       quarter: currentQuarter,
     });
 
-    // const score = await resultScore.ResultScore(req);
+    // // const score = await resultScore.ResultScore(req);
 
-    // if req.params.id exists, get staff using req.params.id, else, use req.user
-    // calculate manager score
-    let score;
-    if (req.params.id) {
-      console.log("req.params found")
-      console.log("score calculated")
-      score = await resultScore.ResultScoreUpdate(req, "score");
-    } else {
-      console.log("req.params not found")
-      console.log("score calculated")
-      score = await resultScore.ResultScore(req);
-      // score = await calculateScore(req)
-    }    
+    // // if req.params.id exists, get staff using req.params.id, else, use req.user
+    // // calculate manager score
+    // let score;
+    // if (req.params.id) {
+    //   console.log("req.params found")
+    //   console.log("score calculated")
+    //   score = await resultScore.ResultScoreUpdate(req, "score");
+    // } else {
+    //   console.log("req.params not found")
+    //   console.log("score calculated")
+    //   // score = await resultScore.ResultScore(req);
+    //   score = await calculateScore(req)
+    // }    
+
+    let score = await calculateScore(req)
 
     if (!session || !quarter) {
       body.session = currentSession;
@@ -42,29 +45,31 @@ const createSectionAResult = async (req, res) => {
     body.score = Number(score?.sectionAScore?.toFixed(2) ?? 0);
 
     try {
-      // const managerScore = await resultScore.ResultScoreUpdate(
-      //   req,
-      //   (scoreType = "managerscore")
-      // );
+      // // const managerScore = await resultScore.ResultScoreUpdate(
+      // //   req,
+      // //   (scoreType = "managerscore")
+      // // );
 
-      // if req.params.id exists, get staff using req.params.id, else, use req.user
-      // calculate manager score
-      let managerScore;
-      if (req.params.id) {
-        console.log("req.params found")
-      console.log("manager score calculated")
-        managerScore = await resultScore.ResultScoreUpdate(
-          req,
-          (scoreType = "managerscore")
-        );
-      } else {
-        console.log("req.params not found")
-      console.log("manager score calculated")
-        managerScore = await resultScore.ResultScore(
-          req,
-          (scoreType = "managerscore")
-        );
-      }
+      // // if req.params.id exists, get staff using req.params.id, else, use req.user
+      // // calculate manager score
+      // let managerScore;
+      // if (req.params.id) {
+      //   console.log("req.params found")
+      // console.log("manager score calculated")
+      //   managerScore = await resultScore.ResultScoreUpdate(
+      //     req,
+      //     (scoreType = "managerscore")
+      //   );
+      // } else {
+      //   console.log("req.params not found")
+      // console.log("manager score calculated")
+      //   managerScore = await resultScore.ResultScore(
+      //     req,
+      //     (scoreType = "managerscore")
+      //   );
+      // }
+
+      let managerScore = await calculateScore(req, "managerscore")
 
       body.managerscore = Number(managerScore?.sectionAScore?.toFixed(2) ?? 0);
     } catch (err) {
